@@ -1,0 +1,187 @@
+-- $Id: view.tlu 43228 2017-02-14 22:30:46Z karl $
+-- view.tlu view a document and/or display the list of results in texdoc
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+-----------------------------   view a document   ------------------------------
+
+-- view a document
+-- see search.tlu for the structure of the argument
+function view_doc(docfile)
+    return view_file(docfile.realpath)
+end
+
+-- get viewer and viewer_replacement before calling try_viewing
+-- returns false of failure, true on success
+-- viewer_replacement is either:
+-- 1. the filename, quoted with "
+-- 2. the filename, quoted with " followed by some rm commands
+-- The second case happens when the doc was zipped. In the case, this function
+-- unzips it in a tempdir so that the viewer command can use the unzipped file.
+function view_file (filename)
+    local viewer, viewer_replacement
+    -- check if the file is zipped
+    local nozipname, zipext = parse_zip(filename)
+    -- determine viewer_replacement
+    if zipext then
+        local unzip_cmd = config['unzip_'..zipext]
+        if not unzip_cmd then
+            err_print('error',
+            "No unzip command for ."..zipext..' files, skipping '..filename)
+            return false
+        end
+        local tmpdir = os.tmpdir("/tmp/texdoc.XXXXXX")
+        if not tmpdir then
+            err_print('error', 'Failed to create tempdir to unzip.')
+            return false
+        end
+        local basename = string.match(nozipname, '.*/(.*)$') or nozipname
+        local tmpfile = '"'..tmpdir..'/'..basename..'"'
+        local unzip = unzip_cmd..' "'..filename..'">'..tmpfile
+        deb_print('view', "Unzip command: "..unzip)
+        if not os.execute(unzip) then
+            err_print('error', "Failed to unzip '"..filename.."'")
+            os.remove(tmpfile)
+            os.remove(tmpdir)
+            return false
+        end
+        viewer_replacement = ''..tmpfile..'; '
+            ..config.rm_file..' '..tmpfile..'; '
+            ..config.rm_dir..' '..tmpdir
+        filename = nozipname
+    else
+        viewer_replacement = '"'..w32_path(filename)..'"'
+    end
+    -- files without extension are assumed to be text
+    local viewext = (filename:match('.*%.([^/]*)$') or 'txt'):lower()
+    -- special case : sty files use txt viewer
+    if viewext == 'sty' then viewext = 'txt' end
+    -- FIXME: hardcoding such cases this way is not very clean
+    if viewext == 'texlive' then viewext = 'txt' end
+    if viewext == 'htm' then viewext = 'html' end
+    -- get a viewer from built-in defaults if not already set
+    if not config['viewer_'..viewext] then
+        get_default_viewers()
+    end
+    -- still no viewers? use txt as a fallback
+    if not config['viewer_'..viewext] then
+        err_print('warning',
+            "No viewer_"..viewext.." defined, using viewer_txt.")
+        viewext = 'txt'
+    end
+    assert(config['viewer_'..viewext], 'Internal error: no viewer found.')
+    return try_viewing(config['viewer_'..viewext], viewer_replacement)
+end
+
+-- view a file, if possible
+function try_viewing (view_command, viewer_replacement)
+    if string.match (view_command, C.place_holder) then
+        view_command = string.gsub(
+        view_command, C.place_holder, viewer_replacement)
+    else
+        view_command = view_command..' '..viewer_replacement
+    end
+    -- try to catch problems with missing DISPLAY on Unix
+    if os.type == 'unix' and not (os.name == 'macosx')
+            and os.getenv('DISPLAY') == nil then
+        err_print('warning',
+        "DISPLAY is not set. Things may go wrong with you viewer.")
+        err_print('warning',
+        "Try --list if you want results to be listed, not displayed.")
+    end
+    err_print('info', 'View command: '..view_command)
+    if not os.execute(view_command) then
+        err_print('error', "Failed to execute '"..view_command.."'")
+        return false
+    end
+    return true
+end
+
+-----------------------------   display results   ------------------------------
+
+-- print a list of docfile objects (see search.tlu) as a menu
+-- if showall is false, stop as soon as a bad result is encountered
+function print_menu(name, doclist, showall)
+    local max_lines = tonumber(config.max_lines)
+    if config.interact_switch and doclist[max_lines+1] then
+        -- there may be too many lines, count them
+        local n
+        if showall then
+            n = #doclist
+        else
+            n = 0
+            while doclist[n+1] and doclist[n+1].quality == 'good' do
+                n = n + 1
+            end
+        end
+        if n > max_lines then
+            io.write (n, " results.  Display them all? (y/N) ")
+            local ans = io.read('*line')
+            if not ((ans == 'y') or (ans == 'Y')
+                -- io.read had a bug wrt windows eol on some versions of texlua
+                or (ans == '\ry') or (ans == '\rY')) then
+                return
+            end
+        end
+    end
+    local i, doc
+    for i, doc in ipairs (doclist) do
+        if doc.quality == 'killed' then break end
+        if doc.quality ~= 'good' and not showall then break end
+        if config.machine_switch == true then
+            print(name, doc.score, w32_path(doc.realpath),
+            doc.lang or '', doc.details or '')
+        else
+            print(string.format('%2d %s', i, w32_path(doc.realpath)))
+            if doc.details or doc.lang then
+                local line = '   = '
+                if doc.lang then line = line..'['..doc.lang..'] ' end
+                if doc.details then line = line..doc.details end
+                print(line)
+            end
+        end
+    end
+    if config.interact_switch then
+        io.write ("Please enter the number of the file to view, ",
+        "anything else to skip: ")
+        local num = tonumber(io.read('*line'))
+        if num and doclist[num] then
+            view_doc(doclist[num])
+        end
+    end
+end
+
+-----------------------   deliver results base on mode   -----------------------
+
+function deliver_results(name, doclist, many)
+    -- ensure that results were found or apologize
+    if not doclist[1] or doclist[1].quality == 'killed' then
+        if not config.machine_switch then
+            local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
+            print(msg) -- get rid of gsub's 2nd value
+        end
+        return
+    end
+    -- shall we show all of them or only the "good" ones?
+    local showall = (config.mode == 'showall')
+    if not showall and doclist[1].quality ~= 'good' then
+        showall = true
+        err_print('info', 'No good result found, showing all results.')
+    end
+    -- view result or show menu based on mode and number of results
+    if (config.mode == 'view')
+        or config.mode == 'mixed' and (not doclist[2]
+            or (doclist[2].quality ~= 'good' and not showall)) then
+        view_doc(doclist[1])
+    else
+        if many and not config.machine_switch then 
+            print ("*** Results for: "..name.." ***")
+        end
+        print_menu(name, doclist, showall)
+    end
+end
+
+return {
+    view_file       = view_file,
+    deliver_results = deliver_results,
+}
