@@ -1,0 +1,84 @@
+-- check-aliases.tlu: check aliases in texdoc.cnf
+--
+-- Two points are checked:
+-- 1. Aliases should modify the (ordered) list of results or they are useless.
+-- 2. A sty file should always be alone in the list of results.
+--
+-- Usage: use the Perl wrapper
+--
+-- Manuel Pégourié-Gonnard, 2010. WTFPL v2.
+
+-- initialize kpathsea
+kpse.set_program_name(arg[-1], 'texdoc')
+
+-- load texdoclib
+local texdoc = require('texdoc.texdoclib')
+
+-- return true iff the two doclists are equal
+local function dl_equal(a, b)
+    if #a ~= #b then return false end
+    for i = 1, #a do
+        if a[i].realpath ~= b[i].realpath then return false end
+    end
+    return true
+end
+
+-- return true iff there is a sty in a and something good in b
+local function sty_not_alone(a, b)
+    if #b == 0 then return false end
+    if b[1].score < 4.5 then return false end
+    for _, df in ipairs(a) do
+        if df.realpath:match('%.sty$') then
+            return true
+        end
+    end
+    return false
+end
+
+-- removes elements with score < 0 from a doclist
+local function cleanup(dl)
+    for i = 1, #dl do
+        if dl[i].score < 0 then dl[i] = nil end
+    end
+end
+
+-- get started
+texdoc.setup_config_and_alias({})
+texdoc.init_databases()
+
+-- check all aliased names
+local useless = {}
+local mostly_useless = {}
+local badsty = {}
+for name in texdoc.aliased_names() do
+    local with = texdoc.get_doclist(name)
+    local without = texdoc.get_doclist(name, true)
+    if dl_equal(with, without) then
+        table.insert(useless, name)
+    else
+        if sty_not_alone(with, without) then
+            table.insert(badsty, name)
+        end
+        cleanup(with)
+        cleanup(without)
+        if dl_equal(with, without) then
+            table.insert(mostly_useless, name)
+        end
+    end
+end
+
+-- print out the results
+if #useless > 0 then
+    print 'Useless aliases:'
+    for _, a in ipairs(useless) do print('  '..a) end
+end
+if #mostly_useless > 0 then
+    print 'Mostly useless aliases:'
+    for _, a in ipairs(mostly_useless) do print('  '..a) end
+end
+if #badsty > 0 then
+    print 'Bad sty aliases:'
+    for _, a in ipairs(badsty) do print('  '..a) end
+end
+
+os.exit(0)

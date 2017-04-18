@@ -1,0 +1,79 @@
+-- main.tlu: default command-line interface of texdoc
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+-- load texdoclib (kpse initialized by the wrapper)
+local texdoc = require('texdoc.texdoclib')
+
+-- exit codes
+local exit_ok = 0
+local exit_error = 1 -- apparently hard-coded in Lua
+local exit_usage = 2
+
+-- action command-line options, not treated by setup_config_and_alias
+local action_help = [[
+  -h, --help            Print this help message.
+  -V, --version         Print the version number.
+  -f, --files           Print the list of configuration files used.
+  --just-view file      Display file, given with full path (no searching).]]
+local action_opts = {
+    ['-h']          = 'help',
+    ['--help']      = 'help',
+    ['-V']          = 'version',
+    ['--version']   = 'version',
+    ['-f']          = 'files',
+    ['--files']     = 'files',
+    ['--just-view'] = 'view',
+}
+
+-- detect action options, but do not act now (some need setup_config)
+local action
+if arg[1] then
+    action = action_opts[arg[1]]
+    if action then table.remove(arg, 1) end
+end
+
+-- get configuration
+if not texdoc.setup_config_and_alias(arg) then
+    os.exit(exit_usage)
+end
+
+-- handle action options
+if action == 'help' then
+    texdoc.print_usage(action_help)
+    os.exit(exit_ok)
+elseif action == 'version' then
+    print(texdoc.const.progname .. ' ' .. texdoc.const.version)
+    print('\n' .. texdoc.const.copyright_msg)
+    os.exit(exit_ok)
+elseif action =='files' then
+    print(texdoc.const.fullname .. ' ' .. texdoc.const.version)
+    texdoc.show_config_files(print, true)
+    os.exit(exit_ok)
+elseif action == 'view' then
+    local ok = texdoc.view_file(arg[1])
+    os.exit(ok and exit_ok or exit_error)
+end
+
+-- make sure we actually have argument(s)
+if not arg[1] then
+    texdoc.print_usage()
+    os.exit(exit_usage)
+end
+
+-- initialise databases
+texdoc.init_databases()
+
+-- main loop
+local docname
+for _, docname in ipairs(arg) do
+    -- do we have more then one argument?
+    local multiarg = not not arg[2]
+    -- get results
+    local doclist = texdoc.get_doclist(docname)
+    -- deliver results to the user
+    texdoc.deliver_results(docname, doclist, multiarg)
+end
+
+-- the end
+os.exit(exit_ok)

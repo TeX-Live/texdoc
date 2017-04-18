@@ -1,0 +1,244 @@
+Version 0.85
+------------
+
+Compatibility with LuaTeX 0.74+ (Lua 5.2).
+
+Version 0.84 (TeX Live 2012)
+============================
+
+Fix -f output when TEXMFHOME contains a list of paths. Bug sort-of reported
+by Matthew Leingang, see http://tex.stackexchange.com/questions/42920/
+
+Version 0.83
+------------
+
+Minor adjustments in the scoring system.
+
+Version 0.82
+------------
+
+Fixes to the default viewer/destkop environment detection:
+- try gvfs-open with Gnome
+- always try xdg-open first (usually more up-to-date)
+Thanks to Axel E. Retif for informing me that newer versions of Ubuntu don't
+ship gnome-open by default any more.
+
+Version 0.81 (TeX Live 2011)
+============================
+
+Allow configuration files to be found in all TEXMF trees.
+The default one should now be installed in TEXMFDIST (in upstream TeX Live) or
+in a tree search after TEXMFLOCAL (in downstream distros).
+
+Delay default viewer detection, see:
+http://tug.org/pipermail/tex-live/2011-May/029150.html
+
+Drop long-deprecated things:
+- --search (-> --showall), --verbosity-level and old syntax of -v
+- alias_switch, -a, -A, --alias, --noalias
+- 'regex' mode,
+
+Various internal cleanups and rearrangements.
+
+Version 0.80
+============
+
+New 'lang' configuration option (defaults on system locale): now <name>-de.pdf
+wins over <name>.pdf if German is preferred. Patch kindly provided by Philipp
+Stephani. Also works with aliases (eg koma-de = scrguide wins over koma =
+scrguien).
+
+Document the previously undocumented options from 0.72-tl2010.
+
+Accept htm as a valid extension, synonym for html. Emit less warnings about
+viewers.
+
+Version 0.72 as in TeX Live 2010
+--------------------------------
+
+New (undocumented) settings (bad)basenme_list, parallel to (bad)ext_list.
+
+New (undocumented) setting item suffix_list for known documentation suffixes,
+previously hardcoded.
+
+New (undocumented) option --just-view for use by front-end programs.
+
+Version 0.72
+------------
+
+Fix stupid bug introduced in 0.70: texdoc would crash if called without
+arguments. (Reported by Maxime Chupin.)
+
+Version 0.71
+------------
+
+Fix bug introduced in 0.70: some results were duplicated on windows. (Reported
+by Uwe Siart.)
+
+Version 0.70
+============
+
+Use information from the TeX Live package database (some of it coming from the
+CTAN catalogue) to improve search results. Display some of this information.
+
+Show the current settings in --help message.
+
+Misc. internal changes & fixes.
+
+Deprecate -a, --alias, -A, --noalias and alias_switch.
+
+Version 0.66
+------------
+
+Turn the -v=N, --verbosity=N command-line option into a pair of related options
+-v, --verbose and -q, --quiet (more standard, Karl's suggestion). Also remove
+uselessly verbose debug items so --debug is usable again.
+
+Rework help text (Karl's suggestion).
+
+Issue a warning about DISPLAY not being set on generic Unix before trying to
+start a viewer.
+
+Small internal clean-ups.
+
+Version 0.65
+------------
+
+Make it easier to change the list of configuration files used (eg for
+downstream distributions).
+
+Version 0.64
+------------
+
+Fix a crash when DISPLAY is unset on Unix by querying xprop more carefully.
+(Bug introduced in 0.61.)
+
+Version 0.63
+------------
+
+Fix a bug on windows which prevented from viewing sty files.
+
+Version 0.62
+------------
+
+Support for zipped documentation is now an official option.
+Please read the warnings before using it!
+
+Version 0.61
+------------
+
+Detect desktop environments (KDE4, KDE, GNOME, XFCE) for viewer selection.
+
+Version 0.60
+============
+
+Changed the search/alias/score logic. See section 2 of the manual for details,
+but here is a primer:
+- alias now /adds/ patterns to be search, it is no more a substitution
+- new scoring system, partially configurable, with improved heuristics
+
+The beginning of the manual has been completely rewritten.
+
+Bugs have been fixed as usual, and probably some others introduced...
+
+Version 0.50
+============
+
+- New option for machine-readable output.
+- Bugfixes (esp. for zipped file support (Unix only)).
+- Hopefully more sensible default viewer selection.
+
+Version 0.49
+------------
+
+Major code rewrite. No big user-visible change, except a few bugs fixed and new
+debugging levels.
+
+Version 0.47 (TeX Live 2009)
+----------------------------
+
+Adapt for man pages named *.man1.pdf instead of *.pdf.
+(Temporary hack, done better since version 0.60.)
+
+Warning: zip support probably broken!
+
+Version 0.46
+------------
+
+Avoid using lfs.currentdir() and lfs.chdir() which are broken on Solaris 10 
+in LuaTeX 0.40
+
+Version 0.45
+------------
+
+Fix possible line ending problems on windows with certain versions of LuaTeX
+
+Version 0.44
+------------
+
+- fixing viewer problems on Windows
+- expanding the list of default viewers on generic Unix
+
+
+Version 0.43
+------------
+
+Improve support for zipped documentation and comments about it in the default
+configuration file. (Thank Norbert Preining for his help.)
+
+Various fixes, aliases updates as usual.
+
+Version 0.42
+------------
+
+Improvements to default txt viewer on Windows (thanks to Phil Taylor).
+
+New debugging levels; new names for debugging options.
+
+New configuration file allowing to run the development version more easily.
+
+Changes to the way files are displayed. Results are numbered even when -I is
+used.
+
+Documentation update.  Alias additions and fixes as usual. Various bugfixes.
+
+License switched to GPL.
+
+Version 0.4 (TeX Live 2008)
+===========================
+
+Use our own configuration files, not texmf.cnf. Rework the way viewers are
+handled, and add a few configuration options.
+
+Add an 'alias' feature. Filter results in a more restrictive way. Add new search
+modes 'mixed' and 'regex'. Turn result lists into menus.
+
+Add a user manual in pdf.
+
+Development passed from Frank Küster to Manuel Pégourié-Gonnard.
+
+Version 0.3
+-----------
+
+Various changes including:
+- added changelog
+- better OS detection for default viewer settings
+- removed some debugging code
+- -s now works in dirs without ls-R, too
+
+Version 0.2
+-----------
+
+Various changes including:
+- implemented reading of configuration from texmf.cnf
+- fixed "-s" option
+
+Version 0.1
+-----------
+
+Initial public release of the texlua version by Frank Küster.
+
+Earlier versions
+----------------
+
+Shell script by Thomas Esser maintained as part of teTeX.

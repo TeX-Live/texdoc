@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+# Wrap coverage.tlu
+#
+# Manuel Pégourié-Gonnard, 2010. WTFPL v2.
+
+my $usage = <<USAGE;
+Usage: $0 [--td=texdoc-path] [--tl=texlive_path]
+USAGE
+
+use warnings;
+use strict;
+use utf8;
+use open qw(:std utf8);
+
+BEGIN { (my $dir = $0) =~ s!(.*)/.*!$1!; unshift @INC, $dir; }
+use TdTools;
+
+my $conf = TdTools::setup($usage);
+
+my $tlpdb = "$conf->{texlive_path}/../../tlpkg/texlive.tlpdb";
+open my $fh, '<', $tlpdb;
+my @pack;
+for (<$fh>) {
+    chomp;
+    if (s/^name ([^.]+)$/$1/) {
+        push @pack, $_ unless /^(scheme|collection|texlive|hyphen)-/;
+    }
+}
+close $fh;
+
+exec 'texlua', "$conf->{texdoc_path}/tools/coverage.tlu", @pack;
+
+__END__

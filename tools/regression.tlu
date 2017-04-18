@@ -1,0 +1,85 @@
+-- regression.tlu: check regressions using oldalias.cnf
+--
+-- Usage: use the Perl wrapper
+--
+-- Manuel Pégourié-Gonnard, 2010. WTFPL v2.
+
+-- initialize kpathsea
+kpse.set_program_name(arg[-1], 'texdoc')
+
+-- load texdoclib
+local texdoc = require('texdoc.texdoclib')
+
+-- removes elements with score < 0 from a doclist
+local function cleanup(dl)
+    for i = 1, #dl do
+        if dl[i].score < 0 then dl[i] = nil end
+    end
+end
+
+-- return true iff the two doclists are equal
+local function dl_equal(a, b)
+    if #a ~= #b then return false end
+    for i = 1, #a do
+        if a[i].realpath ~= b[i].realpath then return false end
+    end
+    return true
+end
+
+-- read oldalias.cnf to get the list of names to test
+local to_check = {}
+local oa = assert(io.open('oldalias.cnf', 'r'))
+while true do
+    local line = oa:read('*line')
+    if line == nil then break end -- EOF
+    local key = assert(
+        line:match('^alias%s+([%w%p]+)')
+        or line:match('^alias%([%d+-.]+%)%s+([%w%p]+)')
+    )
+    table.insert(to_check, key)
+end
+oa:close()
+
+-- get started
+texdoc.setup_config_and_alias({})
+texdoc.init_databases()
+
+-- build the list of results with standard config
+local std_results = {}
+for _, name in ipairs(to_check) do
+    std_results[name] = texdoc.get_doclist(name)
+end
+
+-- build the list of results with additional aliases
+texdoc.read_config_file('oldalias.cnf')
+local old_results = {}
+for _, name in ipairs(to_check) do
+    old_results[name] = texdoc.get_doclist(name)
+end
+
+-- compare lists and report
+local bad, medium = 0, 0
+for _, name in ipairs(to_check) do
+    local std = std_results[name]
+    local old = old_results[name]
+    if not dl_equal(std, old) then
+        print('# ' .. name);
+        print('old: ' .. old[1].normname)
+        print('new: ' .. (std[1] and std[1].normname or '(none)'))
+        bad = bad + 1
+    else
+        cleanup(std)
+        cleanup(old)
+        if not dl_equal(std, old) then
+            print('# ' .. name .. ' (after cleanup)');
+            print('old: ' .. (old[1] and old[1].normname or '(none)'))
+            print('new: ' .. (std[1] and std[1].normname or '(none)'))
+            medium = medium + 1
+        end
+    end
+end
+
+io.stderr:write(string.format('%d checked, %d bad, %d medium\n',
+    #to_check, bad, medium))
+
+os.exit(0)

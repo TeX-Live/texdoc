@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# Basic checks (currently just exit status wit hvarious arguments)
+#
+# Manuel Pégourié-Gonnard, 2010. WTFPL v2.
+
+my $usage = "Usage: $0 [--td=texdoc-path] [--tl=texlive_path]";
+
+use warnings 'FATAL' => 'all';
+use strict;
+use utf8;
+use open qw(:std utf8);
+
+BEGIN { (my $dir = $0) =~ s!(.*)/.*!$1!; unshift @INC, $dir; }
+use TdTools;
+
+my $conf = TdTools::setup($usage);
+my $texdoc = "texlua $conf->{texdoc_path}/script/texdoc.tlu";
+
+# various command lines and associated exit status
+my %cl_exit = (
+    ''                               => 2,
+    '-l'                             => 2,
+    '--foobar baz'                   => 2,
+    '-V'                             => 0,
+    '--version'                      => 0,
+    '-h'                             => 0,
+    '--help'                         => 0,
+    '-f'                             => 0,
+    '--files'                        => 0,
+    'foobarbaz'                      => 0,
+    '--list -M -q texdoc'            => 0,
+    '-I --showall -d texlive-en'     => 0,
+    '-l -I --debug=files texlive-en' => 0,
+);
+
+# check that the command lines return the right exit code
+my $quiet;
+$quiet = '>/dev/null 2>&1'; # comment for verbose output
+while (my ($cl, $status) = each(%cl_exit)) {
+    print "===> Running texdoc $cl (expecting: $status) <==='" unless $quiet;
+    system("$texdoc $cl $quiet");
+    my $code = $? >> 8;
+    die "`texdoc $cl' returned $code, not $status\n" if $code != $status;
+}
+
+__END__

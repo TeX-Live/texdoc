@@ -1,0 +1,11 @@
+[see also]
+The full documentation is maintained as a PDF manual.  The command
+.IP
+.B texdoc texdoc
+.PP
+should give you access to the complete manual.
+/bugs/
+.br
+Texdoc home page: <http://tug.org/texdoc/>
+.br
+Source: <https://github.com/mpg/texdoc>

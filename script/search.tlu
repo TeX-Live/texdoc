@@ -1,0 +1,639 @@
+-- search.tlu: file searching functions for texdoc.
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+-- Warning: every single function here assumes init_databases() has been called.
+
+-- shared by all functions in this file
+local s_doclist -- the Doclist objet to be populated by various functions
+local s_meta -- {[normname] = meta, ...} (populated by init_tlp_database)
+local vanilla -- is this a vanilla TL or a re-package one without tlpdb?
+
+-----------------------   docfile and doclist objects   ------------------------
+
+--[[
+doclist = {
+    [1] = docfile1, [2] = docfiles2, ...,
+    inv = { realpath1 = index1, ... }
+}
+
+The inv subtable is such that for all i
+doclist.inv(doclist[i].realpath:lower()) == i
+Paths are lowercased in order to avoid duplicates on windows.
+--]]
+
+local Doclist = {}
+Doclist.__index = Doclist
+
+-- create a new list of docfiles
+function Doclist:new()
+    local dl = { inv = {} }
+    setmetatable(dl, self)
+    return dl
+end
+
+-- add a docfile to a list
+function Doclist:add(df)
+    if not df.realpath then return end -- useful if vanilla == false
+    local index = self.inv[df.realpath:lower()]
+    if index then
+        self[index]:mergein(df)
+    else
+        local newindex = #self + 1
+        self[newindex] = df
+        self.inv[df.realpath:lower()] = newindex
+    end
+end
+
+-- stops a doclist
+function Doclist:stop()
+    self.inv = nil
+end
+
+--[[
+docfile = {
+    -- name and tree are mendatory
+    name      = filename (used for scoring only)
+    tree      = code of the tree, see below
+    -- at least one of the following fields should exist
+    matches   = {pattern1, pattern2, ...} or {}
+    runtodoc  = true if there is a runfile -> docfile association
+    tlptodoc  = true if there is a tlp name -> docfile association
+    -- those are virtual members, see below
+    realpath  = full path
+    normname  = nomrmalised (path removed up to the 'doc' component)
+    shortname = short name used for scoring
+    basename  = basename
+    lang      = language tag from the catalogue metadata
+    details   = details tag from the catalogue metadata
+    quality   = 'good', 'bad', or 'killed' depending on score
+    ext_pos   = position of the extension in ext_list
+    -- set for elements of a list as a side effect of sort_doclist()
+    score     = score
+}
+if tree > 1, this is the index of the tree in TEXDOCS
+if tree = 0, then name is relative to TLROOT
+tree = - 1 if and only if file is a sty file. Here name is absolute.
+--]]
+
+-- Docfile objects inherit members from Docfile
+-- and have virtual members implemented by get_<member>() methods
+-- for best cache performance, getters should not return nil
+local Docfile = {}
+function Docfile:__index(key)
+    if Docfile[key] then return Docfile[key] end
+    local getter = Docfile['get_'..key]
+    if getter then
+        rawset(self, key, getter(self))
+        return rawget(self, key)
+    end
+end
+
+-- create a new docfile objet using initilisation info
+-- required fields: name, tree
+function Docfile:new(info)
+    local df = {}
+    setmetatable(df, self)
+    for k, v in pairs(info) do
+        if k == 'pattern' then
+            df.matches = { info.pattern }
+        else
+            df[k] = v
+        end
+    end
+    return df
+end
+
+-- merge a second docfile objet in, assuming it represents the same file
+function Docfile:mergein(df)
+    for k, v in pairs(df) do
+        if k == 'matches' then
+            for _, m in ipairs(df.matches or {}) do
+                table.insert(self.matches, m)
+            end
+        else
+            self[k] = v
+        end
+    end
+end
+
+-- return the full path to the file
+function Docfile:get_realpath()
+    if self.tree > 0 then 
+        return texdocs_tree_to_path(self.tree, self.name)
+    elseif self.tree == 0 then
+        if vanilla then
+            return get_tlroot()..'/'..self.name
+        else
+            return kpse.find_file(self.normname, 'TeX system documentation')
+        end
+    else
+        return self.name
+    end
+end
+
+-- normalise a name from the tlpdb (use for s_meta indexes)
+function reloc_tlpdb_path(name)
+    return string.gsub(name, '^texmf[^/]*/doc/', '', 1)
+end
+
+-- return normalised name
+function Docfile:get_normname()
+    return (self.tree == 0) and reloc_tlpdb_path(self.name) or self.name
+end
+
+-- retrieve the lang from meta
+function Docfile:get_lang()
+    local meta = s_meta[self.normname]
+    return meta and (meta.lang or false) or false
+end
+
+-- retrieve the details from meta
+function Docfile:get_details()
+    local meta = s_meta[self.normname]
+    return meta and (meta.details or false) or false
+end
+
+-- return the short name used for scoring
+function Docfile:get_shortname()
+    if self.tree == -1 then return self.name end
+    -- remove first component of name if at least two directory levels
+    return string.match(self.normname, '^..-/(.+/.+)$') or self.normname
+end
+
+-- return the base name
+function Docfile:get_basename()
+    return string.gsub(self.name, '.*/', '', 1)
+end
+
+-- for interface consistency, matches should always be a table, never nil
+function Docfile:get_matches()
+    return {}
+end
+
+-- from score.tlu
+Docfile.get_quality = docfile_quality
+
+-- from score.tlu
+function Docfile:get_ext_pos()
+    return ext_pos(self.basename)
+end
+
+---------------------   manage TEXDOCS trees à la kpse   ----------------------
+
+do -- scope of doc_roots
+local doc_roots
+
+--[[
+doc_roots[i] = {
+    path    = initial path,
+    db      = { [file1] = basename1, [file2] = basename2, ... },
+}
+--]]
+
+-- populate the doc_roots filename databases
+function init_texdocs_database()
+    doc_roots = {}
+    local sep = (os.type == 'windows') and ';' or ':'
+    local kpse_texdocs = kpse.expand_var("$TEXDOCS")
+    -- expand the path and turn it into a lua list
+    local raw_doc_roots = string.explode(kpse.expand_braces(kpse_texdocs), sep)
+    local max = #raw_doc_roots + 1
+    for j, dir in ipairs(raw_doc_roots) do
+        local i = max - j
+        local n
+        local path, db
+        -- get path, !! and // values
+        dir, n = string.gsub (dir, '//$', '')
+        local recursion_allowed = (n == 1)
+        local path, n = string.gsub (dir, '^!!', '')
+        local index_mandatory = (n == 1)
+        deb_print('texdocs', string.format(
+            'texdocs[%d] = %s (index_mandatory=%s, recursion_allowed=%s)',
+            i, path, tostring(index_mandatory), tostring(recursion_allowed)))
+        -- decide if we should use a ls-R index, the filesystem, or do nothing
+        local root, shift = lsr_root(path)
+        if root and shift and recursion_allowed then
+            deb_print('texdocs', string.format(
+                'texdocs[%d] using index: %s (shift=%s)', i, root, shift))
+            db = init_lsr_db(root, shift)
+        elseif not index_mandatory and lfs.isdir(path) then
+            deb_print('texdocs', string.format(
+                'texdocs[%d] using filesystem search', i))
+            db = init_tree_db(path, recursion_allowed)
+        end
+        -- register this in docroots
+        doc_roots[i] = { path = path, db = db }
+    end
+end
+
+-- return the real path from a texdocs tree number + relative path
+function texdocs_tree_to_path(tree, rel)
+    return doc_roots[tree].path..'/'..rel
+end
+
+-- find docfiles in texdocs directories
+function get_doclist_texdocs(patlist)
+    for code, dr in ipairs(doc_roots) do
+        if dr.db then scan_db(patlist, code, dr.db) end
+    end
+end
+
+end -- scope of doc_roots
+
+-- find a ls-R file in a parent directory and return it or nil
+function lsr_root (path)
+    if not lfs.isdir (path) then return end
+    local root, shift = path, ''
+    if string.sub(root, -1) == '/' then root = string.sub(root, 1, -2) end
+    while string.find(root, '/', 1, true) do
+        if lfs.isfile(root..'/ls-R') then
+            return root, shift
+        end
+        local last_comp = string.match(root, '^.*/(.*)$')
+        -- /!\ cannot put last_comp in a regex: can contain special char
+        root = string.sub(root, 1, - (#last_comp + 2))
+        shift = last_comp..'/'..shift
+    end
+end
+
+-- build a db from a ls-R file
+function init_lsr_db(root, shift)
+    -- open the file
+    local lsr = assert(io.open(root..'/ls-R', 'r'))
+    local _ = lsr:read('*line') -- throw away first line (comment)
+    -- scan it
+    local db = {}
+    local maybe_dir, isdoc = true, false
+    local current_dir
+    local l = #shift
+    while true do
+        local line = lsr:read('*line')
+        while line == '' do line, maybe_dir = lsr:read('*line'), true end
+        if line == nil then break end -- EOF
+        local dir_line = maybe_dir and string.match(line, '^%./(.*):$')
+        if dir_line then
+            maybe_dir = false -- next line may not be a dir
+            if string.sub(dir_line..'/', 1, l) == shift then
+                isdoc = true
+                current_dir = string.sub(dir_line, l+1)
+                db[current_dir] = nil
+            elseif isdoc then
+                break -- we're exiting the ./doc (or shift) dir, so it's over
+            end
+        elseif isdoc then
+            local file = (current_dir == '') and line or current_dir..'/'..line
+            if check_ext(line) then db[file] = line end
+        end
+    end
+    lsr:close()
+    return db
+end
+
+-- build a db for a tree without ls-R index
+function init_tree_db(base, recurse)
+    local db = {}
+    local function init_tree_db_rec(dir)
+        for file in lfs.dir(base..'/'..dir) do
+            if file ~= '.' and file ~= '..' then
+                local f = (dir == '') and file or dir..'/'..file
+                if lfs.isdir(base..'/'..f) then
+                    if recurse then init_tree_db_rec(f) end
+                else
+                    if check_ext(file) then db[f] = file end
+                end
+            end
+        end
+    end
+    init_tree_db_rec('')
+    return db
+end
+
+--------------------   select results from TEXDOCS trees   ---------------------
+
+-- scan a database
+function scan_db(patlist, code, lsr_db)
+    for file, basename in pairs(lsr_db) do
+        local df = process_file(patlist, basename, file, code)
+        if df then s_doclist:add(df) end
+    end
+end
+
+-- says if file has a known extenstion according to ext_list
+-- (or known basename according to basename_list)
+function check_ext(file)
+    file = string.lower(file)
+    -- remove zipext if applicable
+    file = parse_zip(file)
+    -- then do the normal thing
+    for _, e in ipairs(config.ext_list) do
+        if e == '*' then
+            return true
+        elseif (e == '') then
+            if not string.find(file, '.', 1, true) then
+                return true
+            end
+        else
+            local dot_e = '.'..e
+            if string.sub(file, -string.len(dot_e)) == dot_e then
+                return true
+            end
+        end
+    end
+    -- is the basename good?
+    for _, b in ipairs(config.basename_list) do
+        if file:find('^'..b..'$') or file:find('^'..b..'%.') then
+            return true
+        end
+    end
+    return false
+end
+
+-- say if a file (with its path) matches a pattern
+function matches(pattern, file)
+    if pattern.original then
+        return string.find(file:lower(), pattern.name:lower(), 1, true)
+    else
+        return is_exact(file, pattern.name)
+    end
+end
+
+-- return a docfile object if file "matches", nil ortherwise
+function process_file(patlist, file, pathfile, code)
+    local docfile
+    local pattern
+    for _, pattern in ipairs(patlist) do
+        if matches(pattern, pathfile) then
+            local info = {
+                name    = pathfile,
+                tree    = code,
+                pattern = pattern,
+            }
+            if docfile then
+                docfile:mergein(Docfile:new(info))
+            else
+                docfile = Docfile:new(info)
+            end
+        end
+    end
+    return docfile
+end
+
+----------------------------   look for sty files   ----------------------------
+
+-- add doclist entries for sty files in patlist
+function get_doclist_sty(patlist)
+    for _, pat in ipairs(patlist) do
+        local file = kpse.find_file(pat.name)
+        if file then
+            local df = Docfile:new({
+                name    = file,
+                tree    = -1,
+                pattern = pat,
+            })
+            s_doclist:add(df)
+        end
+    end
+end
+
+--------------------------------   use tlpdb   ---------------------------------
+
+-- tlpdb mean TeX Live Package DataBase and tlp means TeX Live Package
+
+-- find the TeX Live root
+function get_tlroot()
+    local tlroot = kpse.var_value('SELFAUTOPARENT')
+    get_tlroot = function() return tlroot end
+    return tlroot
+end
+
+-- return true if cache exists and is newer than original, false otherwise
+function good_cache(cache, ori)
+    local cache_date = lfs.attributes(cache, 'modification')
+    if not cache_date then return false end
+    local ori_date = assert(lfs.attributes(ori, 'modification'))
+    return cache_date > ori_date
+end
+
+-- make sure a given directory exists, or return nil plus an error string
+function mkdir_p(dir)
+    if lfs.isdir(dir) then return true end
+    local parent = path_parent(dir)
+    if parent then
+        local ok, msg = mkdir_p(parent)
+        if not ok then return nil, msg end
+    end
+    return lfs.mkdir(dir)
+end
+
+-- get tlpinfo tables initialised by whatever mean
+function init_tlp_database()
+    local TEXMFVAR = kpse.var_value('TEXMFVAR')
+    local cache_file = TEXMFVAR..'/'..C.cache_name
+    local texlive_tlpdb = get_tlroot()..'/tlpkg/texlive.tlpdb'
+    vanilla = lfs.isfile(texlive_tlpdb)
+    if vanilla then
+        if good_cache(cache_file, texlive_tlpdb) then
+            deb_print('tlpdb', 'Using cached data from '..cache_file)
+            get_tlpinfo_from_cache(cache_file)
+        else
+            deb_print('tlpdb', 'Getting data from tlpdb file '..texlive_tlpdb)
+            get_tlpinfo_from_tlpdb(texlive_tlpdb)
+            deb_print('tlpdb', 'Writing data in cache file '..cache_file)
+            local ok, msg = mkdir_p(path_parent(cache_file))
+            if not ok then
+                err_print('warning',
+                'Failed to create cache file in '..cache_file..':')
+                err_print('warning', msg)
+            else
+                print_out_tlpinfo(cache_file)
+            end
+        end
+    else
+        deb_print('tlpdb', 'Using shipped tlpdb data.')
+        get_tlpinfo_from_dist()
+    end
+end
+
+do -- begin scope of tlpinfo tables
+local tlp_from_runfile -- { [runfile_basename] = {tlp1 = true, ...}, ... }
+local tlp_doclist -- { [tlp_name] = { relname1, relname2, ...}, ... }
+
+-- populate tlpinfo tables using the given texlive.tlpdb
+function get_tlpinfo_from_tlpdb(filename)
+    s_meta, tlp_from_runfile, tlp_doclist = {}, {}, {}
+    local curr_tlp
+    local state = 'none'
+    for line in io.lines(filename) do
+        if state == 'none' and string.find(line, '^name ') then
+            -- begin a new package
+            curr_tlp = string.lower(string.sub(line, 6, -1))
+            tlp_doclist[curr_tlp] = {}
+        elseif state == 'docfiles' then
+            if not string.find(line, '^ ') then
+                state = 'none'
+            else
+                local file = string.match(line, '^ ([^ ]*)')
+                local meta = string.match(line, '^ [^ ]* (.+)')
+                local basename = string.match(file, '([^/]*)$')
+                if check_ext(basename) then
+                    -- we've got a docfile here, add it
+                    table.insert(tlp_doclist[curr_tlp], file)
+                    if meta then
+                        local details = string.match(meta, 'details="([^"]+)"')
+                        local lang = string.match(meta, 'language="([^"]+)"')
+                        s_meta[reloc_tlpdb_path(file)] = {
+                            details = details,
+                            lang = lang,
+                        }
+                    end
+                end
+            end
+        elseif state == 'runfiles' then
+            if not string.find(line, '^ ') then
+                state = 'none'
+            else
+                -- check for interesting runfiles
+                local e = string.sub(line, -4, -1)
+                if e == '.tex' or e == '.sty' or e == '.cls' then
+                    local f = string.match(line, '.*/(.*)%.')
+                    tlp_from_runfile[f] = tlp_from_runfile[f] or {}
+                    tlp_from_runfile[f][curr_tlp] = true
+                end
+            end
+        end
+        -- update state
+        if string.find(line, '^docfiles ') then
+            state = 'docfiles'
+        elseif string.find(line, '^runfiles ') then
+            state = 'runfiles'
+        end
+    end
+    remove_useless_tlp()
+end
+
+-- remove entries for tlp without any docfile
+function remove_useless_tlp()
+    for tlp, doclist in pairs(tlp_doclist) do
+        if #doclist == 0 then tlp_doclist[tlp] = nil end
+    end
+    for runfile, tlp_set in pairs(tlp_from_runfile) do
+        for tlp in pairs(tlp_set) do
+            if not tlp_doclist[tlp] then
+                tlp_from_runfile[runfile][tlp] = nil
+            end
+        end
+    end
+end
+
+-- print out data from tlpdb in dofile()-able form
+function print_out_tlpinfo(filename)
+    local fh = assert(io.open(filename, 'w'))
+    local function printf(s, ...) fh:write(string.format(s, ...)) end
+    -- s_meta
+    printf('local s_meta = {\n')
+    for k, v in pairs(s_meta) do
+        printf('  [%q] = {', k)
+        for i, j in pairs(v) do printf('[%q] = %q, ', i, j) end
+        printf('},\n')
+    end
+    printf('}\n')
+    -- tlp_from_runfile
+    printf('local tlp_from_runfile = {\n')
+    for k, v in pairs(tlp_from_runfile) do
+        printf('  [%q] = {', k)
+        for f in pairs(v) do printf('[%q]=true,', f) end
+        printf('},\n')
+    end
+    printf('}\n')
+    -- tlp_doclist
+    printf('local tlp_doclist = {\n')
+    for k, v in pairs(tlp_doclist) do
+        printf('  [%q] = {\n', k)
+        for _, f in ipairs(v) do printf('    %q,\n', f) end
+        printf('  },\n')
+    end
+    printf('}\n')
+    printf('return s_meta, tlp_from_runfile, tlp_doclist\n')
+    fh:close()
+end
+
+-- get pre-hashed tlpdb info from a cache file
+function get_tlpinfo_from_cache(filename)
+    s_meta, tlp_from_runfile, tlp_doclist = dofile(filename)
+end
+
+-- get pre-hashed tlpdb info from a pseudo-cache file
+function get_tlpinfo_from_dist()
+    local f = assert(kpse.find_file(C.data_tlpdb_name, 'texmfscripts'))
+    s_meta, tlp_from_runfile, tlp_doclist = dofile(f)
+end
+
+-- get docfiles for pattern using specific tlpdb information
+function get_doclist_tlpdb(pattern)
+    -- runfile to tlp to docfile
+    if tlp_from_runfile[pattern] then
+        for tlp in pairs(tlp_from_runfile[pattern]) do
+            for _, file in ipairs(tlp_doclist[tlp]) do
+                s_doclist:add(Docfile:new{
+                    name        = file,
+                    tree        = 0,
+                    runtodoc    = true,
+                })
+            end
+        end
+    end
+    -- tlp name to docfile
+    if tlp_doclist[pattern] then
+        for _, file in ipairs(tlp_doclist[pattern]) do
+            s_doclist:add(Docfile:new{
+                name            = file,
+                tree            = 0,
+                tlptodoc        = true,
+            })
+        end
+    end
+end
+
+end --scope of tlpinfo table
+
+------------------------------   main function   -------------------------------
+
+-- initialise the various databases (must be called first)
+function init_databases()
+    init_texdocs_database()
+    init_tlp_database()
+end
+
+-- find docfiles according to pattern
+function get_doclist(pattern, no_alias)
+    -- get patterns (inc. aliases)
+    local normal, sty = normal_vs_sty(get_patterns(pattern, no_alias))
+    -- initialise result list
+    s_doclist = Doclist:new()
+    -- get results
+    get_doclist_sty(sty)
+    get_doclist_texdocs(normal)
+    get_doclist_tlpdb(pattern)
+    -- finally, sort results
+    sort_doclist(s_doclist, pattern)
+    return s_doclist
+end
+
+-- separate sty patterns from the rest
+function normal_vs_sty(list)
+    local normal, sty = {}, {}
+    for _, p in ipairs(list) do
+        if string.match(string.lower(p.name), '%.([^/.]*)$') == 'sty' then
+            table.insert(sty, p)
+        else
+            table.insert(normal, p)
+        end
+    end
+    return normal, sty
+end
+
+return {
+    init_databases = init_databases,
+    get_doclist    = get_doclist,
+}

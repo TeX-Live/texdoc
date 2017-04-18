@@ -1,0 +1,144 @@
+-- constants.tlu: global "constants" for texdoc.
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+-- use an empty environment that will become texdoc_env.C (see EOF)
+local constants = {}
+local kpse = kpse
+local setfenv = setfenv
+local texdoc_env
+if setfenv then
+    texdoc_env = getfenv()
+    setfenv(1, constants)
+else
+    texdoc_env = _ENV
+    _ENV = constants
+end
+
+-- BEGIN constants
+
+-- progname and version
+fullname    = kpse.find_file('texdoc/texdoclib', 'lua')
+progname    = 'texdoc'
+version     = '0.85'
+
+-- make sure to update setup_config_from_cl() accordingly
+-- and set a default value in setup_config_from_defaults() if relevant
+usage_msg = [[
+Usage: texdoc [OPTION]... NAME...
+  or:  texdoc ACTION
+
+Try to find appropriate TeX documentation for the specified NAME(s).
+Alternatively, perform the given ACTION and exit.
+
+Current settings:
+
+Actions:
+Options:
+  -w, --view            Use view mode: start a viewer. (default)
+  -m, --mixed           Use mixed mode (view or list).
+  -l, --list            Use list mode: show a list of results.
+  -s, --showall         Use showall mode: show also "bad" results.
+
+  -i, --interact        Use interactive menus. (default)
+  -I, --nointeract      Use plain lists, no interaction required.
+  -M, --machine         Machine-readable output for lists (implies -I).
+
+  -q, --quiet           Suppress warnings and most error messages.
+  -v, --verbose         Print additional information (eg, viewer command).
+  -d, --debug[=list]    Activate debug output (restricted to list).
+
+Environment: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER.
+Files: <texmf>/texdoc/texdoc.cnf, see output of the --files option.
+Report bugs to <texdoc@tug.org>.
+Full manual available via `texdoc texdoc'.]]
+
+copyright_msg = [[
+Copyright (C) 2008-2013 Manuel P'egouri'e-Gonnard.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.]]
+
+actions_ph = 'Actions:\n'
+
+usage_settings_ph = 'Current settings:' -- keep ../doc/texdoc wrapper in sync!
+usage_settings = {
+    { name = 'mode', view = '--view', mixed = '--mixed', list = '--list',
+        showall = '--showall' },
+    { name = 'interact_switch',
+        [true] = '--interact', [false] = '--nointeract' },
+}
+
+known_options = {
+    'viewer_.*',
+    'mode',
+    'interact_switch',
+    'machine_switch',
+    'ext_list',
+    'basename_list',
+    'badext_list',
+    'badbasename_list',
+    'suffix_list',
+    'verbosity_level',
+    'debug_list',
+    'lastfile_switch',
+    'rm_dir',
+    'rm_file',
+    'unzip_.*',
+    'zipext_list',
+    'max_lines',
+    'lang',
+}
+
+error_msg = [[
+Try `texdoc --help' for a short help, `texdoc texdoc' for the user manual.]]
+notfound_msg = [[
+Sorry, no documentation found for PKGNAME.
+If you are unsure about the name, try searching CTAN's TeX catalogue at
+http://ctan.org/search.html#byDescription.]]
+notfound_msg_ph = 'PKGNAME'
+
+err_priority = {
+    error   = 1,
+    warning = 2,
+    info    = 3,
+}
+min_verbosity='0'
+max_verbosity='3'
+def_verbosity='2'
+
+known_debugs = {
+    version = {},
+    files   = {},
+    config  = {'files'},
+    view    = {},
+    texdocs = {},
+    score   = {},
+    tlpdb   = {}
+}
+
+-- various cache or non-cache files
+cache_name = 'texdoc/cache-tlpdb.lua' -- relative to TEXMFVAR
+data_tlpdb_name = 'texdoc/Data.tlpdb.lua'
+
+place_holder = '%%s' -- used for viewer commands
+
+-- END constants
+
+-- get our previous environment back
+if setfenv then
+    setfenv(1, texdoc_env)
+else
+    _ENV = texdoc_env
+end
+
+-- Make global C a read-only proxy to the local <constants>.
+-- Note this is not deep read-only: C.known_debugs is read-only, but
+-- C.known_debugs.version isn't, for instance.
+assert(next(C) == nil,
+    'Internal error: table of constants should be empty at this point')
+setmetatable(C, {
+    __index = constants,
+    __newindew = function ()
+        error('Internal error: attempt to modify a constant.')
+    end
+})

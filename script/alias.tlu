@@ -1,0 +1,116 @@
+-- alias.tlu: configuration handling for texdoc
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+--[[ structure of the alias table
+
+alias = {
+  name1 = { <true or nill> stop, <aliasentry> aliasentry1, ... },
+  ...
+}
+stop == true means further alias directives should be ignored
+
+aliasentry = {
+  name      = <string> pattern to be matched,
+  score     = <number or nil> associated score,
+  original  = <true or nil> is this the original keyword?,
+  locale    = <true or nil> is this entry found via config.lang?
+}
+score == nil means to use the default score (defined in score.tlu)
+
+--]]
+
+-- alias is local to this file
+local alias = {}
+
+-- turn a name into a suitable alias entry
+-- if score is 'false', this is the original name
+function make_alias(pat, score)
+    local al = {}
+    al.name = pat
+    if score == false then
+        al.original = true
+    else
+        al.score = score -- may be nil
+    end
+    return al
+end
+
+-- add an alias value for a key
+function add_alias(key, value, score)
+    local k = string.lower(key)
+    alias[k] = alias[k] or { make_alias(key, false) }
+    if alias[k].stop then return end
+    table.insert(alias[k], make_alias(value, score))
+end
+
+-- prevent a key from being further aliased
+function stop_alias(key)
+    local k = string.lower(key)
+    alias[k] = alias[k] or {}
+    alias[k].stop = true
+end
+
+-- get patterns for a name
+function get_patterns(name, no_alias)
+    local n = string.lower(name)
+    -- get normal aliases
+    local res
+    if alias[n] and not no_alias then
+        res = alias[n]
+    else
+        res = { make_alias(name, false) }
+    end
+    -- check for language-specific aliases
+    local lang = config.lang and alias[n .. '-' .. config.lang]
+    if lang then
+        for _, entry in ipairs(lang) do
+            if not entry.original then
+                table.insert(res, {
+                    name    = entry.name,
+                    score   = entry.score,
+                    locale  = true,
+                })
+            end
+        end
+    end
+    return res
+end
+
+-- interpret a confline as an alias setting or return false
+function confline_to_alias(line, file, pos)
+    -- alias directive without score
+    local key, val = string.match(line, '^alias%s+([%w%p]+)%s*=%s*(.+)')
+    if key and val then
+        add_alias(key, val)
+        return true
+    end
+    -- alias directive with score
+    local score, key, val = string.match(line,
+        '^alias%(([%d+-.]+)%)%s+([%w%p]+)%s*=%s*(.+)')
+    if score then score = tonumber(score) end
+    if key and val and score then
+        add_alias(key, val, score)
+        return true
+    end
+    -- stopalias directive
+    local key = string.match(line, '^stopalias%s+(.+)')
+    if key then 
+        stop_alias(key)
+        return true
+    end
+    return false
+end
+
+-- iterator over the list of keys in the alias table
+function aliased_names()
+    return function(_, cur)
+        return (next(alias, cur))
+    end
+end
+
+return {
+    confline_to_alias = confline_to_alias,
+    get_patterns      = get_patterns,
+    aliased_names     = aliased_names,
+}

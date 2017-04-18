@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+# Update various texdoc files from a texdoc git repo to a texlive repo.
+#
+# Manuel Pégourié-Gonnard, 2009. WTFPL v2.
+
+my $usage = <<USAGE;
+Usage: $0 [option...] [fileset...]
+Options: --td=texdoc-path --tl=texlive-path --dont-check-branch
+Filesets: all (default), doc, cnf, tlu
+USAGE
+
+use warnings 'FATAL' => 'all';
+use strict;
+use utf8;
+use open qw(:std utf8);
+use File::Basename;
+
+BEGIN { (my $dir = $0) =~ s!(.*)/.*!$1!; unshift @INC, $dir; }
+use TdTools;
+
+# get configuration and a secure environment
+my $conf = TdTools::setup($usage, 1);
+
+my $texdoc_path  = $conf->{texdoc_path};
+my $texlive_path = $conf->{texlive_path};
+my $texlive_root = "$texlive_path/../..";
+
+# TL directories
+use constant {
+    TL_scr      => 'texmf/scripts/texdoc',
+    TL_cnf      => 'texmf-dist/texdoc',
+    TL_doc      => 'texmf/doc/texdoc',
+    TL_man      => 'texmf/doc/man/man1',
+    TD_man      => 'doc/texdoc.1',
+    TD_manpdf   => 'doc/texdoc.man1.pdf',
+    TD_doc      => 'doc/texdoc.pdf',
+};
+
+# file sets and destination directories
+my %filesets = (
+    tlu => {    'script/*.lua script/*.tlu' => TL_scr },
+    cnf => {    'texdoc.cnf'      => TL_cnf },
+    doc => {    'doc/texdoc.tex'  => TL_doc,
+                'News'            => TL_doc,
+                TD_doc()          => TL_doc,
+                TD_man()          => TL_man,
+                TD_manpdf()       => TL_man,
+    });
+@{$filesets{all}}{keys %$_} = values %$_ for (values %filesets);
+
+# cd the texdoc's repo root
+chdir($texdoc_path) or die "chdir $texdoc_path failed.\n";
+
+# check that texdoc basically doesn't crash too much
+system("tools/basic-checks --tl=$texlive_path");
+die "texdoc is broken, aborting upload" if $?;
+
+# get the file set
+my %files;
+@ARGV = ('all') if @ARGV == 0;
+for my $fs (@ARGV) {
+    defined $filesets{$fs} or die "Unkown fileset $fs.\n$usage";
+    @files{keys %{$filesets{$fs}}} = values %{$filesets{$fs}};
+}
+
+# rebuild documentation if needed
+if (grep /doc\//, keys %files) {
+    system("cd doc && make >/dev/null");
+    die "Could not make documentation: $!.\n" if $?;
+}
+
+# says if f1 and f2 differ, after applying subs to each line
+sub files_diff (&$$) {
+    my ($subs, $f1, $f2) = @_;
+    open my $fh1, '<:bytes', $f1;
+    my @lines1 = <$fh1>;
+    close $fh1;
+    open my $fh2, '<:bytes', $f2;
+    my @lines2 = <$fh2>;
+    close $fh2;
+    return 1 if @lines1 != @lines2;
+    map { &$subs } @lines1, @lines2;
+    for (my $i = 0; $i < @lines1; $i++) {
+        return 1 if $lines1[$i] ne $lines2[$i];
+    }
+}
+
+# don't update the man page if only the date changed
+if (defined $files{TD_man()} and not files_diff
+        { s/^(\.TH TEXDOC "1" ").*?("texdoc [\d.]+" "User Commands")$/$1$2/ }
+        TD_man, "$texlive_root/$files{TD_man()}/".basename(TD_man)) {
+    print "Info: man page differs only by date, skipping.\n";
+    delete @files{TD_man, TD_manpdf};
+}
+
+# don't update the user manual if only the date and id changed
+if (defined $files{TD_doc()} and not files_diff
+        { s"^\/(CreationDate|ModDate|ID) .*"$1" }
+        TD_doc, "$texlive_root/$files{TD_doc()}/".basename(TD_doc)) {
+    print "Info: user manual differs only by date or id, skipping.\n";
+    delete @files{TD_doc()};
+}
+
+# do the actual copy and compute the list of touched directories
+my %touched_dir;
+while (my ($s, $d) = each %files) {
+    $touched_dir{$d}++;
+    my $dest = "$texlive_root/$d";
+    system("cp -t $dest $s");
+    die "Could not copy $s to $dest: $!\n" if $?;
+}
+
+# commit
+chdir $texlive_root or die "Failed to chdir $texlive_root: $!\n";
+my $svn_cl = "svn ci " . join(' ', keys %touched_dir);
+$ENV{LC_ALL} = undef; # vim doesn't like LC_ALL=C from TdTools
+exec $svn_cl or die "boo";
+
+__END__

@@ -1,0 +1,545 @@
+-- config.tlu: configuration handling for texdoc
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+--------------------------   hide the config table   ---------------------------
+
+-- config is read-only (but not "deep" read-only)
+function set_read_only(table, name)
+    assert(next(table) == nil,
+        'Internal error: '..name..' should be empty at this point.')
+    local ro = 'Internal error: attempt to update read-only table '
+    local real = {}
+    setmetatable(table, {
+        __index = real,
+        __newindex = function () error(ro..name..'.') end,
+    })
+    return function(k, v) real[k] = v end
+end
+
+real_set_config = set_read_only(config, 'config')
+
+
+-------------------------   general config functions   -------------------------
+
+-- set a config parameter, but don't overwrite it if already set
+-- three special types: *_list (list), *_switch (boolean), *_level (number)
+function set_config_element (key, value, context)
+    local is_known = false -- is key a valid option?
+    local option
+    for _, option in ipairs(C.known_options) do
+        if string.match(key, '^'..option..'$') then is_known = true break end
+    end
+    -- warn and exit if key is not a known option
+    if not is_known then config_warn(key, nil, context, true) return end
+    -- exit if key is already set (/!\ must test for nil, not false)
+    if not (config[key] == nil) then
+        if context.src ~= 'def' then
+            deb_print('config', "Ignoring '"..key.."="..value.."' "
+                ..context_to_string(context)..'.')
+        end
+        return nil
+    end
+    -- record the source of the setting
+    real_set_config(key..'_src', context.src)
+    -- detect the type of the key
+    if string.match(key, '_list$') then
+        -- coma-separated list
+        local values
+        if value == '' then
+            values = {}
+        else
+            values = string.explode(value, ',')
+        end
+        local inverse = {}
+        for i, j in ipairs(values) do -- sanitize values...
+            j = string.gsub(j, '%s*$', '')
+            j = string.gsub(j, '^%s*', '')
+            values[i] = j
+            inverse[j] = i -- ... and build inverse mapping on the way
+        end
+        real_set_config(key, values)
+        real_set_config(key..'_inv', inverse)
+        real_set_config(key..'_max', #values)
+    elseif string.find (key, '_switch$') then
+        -- boolean
+        if value == 'true' then
+            real_set_config(key, true)
+        elseif value == 'false' then
+            real_set_config(key, false)
+        else
+            config_warn (key, value, context)
+        end
+    elseif string.find (key, '_level$') then
+        -- integer
+        local val = tonumber (value)
+        if val then
+            real_set_config(key, val)
+        else
+            config_warn (key, value, context)
+        end
+    else -- string
+        real_set_config(key, value)
+    end
+    -- special case: if we just set debug_list, print version info now
+    if key == 'debug_list' then
+        deb_print('version', C.fullname..' version '..C.version)
+    end
+    -- now tell what we have just done, for debugging
+    deb_print('config',
+        "Setting '"..key.."="..value.."' "..context_to_string(context)..'.')
+end
+
+-- a helper function for warning messages in the above
+function config_warn (key, value, context, unknown)
+    local begin = unknown
+        and 'Unknown option "'..key..'"'
+        or 'Illegal value "'..tostring(value)..'" for option "'..key..'"'
+    local ending = '.  Skipping.'
+    err_print('warning', begin..' '..context_to_string(context)..ending)
+end
+
+-- interpreting 'context' for the previous functions
+function context_to_string(context)
+    if not context then return '(no context)' end
+    if      context.src == 'cl' then
+        return 'from command line option "'..context.name..'"'
+    elseif  context.src == 'env' then
+        return 'from environment variable "'..context.name..'"'
+    elseif  context.src == 'loc' then
+        return 'from operating system locale'
+    elseif  context.src == 'file' then
+        return 'in file "'..context.file..'" on line '..context.line
+    elseif  context.src == 'def' then
+        return 'from built-in defaults'
+    else
+        return 'from unkown source (should not happen, please report)'
+    end
+end
+
+-- set a whole list, also whithout overwriting
+function set_config_list (conf, context)
+    for key, value in pairs(conf) do
+        set_config_element (key, value, context)
+    end
+end
+
+------------------------   options from command line   -------------------------
+
+-- set config from the command line
+-- Please make sure to update C.usage_msg accordingly
+-- and set a default value in setup_config_from_defaults() if relevant.
+function setup_config_from_cl(arg)
+    local curr_arg
+    local function set_config_elt(key, val)
+        set_config_element(key, val, {src='cl', name=curr_arg})
+    end
+    while arg[1] and string.match(arg[1],'^%-') do
+        curr_arg = table.remove(arg,1)
+        -- mode
+        if (curr_arg == '-w') or (curr_arg == '--view') then
+            set_config_elt('mode', 'view')
+        elseif (curr_arg == '-m') or (curr_arg == '--mixed') then
+            set_config_elt('mode', 'mixed')
+        elseif (curr_arg == '-l') or (curr_arg == '--list') then
+            set_config_elt('mode', 'list')
+        elseif (curr_arg == '-s') or (curr_arg == '--showall') then
+            set_config_elt ('mode', 'showall')
+        -- interaction
+        elseif (curr_arg == '-I') or (curr_arg == '--nointeract') then
+            set_config_elt('interact_switch', 'false')
+        elseif (curr_arg == '-i') or (curr_arg == '--interact') then
+            set_config_elt('interact_switch', 'true')
+        -- output format
+        elseif (curr_arg == '-M') or (curr_arg == '--machine') then
+            set_config_elt('machine_switch', 'true')
+        -- debug
+        elseif (curr_arg == '-d') or (curr_arg == '--debug') then
+            set_config_elt('debug_list', 'all')
+        elseif string.match(curr_arg, '^%-d=') then
+            local value = string.gsub(curr_arg, '^%-d=', '')
+            set_config_elt('debug_list', value)
+        elseif string.match(curr_arg, '^%-%-debug=') then
+            local value = string.gsub(curr_arg, '^%-%-debug=', '')
+            set_config_elt('debug_list', value)
+        -- verbosity
+        elseif (curr_arg == '-q') or (curr_arg == '--quiet') then
+            set_config_elt('verbosity_level', C.min_verbosity)
+        elseif (curr_arg == '-v') or (curr_arg == '--verbose') then
+            set_config_elt('verbosity_level', C.max_verbosity)
+        -- problem
+        else
+            err_print('error', "unknown option: "..curr_arg)
+            err_print('error', C.error_msg)
+            return false
+        end
+    end
+    return true
+end
+
+-------------------------   config from environment   --------------------------
+
+-- set config from environment if available
+function setup_config_from_env ()
+    local function set_config_elt_from_vars(key, vars)
+        for _, var in ipairs(vars) do
+            local value = os.getenv(var)
+            if value then
+                set_config_element(key, value, {src='env', name=var})
+            end
+        end
+    end
+    local function set_config_elt_from_option_env(key, var)
+        if (os.type == "windows") then return end
+        local value = os.getenv(var)
+	if value then
+            err_print('warning', 'NORBERT: consulting ' .. value .. ' for ' .. key)
+            for cmd in string.gmatch(value, '([^:]+)') do
+	        err_print('warning', 'NORBERT: current cmd = ' .. cmd)
+                if is_in_path(cmd) then 
+                    set_config_element(key, cmd, {src='env', name=var})
+                    -- don't test other commands if we have found one
+                    break
+                end
+            end
+        end
+    end
+    set_config_elt_from_vars('viewer_pdf',
+      {"PDFVIEWER_texdoc", "TEXDOCVIEW_pdf", "TEXDOC_VIEWER_PDF"})
+    set_config_elt_from_option_env('viewer_pdf', "PDFVIEWER")
+    set_config_elt_from_vars('viewer_ps',
+      {"PSVIEWER_texdoc", "TEXDOCVIEW_ps", "TEXDOC_VIEWER_PS"})
+    set_config_elt_from_option_env('viewer_ps', "PSVIEWER")
+    set_config_elt_from_vars('viewer_dvi',
+      {"DVIVIEWER_texdoc", "TEXDOCVIEW_dvi", "TEXDOC_VIEWER_DVI"})
+    set_config_elt_from_option_env('viewer_dvi', "DVIVIEWER")
+    set_config_elt_from_vars('viewer_html',
+      {"BROWSER_texdoc", "TEXDOCVIEW_html", "TEXDOC_VIEWER_HTML"})
+    set_config_elt_from_option_env('viewer_html', "BROWSER")
+    bla = config['viewer_html']
+    err_print('warning', 'NORBERT: viewer_html is now ' .. bla)
+    set_config_elt_from_vars('viewer_md',
+      {"MDVIEWER_texdoc", "TEXDOCVIEW_md", "TEXDOC_VIEWER_MD"})
+    set_config_elt_from_option_env('viewer_md', "PAGER")
+    set_config_elt_from_vars('viewer_txt',
+      {"PAGER_texdoc", "TEXDOCVIEW_txt", "TEXDOC_VIEWER_TXT"})
+    set_config_elt_from_option_env('viewer_txt', "PAGER")
+end
+
+----------------------   options and aliases from files   ----------------------
+
+-- set config+aliases from a particular config file assumed to exist
+function read_config_file(configfile)
+    local cnf = assert(io.open(configfile, 'r'))
+    local lineno = 0
+    while true do
+        local line=cnf:read('*line')
+        lineno = lineno + 1
+        if line == nil then break end  -- EOF
+        line = string.gsub(line, '%s*#.*$', '') -- comments begin with #
+        line = string.gsub(line, '%s*$', '')    -- remove trailing spaces
+        line = string.gsub(line, '^%s*', '')    -- remove leading spaces
+        -- try to interpret the line
+        local ok = string.match(line, '^%s*$') 
+        or confline_to_alias(line, configfile, lineno)
+        or confline_to_score(line, configfile, lineno)
+        or confline_to_config(line, configfile, lineno)
+        -- complain if it failed
+        if not ok then
+            err_print('warning',
+            'syntax error in '..configfile..' at line '..lineno..'.')
+        end
+    end
+    cnf:close()
+end
+
+-- interpret a confline as a config setting or return false
+function confline_to_config(line, file, pos)
+    local key, val = string.match(line, '^([%a%d_]+)%s*=%s*(.+)')
+    if key and val then
+        set_config_element(key, val, {src='file', file=file, line=pos})
+        return true
+    end
+    return false
+end
+
+-- return the list of configuration files
+function get_config_files ()
+    -- get names
+    local platform = string.match (kpse.var_value ('SELFAUTOLOC'), '.*/(.*)$')
+    local names = {
+        'texdoc-'..platform..'.cnf',
+        'texdoc.cnf',
+        'texdoc-dist.cnf',
+    }
+    -- get dirs
+    local sep = (os.type == 'windows') and ';' or ':'
+    local texmf_texdoc = kpse.expand_path('$TEXMF/texdoc')
+    local dirs = texmf_texdoc:explode(sep)
+    -- merge them
+    local ret = {}
+    for _, dir in ipairs(dirs) do
+        for _, name in ipairs(names) do
+            local pathname = dir .. '/' .. name
+            if lfs.isfile(pathname) then
+                table.insert(ret, pathname)
+            end
+        end
+    end
+    return ret
+end
+
+-- the config_files table is shared by the next two functions
+do
+local config_files = {}
+
+-- set config/aliases from all config files
+function setup_config_from_files ()
+    local file_list = get_config_files()
+    for i, file in ipairs (file_list) do
+        local status = config.lastfile_switch and 'disabled' or 'active'
+        config_files[i] = {
+            path = file,
+            status = status,
+        }
+        if status == 'active' then
+            read_config_file (file)
+        end
+    end
+end
+
+-- now a special information function (see -f,--file option)
+function show_config_files (print_fun, verbose)
+    local pref = verbose and '    ' or ''
+    print_fun("Configuration files are:")
+    for i, file in ipairs (config_files) do
+        print_fun(pref..file.status..'\t'..w32_path(file.path))
+    end
+    if verbose then
+        print_fun('Recommended file(s) for personal settings:')
+        local sep = (os.type == 'windows') and ';' or ':'
+        local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
+        for _, home in ipairs(texmfhomes) do
+            print_fun(pref..home..'/texdoc/texdoc.cnf')
+        end
+    end
+end
+
+end -- scope of config_files
+
+----------------------   config from locale settings   -------------------------
+
+function setup_config_from_locale()
+    local current = os.setlocale(nil, "all")
+    os.setlocale("", "all")
+    local native = os.setlocale(nil, "time")
+    os.setlocale(current, "all")
+    local lang = string.match(native, "^[a-z][a-z]")
+    if lang then
+        set_config_element("lang", lang, {src="loc"})
+    end
+end
+
+----------------------   options from built-in defaults   ----------------------
+
+-- for default viewer on general Unix, we have a list; the following two
+-- functions are used to check in the path which program is available
+
+-- check if "name" is the name of a file in the path
+-- Warning: to be used only on Unix! (separators, and PATH irrelevant on win32)
+-- the value of PATH is cached
+do local path_list = string.explode(os.getenv("PATH"), ':')
+function is_in_path(name)
+    for _, path in ipairs(path_list) do
+        if lfs.isfile(path..'/'..name) then return true end
+    end
+    return false
+end
+end
+
+-- guess a viewer from a list:
+-- - xdg-open from freedesktop if available
+-- - try detecting desktop environments
+-- - or return the first element of "list" whose name is found in path
+-- - or nil
+-- caches results of desktop environment detection
+do local de_viewer
+function guess_viewer(cmds)
+    -- try the freedesktop method
+    if is_in_path('xdg-open') then
+        return '(xdg-open %s) &'
+    end
+    -- try desktop environment
+    if not de_viewer then de_viewer = desktop_environment_viewer() end
+    if de_viewer then return de_viewer end
+    -- or look along path
+    for _, cmd in ipairs(cmds) do
+        if is_in_path(cmd[1]) then return cmd[2] end
+    end
+end
+end
+
+-- returns a viewer specific to a desktop environement if relevant
+-- doesn't work on windows (uses io.popen)
+-- logic stolen from xdg-open (http://www.freedesktop.org/) and adapted
+function desktop_environment_viewer()
+    if os.getenv('KDE_SESSION_VERSION') and is_in_path('kde-open') then
+        return '(kde-open %s) &'                     -- kde 4 (or greater)
+    end
+    if os.getenv('KDE_FULL_SESSION') and is_in_path('kfmclient') then
+        return '(kfmclient exec %s) &'              -- kde < 4
+    end
+    if os.getenv('GNOME_DESKTOP_SESSION_ID') then   -- gnome
+        if is_in_path('gvfs-open') then return '(gvfs-open %s) &' end
+        if is_in_path('gnome-open') then return '(gnome-open %s) &' end
+    end
+    if not is_in_path('xprop') then return end
+    local xprop_fh = io.popen('xprop -root _DT_SAVE_MODE 2>/dev/null')
+    local xprop_out = xprop_fh:read('*line')
+    xprop_fh:close()
+    if xprop_out and string.find(xprop_out, '= "xfce4"$') then     -- xfce
+        return '(exo-open %s) &'
+    end
+end
+
+-- set viewers from defaults (done only if necessary)
+function get_default_viewers()
+    local function set_config_ls(ls) set_config_list(ls, {src='def'}) end
+    if (os.type == "windows") then
+        set_config_ls {
+            -- Use 'start' to get file associations.
+            -- We need to quote the filenames, but the first quoted argument
+            -- is considered as the title by start, so we provide a dummy title.
+            -- Also, since the command line parser removes quotes if there
+            -- is no space inside, the dummy title must contain spaces.
+            viewer_dvi    = 'start "texdoc dvi viewer"',
+            viewer_html   = 'start "texdoc html viewer"',
+            viewer_pdf    = 'start "texdoc pdf viewer"',
+            viewer_ps     = 'start "texdoc ps viewer"',
+            -- 'more' is always available.
+            -- However, we can't assume texdoc is called from a cmd.exe window
+            -- (it can be run from the start->run menu), hence we make sure
+            -- to open a new window if needed.
+            viewer_txt    = 'start cmd /k more',
+            viewer_md     = viewer_txt,
+        }
+    elseif (os.name == 'macosx') then
+        set_config_ls {
+            viewer_dvi    = 'open',
+            viewer_html   = 'open',
+            viewer_pdf    = 'open',
+            viewer_ps     = 'open',
+            viewer_txt    = 'less',
+            viewer_md     = viewer_txt,
+        }
+    else -- generic Unix
+        set_config_ls {
+            viewer_dvi      = guess_viewer {
+                {'xdvi',        '(xdvi %s) &'},
+                {'evince',      '(evince %s) &'},
+                {'okular',      '(okular %s) &'},
+                {'kdvi',        '(kdvi %s) &'},
+                {'xgdvi',       '(xgdvi %s) &'},
+                {'spawg',       '(spawg %s) &'},
+                {'spawx11',     '(spawx11 %s) &'},
+                {'tkdvi',       '(tkdvi %s) &'},
+                {'dvilx',       '(dvilx %s) &'},
+                {'advi',        '(advi %s) &'},
+                {'xdvik-ja',    '(xdvik-ja %s) &'},
+                {'see',         '(see %s) &'}
+            },
+            viewer_html     = guess_viewer {
+                {'firefox',     '(firefox %s) &'},
+                {'seamonkey',   '(seamonkey %s) &'},
+                {'mozilla',     '(mozilla %s) &'},
+                {'konqueror',   '(konqueror %s) &'},
+                {'epiphany',    '(epiphany %s) &'},
+                {'opera',       '(opera %s) &'},
+                {'w3m',         'w3m'},
+                {'links',       'links'},
+                {'lynx',        'lynx'},
+                {'see',         'see'}
+            },
+            viewer_pdf      = guess_viewer {
+                {'xpdf',        '(xpdf %s) &'},
+                {'evince',      '(evince %s) &'},
+                {'okular',      '(okular %s) &'},
+                {'kpdf',        '(kpdf %s) &'},
+                {'acroread',    '(xpdf %s) &'},
+                {'see',         '(see %s) &'}
+            },
+            viewer_ps       = guess_viewer {
+                {'gv',          '(gv %s) &'},
+                {'evince',      '(evince %s) &'},
+                {'okular',      '(okular %s) &'},
+                {'kghostview',  '(kghostview %s) &'},
+                {'see',         '(see %s) &'}
+            },
+            viewer_txt      = guess_viewer {
+                {'most',        'most'},
+                {'less',        'less'},
+                {'more',        'more'}
+            },
+            viewer_md = viewer_txt,
+        }
+    end
+end
+
+-- set some fall-back default values if no previous value is set
+function setup_config_from_defaults()
+    local function set_config_ls(ls) set_config_list(ls, {src='def'}) end
+    local function set_config_elt(key, val)
+        set_config_element(key, val, {src='def'})
+    end
+    -- various, platform independent, stuff
+    set_config_ls {
+        mode                = 'view',
+        interact_switch     = 'true',
+        machine_switch      = 'false',
+        ext_list            = 'pdf, htm, html, txt, ps, dvi, ',
+        basename_list       = 'readme, 00readme',
+        badext_list         = 'txt, ',
+        badbasename_list    = 'readme, 00readme',
+        suffix_list         = '',
+        verbosity_level     = C.def_verbosity,
+        debug_list          = '',
+        max_lines           = '20',
+    }
+    -- zip-related options
+    set_config_ls {
+        zipext_list         = '',
+        rm_file             = 'rm -f',
+        rm_dir              = 'rmdir',
+    }
+end
+
+--------------------------   set all configuration   ---------------------------
+
+-- populate the config and alias arrays
+function setup_config_and_alias(arg)
+    -- setup config from all sources
+    local ret = setup_config_from_cl(arg)
+    setup_config_from_env()
+    setup_config_from_files()
+    setup_config_from_locale()
+    setup_config_from_defaults()
+    -- machine mode implies no interaction
+    if config.machine_switch == true then
+        real_set_config('interact_switch', false)
+    end
+    -- debug implies verbose
+    if #config.debug_list > 0 then
+        real_set_config('verbosity_level', tonumber(C.max_verbosity))
+    end
+    -- we were waiting for config.debug_list to be known to do this
+    show_config_files(function(s) deb_print('files', s) end)
+    -- propagated return value of _from_cl()
+    return ret
+end
+
+return {
+    setup_config_and_alias = setup_config_and_alias,
+    get_default_viewers    = get_default_viewers,
+    show_config_files      = show_config_files,
+    read_config_file       = read_config_file,
+}

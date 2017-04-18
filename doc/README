@@ -1,0 +1,12 @@
+This readme explains what the documentation is, it is not part of the
+documentation itself.
+
+The two sources are:
+1. doc/texdoc.tex
+2. texdoc.tlu (the usage string)
+
+From there are generated:
+1. The real user manual in pdf format: texdoc.pdf
+2. The minimal man page in man(1), pdf and html format: texdoc.1{,.html,.pdf}
+
+See the Makefile for details.

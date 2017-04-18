@@ -1,0 +1,286 @@
+-- score.tlu: scoring functions for texdoc
+--
+-- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+
+-- shared variables
+local global_adjscore, spec_adjscore = {}, {}
+
+-------------------------   configuration directives   -------------------------
+
+-- interpret a confline as a score directive or return false
+function confline_to_score(line, file, pos)
+    local keyw, pat, val
+    -- try global adjscore
+    pat, val = string.match(line, '^adjscore%s+([%w%p]+)%s*=%s*([%d+-.]+)')
+    if pat and val then 
+        return set_score_table(global_adjscore, pat, val)
+    end
+    -- try keyword specific adjscore
+    keyw, pat, val = string.match(line,
+    '^adjscore%(([%w%p]+)%)%s+([%w%p]+)%s*=%s*([%d+-.]+)')
+    if keyw and pat and val then 
+        keyw = string.lower(keyw)
+        spec_adjscore[keyw] = spec_adjscore[keyw] or {}
+        return set_score_table(spec_adjscore[keyw], pat, val)
+    end
+    return false
+end
+
+-- set key in score table to val, without overriding
+function set_score_table(tab, key, val)
+    local k = string.lower(key)
+    local v = tonumber(val)
+    if v then
+        if tab[k] == nil then tab[k] = v end
+        return true
+    end
+    return false
+end
+
+----------------------------   score computation   -----------------------------
+
+-- set the scores for a doclist
+function set_list_scores(list, original_kw)
+    for _, df in ipairs(list) do
+        set_score(df, original_kw)
+    end
+end
+
+-- set the score of a docfile
+function set_score(df, original_kw)
+    -- scoring is case-insenstitive (patterns are already lowercased)
+    local name = string.lower(df.shortname)
+    deb_print('score', '----------')
+    deb_print('score', 'Start scoring '..df.realpath)
+    deb_print('score', 'Name used: '..name)
+    -- get score from patterns
+    local score = -10
+    for _, pat in ipairs(df.matches) do
+        local s = -10
+        local p = string.lower(pat.name)
+        if pat.original then
+            s = df.tree > -1 and heuristic_score(name, p) or 1
+        elseif is_exact(name, p) then
+            local bonus, msg = 0, ''
+            if pat.locale then
+                bonus, msg = 5, ', (language-based)'
+            end
+            s = (pat.score or 10) + bonus -- default alias score is 10
+            deb_print('score', string.format(
+                "Matching alias '%s', score: %g%s", pat.name, s, msg))
+        end
+        if s > score then score = s end
+    end
+    deb_print('score', 'Max pattern score: '..tostring(score))
+    -- get score from tlp associations
+    if score == -10 and df.tlptodoc then
+        score = -1
+        deb_print('score', 'New score: -2 from package name association')
+    end
+    if score == -10 and df.runtodoc then
+        score = -5
+        deb_print('score', 'New score: -6 from sty/cls association')
+    end
+    -- bonus for metadata
+    if df.details then
+        if string.find(string.lower(df.details), 'readme') then
+            score = score + 0.1
+            deb_print('score', 'Catalogue "readme" bonus: +0.1')
+        else
+            score = score + 1.5
+            deb_print('score', 'Catalogue details bonus: +1.5')
+        end
+    end
+    -- adjust from keyword-specific tables
+    if df.tree > -1 and spec_adjscore[original_kw] then
+        for pat, val in pairs(spec_adjscore[original_kw]) do
+            if val and is_subword('/'..name, pat) then
+                score = score + val
+                deb_print('score', string.format(
+                    "Adjust by %g from specific pattern '%s'", val, pat))
+            end
+        end
+    end
+    -- adjust from global tables
+    if df.tree > -1 then
+        for pat, val in pairs(global_adjscore) do
+            if val and is_subword('/'..name, pat) then
+                if score > -10 or val < 0 then score = score + val end
+                deb_print('score', string.format(
+                    "Adjust by %g from global pattern '%s'", val, pat))
+            end
+        end
+    end
+    deb_print('score', 'Final score: '..tostring(score))
+    df.score = score
+end
+
+-- compute a heuristic score -10 <= s < 10
+function heuristic_score(file, pat)
+    deb_print('score', 'Start heuristic scoring with pattern: '..pat)
+    -- score management
+    local score = -10
+    local function upscore(s, reason, force)
+        if s > score or force then
+            score = s
+            deb_print('score', 'New heuristic score: '..tostring(s)
+                ..'. Reason: '..reason)
+        end
+    end
+    local slash = not not string.find(pat, '/', 1, true)
+    -- look for exact or subword match
+    if is_exact_locale(file, pat) then
+        upscore(5, 'exact match with correct locale')
+    elseif is_exact(file, pat) then
+        upscore(4, 'exact match')
+    elseif is_subword(file, pat) then
+        upscore(1, 'subword match')
+    end
+    -- try derivatives unless pat contains a slash
+    if not slash then
+        for _, suffix in ipairs(config.suffix_list) do
+            local deriv = pat..suffix
+            if is_exact(file, deriv) then
+                upscore(3, 'exact match for derived pattern: '..deriv)
+            elseif is_subword(file, deriv) then
+                upscore(2, 'subword match for derived pattern: '..deriv)
+            end
+        end
+    end
+    -- if extension is bad, score becomes an epsilon
+    local ext = config.ext_list[ext_pos(file)]
+    if ext and config.badext_list_inv[ext] and score > 0 then
+        upscore(0.1, 'bad extension', true)
+    end
+    -- if basename is bad, score gets < 0
+    if has_bad_basename(file) and score > 0 then
+        upscore(0.1, 'bad basename', true)
+    end
+    -- bonus for being in the right directory
+    if string.find('/'..file, '/'..pat..'/', 1, true) and not slash then
+        upscore(score + 1.5, 'directory bonus')
+    end
+    -- done
+    deb_print('score', 'Final heuristic score: '..tostring(score))
+    return score
+end
+
+-- says if file is an exact match for pat
+function is_exact(file, pat)
+    file = parse_zip(file)
+    local slashes = string.gsub(pat, '[^/]+', '[^/]+')
+    basename = string.match(file, slashes..'$')
+    if not basename then return nil end
+    if basename == pat then return true end
+    for _, ext in ipairs(config.ext_list) do
+        if ext ~= '' and ext ~= '*' and basename == pat..'.'..ext then
+            return true
+        end
+    end
+    return false
+end
+
+-- says if file is an exact match for pat and the current locale
+function is_exact_locale(file, pat)
+    if string.match(pat, '%-%l%l%l?$') then
+        -- don't match if the pattern appears to include a language code
+        return false
+    end
+    local lang = config.lang
+    if lang then
+        return is_exact(file, pat .. '-' .. lang)
+            or is_exact(file, lang .. '-' .. pat)
+    end
+    return false
+end
+
+-- say if pat is a "subword" of str
+function is_subword(str, pat)
+    local i, j = string.find(str, pat, 1, true)
+    return not not (i and j
+        and (i == 1 or is_delim(str, i) or is_delim(str, i-1))
+        and (j == #str or is_delim(str, j) or is_delim(str, j+1)))
+end
+
+-- say if character i of str is a delimiter (ponctuation)
+function is_delim(str, i)
+    return not not string.find(string.sub(str, i, i), '%p')
+end
+
+-- say if a filename has a bad basename
+function has_bad_basename(file)
+    file = file:gsub('.*/', '')
+    for _, b in ipairs(config.badbasename_list) do
+        if file:find('^'..b..'$') or file:find('^'..b..'%.') then
+            return true
+        end
+    end
+    return false
+end
+
+-- compare two docfile's: (see search.tlu for structure)
+-- 1. by score
+-- 2. then by extensions (ordered as in ext_list),
+-- 3. then lexicographically by filename.
+-- 4. then by tree.
+-- return true if a is better than b
+function docfile_order (a, b)
+    if     a.score > b.score        then return true
+    elseif a.score < b.score        then return false
+    elseif a.ext_pos < b.ext_pos    then return true
+    elseif a.ext_pos > b.ext_pos    then return false
+    elseif a.basename < b.basename  then return true
+    elseif a.basename > b.basename  then return false
+    else return (a.tree > b.tree)
+    end
+end
+
+-----------------------------   public functions   -----------------------------
+
+-- returns the index of the most specific extension of file in ext_list,
+-- or config.ext_list_max + 1
+function ext_pos(file)
+    -- remove zipext if applicable
+    file = parse_zip(file)
+    -- now find the extension
+    local p, e, pos, ext
+    for p, e in ipairs(config.ext_list) do
+        if (e == '*') and (ext == nil) then
+            pos, ext = p, e
+        elseif (e == '') and not string.find(file, '.', 1, true) then
+            pos, ext = p, e
+        elseif string.sub(file, -string.len(e)-1) == '.'..e then
+            if (ext == nil) or (ext == '*')
+                or (string.len(e) > string.len(ext)) then
+                pos, ext = p, e
+            end
+        end
+    end
+    return pos or (config.ext_list_max + 1)
+end
+
+-- return the "quality" of docfile
+function docfile_quality(df)
+    if df.score > 0 then
+        return 'good'
+    elseif df.score > -100 then
+        return 'bad'
+    else
+        return 'killed'
+    end
+end
+
+-- sort a doclist
+function sort_doclist(dl, original_kw)
+    dl:stop()
+    set_list_scores(dl, original_kw)
+    table.sort(dl, docfile_order)
+end
+
+return {
+    sort_doclist      = sort_doclist,
+    docfile_quality   = docfile_quality,
+    ext_pos           = ext_pos,
+    is_exact          = is_exact,
+    confline_to_score = confline_to_score,
+}

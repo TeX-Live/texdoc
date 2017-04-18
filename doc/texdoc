@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# This fake texdoc is intended to try and make help2man happy
+
+case $1 in
+    --help)
+        texlua ../script/texdoc.tlu "$@" | \
+            egrep -v '^(Current settings:|Full manual) ' | \
+            sed -e 's/^\([^UAO ][^-:]*:\) /\1\
+            /'
+        ;;
+    --version)
+        texlua ../script/texdoc.tlu "$@"
+esac
