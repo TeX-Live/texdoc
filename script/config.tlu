@@ -192,11 +192,9 @@ function setup_config_from_env ()
     local function set_config_elt_from_option_env(key, var)
         if (os.type == "windows") then return end
         local value = os.getenv(var)
-	if value then
-            err_print('warning', 'NORBERT: consulting ' .. value .. ' for ' .. key)
+        if value then
             for cmd in string.gmatch(value, '([^:]+)') do
-	        err_print('warning', 'NORBERT: current cmd = ' .. cmd)
-                if is_in_path(cmd) then 
+                if is_in_path(cmd) then
                     set_config_element(key, cmd, {src='env', name=var})
                     -- don't test other commands if we have found one
                     break
