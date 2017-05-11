@@ -1,8 +1,9 @@
+-- $Id$
 -- config.tlu: configuration handling for texdoc
 --
--- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
 
---------------------------   hide the config table   ---------------------------
+--------------------------   hide the config table   --------------------------
 
 -- config is read-only (but not "deep" read-only)
 function set_read_only(table, name)
@@ -20,7 +21,7 @@ end
 real_set_config = set_read_only(config, 'config')
 
 
--------------------------   general config functions   -------------------------
+-------------------------   general config functions   ------------------------
 
 -- set a config parameter, but don't overwrite it if already set
 -- three special types: *_list (list), *_switch (boolean), *_level (number)
@@ -124,7 +125,7 @@ function set_config_list (conf, context)
     end
 end
 
-------------------------   options from command line   -------------------------
+------------------------   options from command line   ------------------------
 
 -- set config from the command line
 -- Please make sure to update C.usage_msg accordingly
@@ -214,8 +215,6 @@ function setup_config_from_env ()
     set_config_elt_from_vars('viewer_html',
       {"BROWSER_texdoc", "TEXDOCVIEW_html", "TEXDOC_VIEWER_HTML"})
     set_config_elt_from_option_env('viewer_html', "BROWSER")
-    bla = config['viewer_html']
-    err_print('warning', 'NORBERT: viewer_html is now ' .. bla)
     set_config_elt_from_vars('viewer_md',
       {"MDVIEWER_texdoc", "TEXDOCVIEW_md", "TEXDOC_VIEWER_MD"})
     set_config_elt_from_option_env('viewer_md', "PAGER")
