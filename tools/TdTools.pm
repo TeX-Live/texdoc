@@ -1,4 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+# $Id$
+# Manuel Pégourié-Gonnard, 2010. WTFPL v2.
+# Updated 2017 Karl Berry.
 
 use warnings;
 use strict;
@@ -9,23 +12,18 @@ use Getopt::Long ();
 package TdTools;
 
 # defaults
-my $texdoc_path = -d '.git' ? '.' : -d '../.git' ? '..' : $ENV{TEXDOCDEV};
+my $texdoc_path = -d '.svn' ? '.' : -d '../.svn' ? '..' : $ENV{TEXDOCDEV};
 my $texlive_path = $ENV{TLROOT} ? "$ENV{TLROOT}/bin/x86_64-linux" : undef;
 
-# setup the controled environment and return texdoc path
+# setup the controlled environment and return texdoc path
 sub setup {
-    my ($usage, $check_branch) = @_;
+    my ($usage) = @_;
 
     # get options
-    my $dont_check_branch = not $check_branch;
     Getopt::Long::GetOptions(
         'td=s'              => \$texdoc_path,
         'tl=s'              => \$texlive_path,
-        'dont-check-branch' => \$dont_check_branch,
     ) or die "Unkown option.\n$usage";
-
-    # possibly check branch
-    check_branch() unless $dont_check_branch;
 
     # derived (and exported) path
     my $texdoc_scriptdir = "$texdoc_path/script";
@@ -44,21 +42,6 @@ sub setup {
     return {
         texdoc_path     => $texdoc_path,
         texlive_path    => $texlive_path,
-    }
-}
-
-# call this to make sure we are in the right branch
-sub check_branch {
-    my $hint = "use --dont-check-branch if you mean it.";
-    if (open my $git_head_fh, '<', "$texdoc_path/.git/HEAD") {
-        my $git_head = <$git_head_fh>;
-        close $git_head_fh;
-        my ($git_branch_name) = $git_head =~ m"^ref: refs/heads/(.*)";
-        $git_branch_name ||= '(no branch)';
-        ($git_branch_name eq 'texlive')
-            or die "Bad branch `$git_branch_name'; $hint\n";
-    } else {
-        die "No a git repo; $hint\n";
     }
 }
 
