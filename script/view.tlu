@@ -1,9 +1,9 @@
 -- $Id$
 -- view.tlu view a document and/or display the list of results in texdoc
 --
--- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
 
------------------------------   view a document   ------------------------------
+-----------------------------   view a document   -----------------------------
 
 -- view a document
 -- see search.tlu for the structure of the argument
@@ -85,9 +85,9 @@ function try_viewing (view_command, viewer_replacement)
     if os.type == 'unix' and not (os.name == 'macosx')
             and os.getenv('DISPLAY') == nil then
         err_print('warning',
-        "DISPLAY is not set. Things may go wrong with you viewer.")
+        "DISPLAY is not set; your viewer will likely have problems.")
         err_print('warning',
-        "Try --list if you want results to be listed, not displayed.")
+        "Try --list to list results instead of displaying them.")
     end
     err_print('info', 'View command: '..view_command)
     if not os.execute(view_command) then
@@ -97,7 +97,7 @@ function try_viewing (view_command, viewer_replacement)
     return true
 end
 
------------------------------   display results   ------------------------------
+-----------------------------   display results   -----------------------------
 
 -- print a list of docfile objects (see search.tlu) as a menu
 -- if showall is false, stop as soon as a bad result is encountered
@@ -151,7 +151,7 @@ function print_menu(name, doclist, showall)
     end
 end
 
------------------------   deliver results base on mode   -----------------------
+-----------------------   deliver results base on mode   ----------------------
 
 function deliver_results(name, doclist, many)
     -- ensure that results were found or apologize
