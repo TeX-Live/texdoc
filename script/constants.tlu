@@ -1,6 +1,7 @@
+-- $Id$
 -- constants.tlu: global "constants" for texdoc.
 --
--- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
 
 -- use an empty environment that will become texdoc_env.C (see EOF)
 local constants = {}
@@ -20,7 +21,7 @@ end
 -- progname and version
 fullname    = kpse.find_file('texdoc/texdoclib', 'lua')
 progname    = 'texdoc'
-version     = '0.85'
+version     = '2.017'
 
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant
@@ -48,13 +49,17 @@ Options:
   -v, --verbose         Print additional information (eg, viewer command).
   -d, --debug[=list]    Activate debug output (restricted to list).
 
-Environment: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER.
+Environment variables: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER,
+and texdoc_* of each.
+
 Files: <texmf>/texdoc/texdoc.cnf, see output of the --files option.
-Report bugs to <texdoc@tug.org>.
-Full manual available via `texdoc texdoc'.]]
+Full manual available via `texdoc texdoc'.
+
+Please report bugs to <texdoc@tug.org>.
+]]
 
 copyright_msg = [[
-Copyright (C) 2008-2013 Manuel P'egouri'e-Gonnard.
+Copyright 2008-2017 Manuel P'egouri'e-Gonnard.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.]]
 
@@ -91,6 +96,7 @@ known_options = {
 
 error_msg = [[
 Try `texdoc --help' for a short help, `texdoc texdoc' for the user manual.]]
+
 notfound_msg = [[
 Sorry, no documentation found for PKGNAME.
 If you are unsure about the name, try searching CTAN's TeX catalogue at
@@ -102,7 +108,7 @@ err_priority = {
     warning = 2,
     info    = 3,
 }
-min_verbosity='0'
+min_verbosity='0'  -- (nothing at all)
 max_verbosity='3'
 def_verbosity='2'
 
