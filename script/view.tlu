@@ -81,6 +81,7 @@ function try_viewing (view_command, viewer_replacement)
     else
         view_command = view_command..' '..viewer_replacement
     end
+
     -- try to catch problems with missing DISPLAY on Unix
     if os.type == 'unix' and not (os.name == 'macosx')
             and os.getenv('DISPLAY') == nil then
@@ -90,12 +91,43 @@ function try_viewing (view_command, viewer_replacement)
         "Try --list to list results instead of displaying them.")
     end
     err_print('info', 'View command: '..view_command)
+     
+    -- See long comment below this function for the LC_CTYPE story.
+    -- We only want to reset the environment if we have the value
+    -- to reset it to. In older versions of luatex, status.lc_* will be nil.
+    local env_lc_ctype = status.lc_ctype
+    local luatex_lc_ctype = os.setlocale(nil, 'ctype')
+    if (env_lc_ctype) then
+      err_print('info', "Setting environment LC_CTYPE to: "..env_lc_ctype)
+      os.setenv("LC_CTYPE", env_lc_ctype)
+    end
+
+    -- the big casino: run the external command.
     if not os.execute(view_command) then
-        err_print('error', "Failed to execute '"..view_command.."'")
+        err_print('error', "Failed to execute: "..view_command)
         return false
     end
+    
+    -- reset back to "C" (should always be C and always happen, but in case...)
+    if (luatex_lc_ctype) then
+      os.setenv("LC_CTYPE", luatex_lc_ctype)
+    end
+
     return true
 end
+
+-- Explanation of locale madness:
+-- LuaTeX resets LC_CTYPE, LC_COLLATE, LC_NUMERIC to "C". That is good for
+-- inside luatex, but when we run an external program, if the user's
+-- environment is something else, we want to switch back to it. As of
+-- TL 2017 LuaTeX, we can inspect the user's locale with status.lc_ctype, etc.
+-- 
+-- For texdoc purposes, what matters is LC_CTYPE (so we don't bother with
+-- the others). For example, with the less pager, when LC_CTYPE=C,
+-- non-ASCII bytes are displayed as "<xx>", where xx is the two hex
+-- digits for the byte.
+-- 
+-- See <texdoc-dev-source>/tools/Makefile for a standalone test case.
 
 -----------------------------   display results   -----------------------------
 
