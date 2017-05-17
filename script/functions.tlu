@@ -1,6 +1,7 @@
+-- $Id$
 -- functions.tlu: general-use functions for texdoc
 --
--- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
 
 -- change '/' to '\' on windows
 -- Use: internal representation of files always use forward slashes.
@@ -26,7 +27,7 @@ else
     end
 end
 
--- generic error display function (see the error_priority constant)
+-- generic error display function (see the err_priority constant)
 function err_print (lvl, msg)
     -- be careful: maybe config.verbosity_level is not set yet
     local verbosity_level = config.verbosity_level or tonumber(C.def_verbosity)
