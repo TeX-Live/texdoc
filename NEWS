@@ -1,22 +1,27 @@
+$Id$
+(This file public domain.)
+
+Version 2.017 (TeX Live 2017)
+============================
+- Restore user's LC_CTYPE value if possible (with this year's luatex).
+- Generic system environment variables, such as BROWSER, accept
+  a colon-separated list of programs.
+
 Version 0.85
 ------------
-
 Compatibility with LuaTeX 0.74+ (Lua 5.2).
 
 Version 0.84 (TeX Live 2012)
 ============================
-
 Fix -f output when TEXMFHOME contains a list of paths. Bug sort-of reported
 by Matthew Leingang, see http://tex.stackexchange.com/questions/42920/
 
 Version 0.83
 ------------
-
 Minor adjustments in the scoring system.
 
 Version 0.82
 ------------
-
 Fixes to the default viewer/destkop environment detection:
 - try gvfs-open with Gnome
 - always try xdg-open first (usually more up-to-date)
@@ -235,10 +240,8 @@ Various changes including:
 
 Version 0.1
 -----------
-
 Initial public release of the texlua version by Frank Küster.
 
 Earlier versions
 ----------------
-
 Shell script by Thomas Esser maintained as part of teTeX.
