@@ -132,13 +132,24 @@ end
 -- and set a default value in setup_config_from_defaults() if relevant.
 function setup_config_from_cl(arg)
     local curr_arg
+    local action = true
     local function set_config_elt(key, val)
         set_config_element(key, val, {src='cl', name=curr_arg})
     end
     while arg[1] and string.match(arg[1],'^%-') do
         curr_arg = table.remove(arg,1)
+
+        -- action
+        if (curr_arg == '-h') or (curr_arg == '--help') then
+            action = 'help'
+        elseif (curr_arg == '-V') or (curr_arg == '--version') then
+            action = 'version'
+        elseif (curr_arg == '-f') or (curr_arg == '--files') then
+            action = 'files'
+        elseif curr_arg == '--just-view' then
+            action = 'view'
         -- mode
-        if (curr_arg == '-w') or (curr_arg == '--view') then
+        elseif (curr_arg == '-w') or (curr_arg == '--view') then
             set_config_elt('mode', 'view')
         elseif (curr_arg == '-m') or (curr_arg == '--mixed') then
             set_config_elt('mode', 'mixed')
@@ -175,7 +186,7 @@ function setup_config_from_cl(arg)
             return false
         end
     end
-    return true
+    return action
 end
 
 -------------------------   config from environment   --------------------------

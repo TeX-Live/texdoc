@@ -10,31 +10,16 @@ local exit_ok = 0
 local exit_error = 1 -- apparently hard-coded in Lua
 local exit_usage = 2
 
--- action command-line options, not treated by setup_config_and_alias
+-- action command-line options
 local action_help = [[
   -h, --help            Print this help message.
   -V, --version         Print the version number.
   -f, --files           Print the list of configuration files used.
   --just-view file      Display file, given with full path (no searching).]]
-local action_opts = {
-    ['-h']          = 'help',
-    ['--help']      = 'help',
-    ['-V']          = 'version',
-    ['--version']   = 'version',
-    ['-f']          = 'files',
-    ['--files']     = 'files',
-    ['--just-view'] = 'view',
-}
 
--- detect action options, but do not act now (some need setup_config)
-local action
-if arg[1] then
-    action = action_opts[arg[1]]
-    if action then table.remove(arg, 1) end
-end
-
--- get configuration
-if not texdoc.setup_config_and_alias(arg) then
+-- get configuration and parse command line
+local action = texdoc.setup_config_and_alias(arg)
+if not action then
     os.exit(exit_usage)
 end
 
@@ -46,7 +31,7 @@ elseif action == 'version' then
     print(texdoc.const.progname .. ' ' .. texdoc.const.version)
     print('\n' .. texdoc.const.copyright_msg)
     os.exit(exit_ok)
-elseif action =='files' then
+elseif action == 'files' then
     print(texdoc.const.fullname .. ' ' .. texdoc.const.version)
     texdoc.show_config_files(print, true)
     os.exit(exit_ok)
