@@ -611,10 +611,12 @@ function get_doclist(pattern, no_alias)
     local normal, sty = normal_vs_sty(get_patterns(pattern, no_alias))
     -- initialise result list
     s_doclist = Doclist:new()
-    -- get results
+    -- get results; _texdocs search comes after _tlpdb search so that
+    -- files found by both will have the priority of the _texdocs tree.
+    -- (https://puszcza.gnu.org.ua/bugs/?369)
     get_doclist_sty(sty)
-    get_doclist_texdocs(normal)
     get_doclist_tlpdb(pattern)
+    get_doclist_texdocs(normal)
     -- finally, sort results
     sort_doclist(s_doclist, pattern)
     return s_doclist
