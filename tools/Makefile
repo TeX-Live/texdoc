@@ -1,7 +1,7 @@
 # $Id$
 # Public domain.
 
-tlbin = /usr/local/texlive/pretest/bin/x86_64-linux
+tlbin = /usr/local/texlive/dev/bin/x86_64-linux
 texlua = texlua
 texlua = $(tlbin)/texlua
 

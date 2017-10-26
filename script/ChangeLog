@@ -1,0 +1,12 @@
+2017-10-26  Karl Berry  <karl@freefriends.org>
+
+* config.tlu (setup_config_from_cl): return action to take instead of boolean.
+* main.tlu: change call.
+(action_opts): no longer needed.
+From Reuben Thomas, http://puszcza.gnu.org.ua/bugs/?363.
+
+2017-10-26  Karl Berry  <karl@freefriends.org>
+
+* search.tlu (get_doclist): do get_doclist_texdocs search last, so
+its (highest priority) tree code is what counts.
+From Reuben Thomas, https://puszcza.gnu.org.ua/bugs/?369.

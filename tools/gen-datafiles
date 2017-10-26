@@ -61,4 +61,7 @@ system("$texdoc texlive-en") == 0 || die "Data.tlpdb broken";
 system("mv '$texlive_tlpdb.temp' '$texlive_tlpdb'")
 == 0 || die "mv(.temp,$texlive_tlpdb) failed: $!";
 
+# show output file.
+system("echo 'generated:'; ls -l '$dest'")
+
 __END__
