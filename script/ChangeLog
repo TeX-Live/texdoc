@@ -1,12 +1,20 @@
+2017-11-04  Karl Berry  <karl@freefriends.org>
+
+* view.tlu (print_menu): make just RET as input view first document in list.
+Suggested by Denis Bitouze,
+http://tug.org/pipermail/texdoc/2017q3/000394.html
+
+Also, quit if number is beyond last in list, even if the document exists.
+
 2017-10-26  Karl Berry  <karl@freefriends.org>
 
 * config.tlu (setup_config_from_cl): return action to take instead of boolean.
 * main.tlu: change call.
 (action_opts): no longer needed.
-From Reuben Thomas, http://puszcza.gnu.org.ua/bugs/?363.
+From Reuben Thomas, http://puszcza.gnu.org.ua/bugs/?363
 
 2017-10-26  Karl Berry  <karl@freefriends.org>
 
 * search.tlu (get_doclist): do get_doclist_texdocs search last, so
 its (highest priority) tree code is what counts.
-From Reuben Thomas, https://puszcza.gnu.org.ua/bugs/?369.
+From Reuben Thomas, https://puszcza.gnu.org.ua/bugs/?369

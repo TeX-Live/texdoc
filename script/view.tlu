@@ -156,8 +156,9 @@ function print_menu(name, doclist, showall)
             end
         end
     end
-    local i, doc
+    local i, doc, last_i
     for i, doc in ipairs (doclist) do
+        last_i = i -- save for test below
         if doc.quality == 'killed' then break end
         if doc.quality ~= 'good' and not showall then break end
         if config.machine_switch == true then
@@ -174,16 +175,20 @@ function print_menu(name, doclist, showall)
         end
     end
     if config.interact_switch then
-        io.write ("Please enter the number of the file to view, ",
-        "anything else to skip: ")
-        local num = tonumber(io.read('*line'))
-        if num and doclist[num] then
+        io.write ("Enter number of file to view, ",
+        "RET to view 1, anything else to skip: ")
+        local num_str = io.read('*line')
+        -- That returns the empty string on an empty line, nil on EOF.
+        -- We only want to default to viewing 1 on an empty line.
+        -- Use Lua's faked ternary operator for fun and brevity:
+        num = (num_str == "" and 1 or tonumber(num_str))
+        if num and doclist[num] and num < last_i then
             view_doc(doclist[num])
         end
     end
 end
 
------------------------   deliver results base on mode   ----------------------
+-----------------------   deliver results based on mode   ---------------------
 
 function deliver_results(name, doclist, many)
     -- ensure that results were found or apologize

@@ -1,11 +1,15 @@
 $Id$
 (This file public domain.)
 
+- In list mode (-l), just RET views first document in list.
+- --help and --version override other specified command-line actions.
+
 Version 2.017 (TeX Live 2017)
 ============================
 - Restore user's LC_CTYPE value if possible (with this year's luatex).
 - Generic system environment variables, such as BROWSER, accept
   a colon-separated list of programs.
+- Sources moved to https://puszcza.gnu.org.ua/projects/texdoc.
 
 Version 0.85
 ------------
