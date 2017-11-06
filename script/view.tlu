@@ -158,13 +158,13 @@ function print_menu(name, doclist, showall)
     end
     local i, doc, last_i
     for i, doc in ipairs (doclist) do
-        last_i = i -- save for test below
         if doc.quality == 'killed' then break end
         if doc.quality ~= 'good' and not showall then break end
         if config.machine_switch == true then
             print(name, doc.score, w32_path(doc.realpath),
             doc.lang or '', doc.details or '')
         else
+            last_i = i -- save for test below
             print(string.format('%2d %s', i, w32_path(doc.realpath)))
             if doc.details or doc.lang then
                 local line = '   = '
@@ -182,7 +182,7 @@ function print_menu(name, doclist, showall)
         -- We only want to default to viewing 1 on an empty line.
         -- Use Lua's faked ternary operator for fun and brevity:
         num = (num_str == "" and 1 or tonumber(num_str))
-        if num and doclist[num] and num < last_i then
+        if num and doclist[num] and num <= last_i then
             view_doc(doclist[num])
         end
     end
