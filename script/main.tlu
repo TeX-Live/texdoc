@@ -36,6 +36,10 @@ elseif action == 'files' then
     texdoc.show_config_files(print, true)
     os.exit(exit_ok)
 elseif action == 'view' then
+    if not arg[1] then
+        texdoc.print_usage()
+        os.exit(exit_usage)
+    end
     local ok = texdoc.view_file(arg[1])
     os.exit(ok and exit_ok or exit_error)
 end
