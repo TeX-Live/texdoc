@@ -75,11 +75,13 @@ function set_score(df, original_kw)
     -- get score from tlp associations
     if score == -10 and df.tlptodoc then
         score = -1
-        deb_print('score', 'New score: -2 from package name association')
+        deb_print('score', 'New score: '..tostring(score)
+            ..' from package name association')
     end
     if score == -10 and df.runtodoc then
         score = -5
-        deb_print('score', 'New score: -6 from sty/cls association')
+        deb_print('score', 'New score: '..tostring(score)
+            ..' from sty/cls association')
     end
     -- bonus for metadata
     if df.details then
@@ -152,7 +154,7 @@ function heuristic_score(file, pat)
     if ext and config.badext_list_inv[ext] and score > 0 then
         upscore(0.1, 'bad extension', true)
     end
-    -- if basename is bad, score gets < 0
+    -- if basename is bad, score becomes an epsilon
     if has_bad_basename(file) and score > 0 then
         upscore(0.1, 'bad basename', true)
     end
