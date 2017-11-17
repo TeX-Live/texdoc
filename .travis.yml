@@ -1,0 +1,12 @@
+os:
+  - osx
+  - linux
+dist: trusty
+sudo: false
+before_install:
+  - wget https://raw.githubusercontent.com/y-yu/install-tex-travis/master/install-tex.sh
+  - chmod +x install-tex.sh
+install:
+  - . ./install-tex.sh
+script:
+  - ./tools/travis-ci
