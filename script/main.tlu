@@ -1,3 +1,4 @@
+-- $Id$
 -- main.tlu: default command-line interface of texdoc
 --
 -- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
@@ -15,7 +16,7 @@ local action_help = [[
   -h, --help            Print this help message.
   -V, --version         Print the version number.
   -f, --files           Print the list of configuration files used.
-  --just-view file      Display file, given with full path (no searching).]]
+  --just-view FILE      Display FILE, given with full path (no searching).]]
 
 -- get configuration and parse command line
 local action = texdoc.setup_config_and_alias(arg)
@@ -37,7 +38,8 @@ elseif action == 'files' then
     os.exit(exit_ok)
 elseif action == 'view' then
     if not arg[1] then
-        texdoc.print_usage()
+        texdoc.err_print('error', "missing file operand to --just-view")
+        texdoc.err_print('error', texdoc.const.error_msg)
         os.exit(exit_usage)
     end
     local ok = texdoc.view_file(arg[1])
@@ -46,7 +48,8 @@ end
 
 -- make sure we actually have argument(s)
 if not arg[1] then
-    texdoc.print_usage()
+    texdoc.err_print('error', "no action specified")
+    texdoc.err_print('error', texdoc.const.error_msg)
     os.exit(exit_usage)
 end
 

@@ -21,7 +21,7 @@ end
 -- progname and version
 fullname    = kpse.find_file('texdoc/texdoclib', 'lua')
 progname    = 'texdoc'
-version     = '2.017'
+version     = '2.0171'
 
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant
@@ -47,15 +47,16 @@ Options:
 
   -q, --quiet           Suppress warnings and most error messages.
   -v, --verbose         Print additional information (eg, viewer command).
-  -d, --debug[=list]    Activate debug output (restricted to list).
+  -d, --debug[=LIST]    Activate debug output (restricted to LIST).
 
 Environment variables: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER,
 and texdoc_* of each.
 
-Files: <texmf>/texdoc/texdoc.cnf, see output of the --files option.
+Files: <TEXMF>/texdoc/texdoc.cnf; see output of the --files option.
 Full manual available via `texdoc texdoc'.
 
-Please report bugs to <texdoc@tug.org>.
+texdoc home page: <https://tug.org/texdoc/>
+Please email bugs to <texdoc@tug.org>.
 ]]
 
 copyright_msg = [[
@@ -95,7 +96,7 @@ known_options = {
 }
 
 error_msg = [[
-Try `texdoc --help' for a short help, `texdoc texdoc' for the user manual.]]
+Try `texdoc --help' for short help, `texdoc texdoc' for full manual.]]
 
 notfound_msg = [[
 Sorry, no documentation found for PKGNAME.

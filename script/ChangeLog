@@ -1,3 +1,9 @@
+2017-11-18  Karl Berry  <karl@freefriends.org>
+
+* constants.tlu: version 2.0171; message wording.
+* main.tlu: message wording, don't print full usage unrequested.
+* texdoclib.tlu: export err_print.
+
 2017-11-05  Karl Berry  <karl@freefriends.org>
 
 * view.tlu (print_menu): off-by-one error in finding last valid number.
@@ -23,3 +29,5 @@ From Reuben Thomas, http://puszcza.gnu.org.ua/bugs/?363
 * search.tlu (get_doclist): do get_doclist_texdocs search last, so
 its (highest priority) tree code is what counts.
 From Reuben Thomas, https://puszcza.gnu.org.ua/bugs/?369
+
+(This ChangeLog file public domain.)
