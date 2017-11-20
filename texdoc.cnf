@@ -20,7 +20,6 @@
 #
 # For more details, see the texdoc manual (try `texdoc texdoc').
 
-
 # General settings
 # ================
 
@@ -88,7 +87,6 @@
 # Known suffixes for documentation
 suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, -man, notes, -info, ref
 
-
 # Score adjustments
 # =================
 
@@ -163,8 +161,7 @@ adjscore(latex) latex-web-companion        = -10
 adjscore(latex) ocr-latex                  = -10
 adjscore(latex) tufte-latex                = -10
 # file names
-adjscore(latex) Content_LaTeX_Package_Demo = -10
-adjscore(latex) example_latex              = -10
+
 adjscore(latex) test_latex                 = -10
 
 # beamer
@@ -185,7 +182,6 @@ adjscore(pgf) pgfmanual.pdf = +5
 # context version is found first
 adjscore(fixme) /third/  = -6
 
-
 # Aliases
 # =======
 
@@ -480,7 +476,6 @@ alias(4.1) thrmappendix  = thrmappendix.sty
 alias(4.1) topcapt       = topcapt.sty
 alias(4.1) vrbexin       = vrbexin.sty
 
-
 # Final hack
 #
 # The next line has no effect when this file is installed as the last
