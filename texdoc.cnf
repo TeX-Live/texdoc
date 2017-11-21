@@ -20,6 +20,7 @@
 #
 # For more details, see the texdoc manual (try `texdoc texdoc').
 
+
 # General settings
 # ================
 
@@ -87,6 +88,7 @@
 # Known suffixes for documentation
 suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, -man, notes, -info, ref
 
+
 # Score adjustments
 # =================
 
@@ -124,16 +126,16 @@ adjscore gpl     = -10
 adjscore /tex-virtual-academy-pl/ = -50
 
 # test and example files are not likely the best documentation
-adjscore example  = -3
-adjscore examples = -3
-adjscore sample   = -3
-adjscore samples  = -3
-adjscore test     = -3
-adjscore tests    = -3
-adjscore /demo/     = -3
-adjscore /demos/    = -3
-adjscore /figures/  = -3
-adjscore /images/   = -3
+adjscore example   = -3
+adjscore examples  = -3
+adjscore sample    = -3
+adjscore samples   = -3
+adjscore test      = -3
+adjscore tests     = -3
+adjscore /demo/    = -3
+adjscore /demos/   = -3
+adjscore /figures/ = -3
+adjscore /images/  = -3
 
 # readme's usually get a negative score because they have a bad extension,
 # but they're still slightly better than other results with negative scores
@@ -161,7 +163,8 @@ adjscore(latex) latex-web-companion        = -10
 adjscore(latex) ocr-latex                  = -10
 adjscore(latex) tufte-latex                = -10
 # file names
-
+adjscore(latex) Content_LaTeX_Package_Demo = -10
+adjscore(latex) example_latex              = -10
 adjscore(latex) test_latex                 = -10
 
 # beamer
@@ -171,10 +174,10 @@ adjscore(beamer) beamer-tut-pt                = -10
 adjscore(beamer) presentations                = -10
 
 # misc
-adjscore(context) circuitikz = -10
-adjscore(context) /gnuplot/  = -3
+adjscore(context) circuitikz   = -10
+adjscore(context) /gnuplot/    = -3
 adjscore(context) context.man1 = +2
-adjscore(symbols) /staves/   = -5
+adjscore(symbols) /staves/     = -5
 
 # catalogue info missing in the tlcontrib version of the package :-(
 adjscore(pgf) pgfmanual.pdf = +5
@@ -182,6 +185,7 @@ adjscore(pgf) pgfmanual.pdf = +5
 # context version is found first
 adjscore(fixme) /third/  = -6
 
+
 # Aliases
 # =======
 
@@ -194,8 +198,8 @@ adjscore(fixme) /third/  = -6
 
 ## Essential documentation
 
-alias live    = texlive-en
-alias texlive = texlive-en
+alias live     = texlive-en
+alias texlive  = texlive-en
 alias tex-live = texlive-en
 
 ## various stuff
@@ -365,42 +369,42 @@ alias l3fp          = interface3
 alias l3luatex      = interface3
 
 # misc
-alias autofe        = ucs
-alias afoot         = arabtex-doc
-alias arabicfont    = bezos
-alias bibtex        = btxdoc
-alias changes       = changes.english.pdf
-alias(5) cmsuper    = cm-super/FAQ
-alias cm-super      = cm-super/README
-alias cmsuper       = cm-super/README
-alias cyrillic      = cyrillic/00readme.txt
-alias elsarticle    = elsdoc
-alias(0.1) fontinst = fontinstallationguide
-alias hyperref      = hyperref/manual.pdf
-alias hyperref-dev  = hyperref.pdf
-alias iso           = isoman
-alias lettrine      = lettrine # to hide context/third/lettrine-doc.pdf
-alias nonfloat-de   = nonfloat
-alias nonfloat      = nonfloat-en
-alias xstring-fr    = xstring_doc_fr
-alias arabic        = arabi/user_guide
-alias 3parttable    = threeparttable
-alias croatian      = babel
-alias mls           = montex
-alias vrbexin       = verbasef
-alias dtk           = dtk/doc/beispiel.pdf
-alias musixtex      = musixdoc
-alias mychemistry   = mychemistry_en
-alias mychemistry-de = mychemistry_de
-alias cjk           = CJK.txt # FIXME: should be case insensitive
-alias ieee          = IEEEtran_HOWTO
-alias layouts       = layman
-alias plnfss        = plnfss.txt # XXX
-alias teubner       = teubner-doc
-alias xypic         = xyguide
+alias autofe          = ucs
+alias afoot           = arabtex-doc
+alias arabicfont      = bezos
+alias bibtex          = btxdoc
+alias changes         = changes.english.pdf
+alias(5) cmsuper      = cm-super/FAQ
+alias cm-super        = cm-super/README
+alias cmsuper         = cm-super/README
+alias cyrillic        = cyrillic/00readme.txt
+alias elsarticle      = elsdoc
+alias(0.1) fontinst   = fontinstallationguide
+alias hyperref        = hyperref/manual.pdf
+alias hyperref-dev    = hyperref.pdf
+alias iso             = isoman
+alias lettrine        = lettrine # to hide context/third/lettrine-doc.pdf
+alias nonfloat-de     = nonfloat
+alias nonfloat        = nonfloat-en
+alias xstring-fr      = xstring_doc_fr
+alias arabic          = arabi/user_guide
+alias 3parttable      = threeparttable
+alias croatian        = babel
+alias mls             = montex
+alias vrbexin         = verbasef
+alias dtk             = dtk/doc/beispiel.pdf
+alias musixtex        = musixdoc
+alias mychemistry     = mychemistry_en
+alias mychemistry-de  = mychemistry_de
+alias cjk             = CJK.txt # FIXME: should be case insensitive
+alias ieee            = IEEEtran_HOWTO
+alias layouts         = layman
+alias plnfss          = plnfss.txt # XXX
+alias teubner         = teubner-doc
+alias xypic           = xyguide
 alias kvoptions-patch = kvoptions # XXX?
-alias cweb          = cwebman # XXX: is in 'cweb' dir, should win
-alias einfuehrung   = einfuehrung/README # tl should get "readme" tag
+alias cweb            = cwebman # XXX: is in 'cweb' dir, should win
+alias einfuehrung     = einfuehrung/README # tl should get "readme" tag
 
 ## a few easy patterns
 
@@ -476,6 +480,7 @@ alias(4.1) thrmappendix  = thrmappendix.sty
 alias(4.1) topcapt       = topcapt.sty
 alias(4.1) vrbexin       = vrbexin.sty
 
+
 # Final hack
 #
 # The next line has no effect when this file is installed as the last

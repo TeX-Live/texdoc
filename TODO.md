@@ -1,6 +1,10 @@
-# For the next release (version 3.0)
+# TODO list for texdoc
 
-## Fuzzy search
+This file public domain.
+
+## For the next release (version 3.0)
+
+### Fuzzy search
 
 Texdoc will run fuzzy search when texdoc can't find any document with
 traditional searching method. The basic concept of the fuzzy search
@@ -14,7 +18,7 @@ Maybe we will provide a new config file option like:
 fuzzy_search = true | false | interact
 ```
 
-## New option parser
+### New option parser
 
 We would like to follow POSIX demands as much as possible.
 
@@ -22,16 +26,16 @@ We would like to follow POSIX demands as much as possible.
 
 Texdoc will provide better error messages as well.
 
-## Documentation update
+### Documentation update
 
 Write explanations for new features and make the information (e.g. current
 maintainers) up-to-date.
 
-# Future works
+## Future works
 
-## Documents not included in TeX Live
+### Documents not included in TeX Live
 
-### Method 1
+#### Method 1
 
 A variety of alias to specify absolute path. Allow to write `texdoc.cnf`
 something like:
@@ -40,13 +44,13 @@ something like:
 alias* foo = /path/to/your/foobar.pdf
 ```
 
-### Method 2
+#### Method 2
 
 Make it possible to specify particular directory (e.g. `~/texdoc`) and search
 the documents in the directory with ordinal way.
 ([Frank's suggestion](https://github.com/latex3/latex3/issues/384#issuecomment-344206155))
 
-## Scoring overhaul
+### Scoring overhaul
 
 Good package (either from the tlpdb or directory name) should be much more
 important for scoring. E.g.
@@ -68,14 +72,14 @@ aliases.)
 
 See aliases marked `XXX` in `texdoc.cnf`.
 
-## Using tlpdb
+### Using tlpdb
 
 There are some ideas to make this better:
 
 * Using `texlive/tlpdb.tlu` for tlpdb reading
 * Make the parsing faster so that the no cache file is needed
 
-## Misc
+### Misc
 
 * Wirte many test scripts (for internal functions as well)
 * Make the list of good and/or bad comments from the catalogue configurable?
@@ -85,7 +89,7 @@ There are some ideas to make this better:
   * cf. Some people want to search document by macro name
 * Try to guess which `*.tex` files are examples and allow them?
 
-## Notes by former maintainer (mpg)
+### Notes by former maintainer (mpg)
 
 ```
 New options
