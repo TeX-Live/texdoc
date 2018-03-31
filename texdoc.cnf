@@ -182,8 +182,14 @@ adjscore(symbols) /staves/     = -5
 # catalogue info missing in the tlcontrib version of the package :-(
 adjscore(pgf) pgfmanual.pdf = +5
 
+# another catalogue info missing case
+adjscore(hyph-utf8) hyphenation.pdf = +5
+
 # context version is found first
 adjscore(fixme) /third/  = -6
+
+# prioritize newer document
+adjscore(babel-german) ngermanb.pdf = +5
 
 
 # Aliases
@@ -292,8 +298,8 @@ alias mathpazo  = psnfss2e
 #alias mathptm   = psnfss2e
 #alias mathptmx  = psnfss2e
 #alias newcent   = psnfss2e
-#alias palatino  = psnfss2e
-#alias times     = psnfss2e
+alias palatino  = psnfss2e
+alias times     = psnfss2e
 alias utopia    = psnfss2e
 
 # ams
