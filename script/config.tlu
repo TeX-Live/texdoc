@@ -136,48 +136,76 @@ function setup_config_from_cl(arg)
     local function set_config_elt(key, val)
         set_config_element(key, val, {src='cl', name=curr_arg})
     end
-    while arg[1] and string.match(arg[1],'^%-') do
-        curr_arg = table.remove(arg,1)
+
+    -- modified Alternative Get Opt
+    -- cf. http://lua-users.org/wiki/AlternativeGetOpt
+    function getopt(arg)
+        local tmp
+        local tab = {}
+        local tmp_arg = {table.unpack(arg)}
+        local opt_num = 0
+        for k, v in ipairs(tmp_arg) do
+            if string.sub(v, 1, 2) == "--" then
+                local x = string.find(v, "=", 1, true)
+                if x then tab[string.sub(v, 3, x-1)] = string.sub(v, x+1)
+                else      tab[string.sub(v, 3)] = true
+                end
+            elseif string.sub(v, 1, 1) == "-" then
+                local y = 2
+                local l = string.len(v)
+                local jopt
+                while (y <= l) do
+                    jopt = string.sub(v, y, y)
+                    tab[jopt] = true
+                    y = y + 1
+                end
+            else
+                break
+            end
+            table.remove(arg, 1)
+        end
+        return tab
+    end
+
+    opts = getopt(arg)
+    for k, v in pairs(opts) do
+        curr_arg = k
 
         -- action
-        if (curr_arg == '-h') or (curr_arg == '--help') then
+        if (curr_arg == 'h') or (curr_arg == 'help') then
             action = 'help'
-        elseif (curr_arg == '-V') or (curr_arg == '--version') then
+        elseif (curr_arg == 'V') or (curr_arg == 'version') then
             action = 'version'
-        elseif (curr_arg == '-f') or (curr_arg == '--files') then
+        elseif (curr_arg == 'f') or (curr_arg == 'files') then
             action = 'files'
-        elseif curr_arg == '--just-view' then
+        elseif curr_arg == 'just-view' then
             action = 'view'
         -- mode
-        elseif (curr_arg == '-w') or (curr_arg == '--view') then
+        elseif (curr_arg == 'w') or (curr_arg == 'view') then
             set_config_elt('mode', 'view')
-        elseif (curr_arg == '-m') or (curr_arg == '--mixed') then
+        elseif (curr_arg == 'm') or (curr_arg == 'mixed') then
             set_config_elt('mode', 'mixed')
-        elseif (curr_arg == '-l') or (curr_arg == '--list') then
+        elseif (curr_arg == 'l') or (curr_arg == 'list') then
             set_config_elt('mode', 'list')
-        elseif (curr_arg == '-s') or (curr_arg == '--showall') then
+        elseif (curr_arg == 's') or (curr_arg == 'showall') then
             set_config_elt ('mode', 'showall')
         -- interaction
-        elseif (curr_arg == '-I') or (curr_arg == '--nointeract') then
+        elseif (curr_arg == 'I') or (curr_arg == 'nointeract') then
             set_config_elt('interact_switch', 'false')
-        elseif (curr_arg == '-i') or (curr_arg == '--interact') then
+        elseif (curr_arg == 'i') or (curr_arg == 'interact') then
             set_config_elt('interact_switch', 'true')
         -- output format
-        elseif (curr_arg == '-M') or (curr_arg == '--machine') then
+        elseif (curr_arg == 'M') or (curr_arg == 'machine') then
             set_config_elt('machine_switch', 'true')
         -- debug
-        elseif (curr_arg == '-d') or (curr_arg == '--debug') then
+        elseif curr_arg == 'd' then
             set_config_elt('debug_list', 'all')
-        elseif string.match(curr_arg, '^%-d=') then
-            local value = string.gsub(curr_arg, '^%-d=', '')
-            set_config_elt('debug_list', value)
-        elseif string.match(curr_arg, '^%-%-debug=') then
-            local value = string.gsub(curr_arg, '^%-%-debug=', '')
-            set_config_elt('debug_list', value)
+        elseif curr_arg == 'debug' then
+            set_config_elt('debug_list', v)
         -- verbosity
-        elseif (curr_arg == '-q') or (curr_arg == '--quiet') then
+        elseif (curr_arg == 'q') or (curr_arg == 'quiet') then
             set_config_elt('verbosity_level', C.min_verbosity)
-        elseif (curr_arg == '-v') or (curr_arg == '--verbose') then
+        elseif (curr_arg == 'v') or (curr_arg == 'verbose') then
             set_config_elt('verbosity_level', C.max_verbosity)
         -- problem
         else
