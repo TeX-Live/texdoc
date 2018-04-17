@@ -595,6 +595,44 @@ function get_doclist_tlpdb(pattern)
     end
 end
 
+-- fuzzy search by using levenshtein distance
+function fuzzy_search(pattern)
+    local tmp_d
+    local min = 100
+    local result
+
+    for p in pairs(tlp_doclist) do
+        tmp_d = levenshtein(pattern, p)
+        if tmp_d < min then
+            min, result = tmp_d, p
+        end
+    end
+
+    if min <= config.fuzzy_level then
+        return result
+    else
+        return ''
+    end
+end
+
+-- calculate levenshtein distance by dynamic programming
+-- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
+function levenshtein(s, t)
+    local s, t = tostring(s), tostring(t)
+    if type(s) == 'string' and type(t) == 'string' then
+        local m, n, d = #s, #t, {}
+        for i = 0, m do d[i] = { [0] = i } end
+        for j = 1, n do d[0][j] = j end
+        for i = 1, m do
+            for j = 1, n do
+                local cost = s:sub(i,i) == t:sub(j,j) and 0 or 1
+                d[i][j] = math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
+            end
+        end
+        return d[m][n]
+    end
+end
+
 end --scope of tlpinfo table
 
 ------------------------------   main function   -------------------------------
@@ -607,19 +645,33 @@ end
 
 -- find docfiles according to pattern
 function get_doclist(pattern, no_alias)
-    -- get patterns (inc. aliases)
-    local normal, sty = normal_vs_sty(get_patterns(pattern, no_alias))
     -- initialise result list
     s_doclist = Doclist:new()
+    -- 1. normal search with the input pattern
+    doc_search(pattern, no_alias)
+    -- 2. if no result, execute fuzzy search
+    if not s_doclist[1] or s_doclist[1].quality == 'killed' then
+        local f_res = fuzzy_search(pattern)
+        if f_res ~= '' then
+            err_print('info', 'Fuzzy search result: ' .. f_res)
+            pattern = f_res
+            doc_search(pattern, no_alias)
+        end
+    end
+    -- finally, sort results
+    sort_doclist(s_doclist, pattern)
+    return s_doclist
+end
+
+function doc_search(pattern, no_alias)
+    -- get patterns (inc. aliases)
+    local normal, sty = normal_vs_sty(get_patterns(pattern, no_alias))
     -- get results; _texdocs search comes after _tlpdb search so that
     -- files found by both will have the priority of the _texdocs tree.
     -- (https://puszcza.gnu.org.ua/bugs/?369)
     get_doclist_sty(sty)
     get_doclist_tlpdb(pattern)
     get_doclist_texdocs(normal)
-    -- finally, sort results
-    sort_doclist(s_doclist, pattern)
-    return s_doclist
 end
 
 -- separate sty patterns from the rest

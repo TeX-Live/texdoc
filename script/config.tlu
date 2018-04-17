@@ -540,6 +540,7 @@ function setup_config_from_defaults()
         verbosity_level     = C.def_verbosity,
         debug_list          = '',
         max_lines           = '20',
+        fuzzy_level         = '5',
     }
     -- zip-related options
     set_config_ls {

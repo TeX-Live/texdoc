@@ -93,6 +93,7 @@ known_options = {
     'zipext_list',
     'max_lines',
     'lang',
+    'fuzzy_level',
 }
 
 error_msg = [[
