@@ -1,5 +1,6 @@
-% this is texdoc's user manual
-% written by Manuel Pégourié-Gonnard in 2008, 2010
+% $Id: texdoc.tex 31 2018-04-19 23:34:49Z karl $
+% texdoc user manual
+% Copyright 2008-2018 Manuel Pégourié-Gonnard
 % distributed under the terms of GPL v3 or later
 
 %!TEX encoding=utf-8
@@ -8,14 +9,14 @@
 \setlength\overfullrule{5pt}
 
 \documentclass[a4paper, oneside]{scrartcl}
-\usepackage{fontspec}
-\usepackage{xunicode}
+%\usepackage{fontspec}
+%\usepackage{xunicode}
 
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{DejaVu Serif}
-\setsansfont{DejaVu Sans}
-\setmonofont{DejaVu Sans Mono}
-\renewcommand\familydefault{\sfdefault} \normalfont
+%\defaultfontfeatures{Ligatures=TeX}
+%\setmainfont{DejaVu Serif}
+%\setsansfont{DejaVu Sans}
+%\setmonofont{DejaVu Sans Mono}
+%\renewcommand\familydefault{\sfdefault} \normalfont
 \newcommand\mylangle{$\langle$}
 \newcommand\myrangle{$\rangle$}
 
@@ -40,7 +41,7 @@
   pdftitle=texdoc: find and view documentation in TeX Live,
   pdfauthor=Manuel Pégourié-Gonnard,
   pdfsubject=texdoc's user manual,
-  pdfkeywords={texdoc, TeX Live, manual}}
+  pdfkeywords={texdoc, TeX Live, manual, documentation}}
 
 \newcommand\CTAN[1]{%
   \href{http://mirror.ctan.org/tex-archive/#1}{CTAN:#1}}
@@ -142,14 +143,14 @@
 \setkomafont{subtitle}{\Large}
 \deffootnote[1.5em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}\thinspace}
 
-\newcommand\tdml{\href{mailto:texdoc@tug.org}{texdoc mailing list}\xspace}
+\newcommand\tdml{\href{http://lists.tug.org/texdoc}{texdoc mailing list}\xspace}
 
 \title{Texdoc}
 \subtitle{Find \& view documentation in \texlive\\
   \href{http://tug.org/texdoc/}{http://tug.org/texdoc/}\\
-  \mailto{texdoc@tug.org}}
+  \tdml}
 \author{Manuel Pégourié-Gonnard\\
-  v0.84 2012-06-01}
+  v2.018 2017-11-22}
 \date{}
 
 \begin{document}
