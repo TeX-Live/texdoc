@@ -650,7 +650,7 @@ function get_doclist(pattern, no_alias)
     -- 1. normal search with the input pattern
     doc_search(pattern, no_alias)
     -- 2. if no result, execute fuzzy search
-    if not s_doclist[1] or s_doclist[1].quality == 'killed' then
+    if not s_doclist[1] then
         local f_res = fuzzy_search(pattern)
         if f_res ~= '' then
             err_print('info', 'Fuzzy search result: ' .. f_res)
