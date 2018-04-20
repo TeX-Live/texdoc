@@ -1,3 +1,7 @@
+# $Id: Makefile 31 2018-04-19 23:34:49Z karl $
+# Makefile for texdoc documentation.
+# Public domain.
+
 TARGETS = texdoc.pdf texdoc.1 texdoc.man1.pdf
 
 H2M_NAME = "find & view documentation in TeX Live"
@@ -6,11 +10,13 @@ H2M_SOURCES = ../script/constants.tlu ../script/texdoc.tlu
 
 all: $(TARGETS)
 
-texdoc.pdf: texdoc.tex
-	latexmk -quiet --pdflatex=xelatex $< >/dev/null
+texdoc.pdf: texdoc.aux
+	texfot xelatex '\nonstopmode\input texdoc.tex'
+texdoc.aux: texdoc.tex
+	texfot xelatex '\nonstopmode\input texdoc.tex'
 
 texdoc.1: texdoc Makefile $(H2M_INC) $(H2M_SOURCES)
-	../tools/sh -- help2man -N -n$(H2M_NAME) --include $(H2M_INC) ./$< > $@
+	../tools/texdocsh -- help2man -N -n$(H2M_NAME) --include $(H2M_INC) ./$< > $@
 
 texdoc.man1.html: texdoc.1
 	groff -man -Thtml $< > $@

@@ -1,8 +1,8 @@
-#!/usr/bin/perl
-
+#!/usr/bin/env perl
+# $Id$
 # Start a shell or run command with the TdTools environment
 #
-# Manuel Pégourié-Gonnard, 2010. WTFPL v2.
+# Manuel Pégourié-Gonnard, 2010-2018. WTFPL v2.
 
 my $usage = <<USAGE;
 Usage: $0 [--td=texdoc-path] [--tl=texlive_path] [-- command]

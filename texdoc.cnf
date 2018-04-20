@@ -191,11 +191,14 @@ adjscore(pgf) pgfmanual.pdf = +5
 # another catalogue info missing case
 adjscore(hyph-utf8) hyphenation.pdf = +5
 
-# context version is found first
+# let's not have context version found first
 adjscore(fixme) /third/  = -6
 
 # prioritize newer document
 adjscore(babel-german) ngermanb.pdf = +5
+
+# prioritize man page
+adjscore(findhyph) findhyph.man1 = +5
 
 
 # Aliases
@@ -293,17 +296,17 @@ alias graphics     = grfguide
 alias graphicx     = grfguide
 
 # latex's required psnfss2e bundle
-#alias avant     = psnfss2e
-#alias bookman   = psnfss2e
-#alias chancery  = psnfss2e
+alias avant     = psnfss2e
+alias bookman   = psnfss2e
+alias chancery  = psnfss2e
 alias charter   = psnfss2e
 alias courier   = psnfss2e
-#alias helvet    = psnfss2e
+alias helvet    = psnfss2e
 alias mathpazo  = psnfss2e
-#alias mathpple  = psnfss2e
-#alias mathptm   = psnfss2e
-#alias mathptmx  = psnfss2e
-#alias newcent   = psnfss2e
+alias mathpple  = psnfss2e
+alias mathptm   = psnfss2e
+alias mathptmx  = psnfss2e
+alias newcent   = psnfss2e
 alias palatino  = psnfss2e
 alias times     = psnfss2e
 alias utopia    = psnfss2e
@@ -485,8 +488,9 @@ alias(4.1) concrete      = concrete.sty
 alias(4.1) linsys        = linsys.sty
 alias(4.1) mitpress      = mitpress.sty
 alias(4.1) nextpage      = nextpage.sty
-alias(4.1) statex2       = statex2.sty
+alias(4.1) setspace      = setspace.sty
 alias(4.1) statex        = statex.sty
+alias(4.1) statex2       = statex2.sty
 alias(4.1) texilikecover = texilikecover.sty
 alias(4.1) thrmappendix  = thrmappendix.sty
 alias(4.1) topcapt       = topcapt.sty
