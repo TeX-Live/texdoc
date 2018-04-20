@@ -169,43 +169,48 @@ function setup_config_from_cl(arg)
 
     opts = getopt(arg)
     for k, v in pairs(opts) do
-        curr_arg = k
+        if #k == 1 then
+            curr_arg = '-' .. k
+        else
+            curr_arg = '--' .. k
+        end
 
         -- action
-        if (curr_arg == 'h') or (curr_arg == 'help') then
+        if (curr_arg == '-h') or (curr_arg == '--help') then
             action = 'help'
-        elseif (curr_arg == 'V') or (curr_arg == 'version') then
+        elseif (curr_arg == '-V') or (curr_arg == '--version') then
             action = 'version'
-        elseif (curr_arg == 'f') or (curr_arg == 'files') then
+        elseif (curr_arg == '-f') or (curr_arg == '--files') then
             action = 'files'
-        elseif curr_arg == 'just-view' then
+        elseif curr_arg == '--just-view' then
             action = 'view'
         -- mode
-        elseif (curr_arg == 'w') or (curr_arg == 'view') then
+        elseif (curr_arg == '-w') or (curr_arg == '--view') then
             set_config_elt('mode', 'view')
-        elseif (curr_arg == 'm') or (curr_arg == 'mixed') then
+        elseif (curr_arg == '-m') or (curr_arg == '--mixed') then
             set_config_elt('mode', 'mixed')
-        elseif (curr_arg == 'l') or (curr_arg == 'list') then
+        elseif (curr_arg == '-l') or (curr_arg == '--list') then
             set_config_elt('mode', 'list')
-        elseif (curr_arg == 's') or (curr_arg == 'showall') then
+        elseif (curr_arg == '-s') or (curr_arg == '--showall') then
             set_config_elt ('mode', 'showall')
         -- interaction
-        elseif (curr_arg == 'I') or (curr_arg == 'nointeract') then
+        elseif (curr_arg == '-I') or (curr_arg == '--nointeract') then
             set_config_elt('interact_switch', 'false')
-        elseif (curr_arg == 'i') or (curr_arg == 'interact') then
+        elseif (curr_arg == '-i') or (curr_arg == '--interact') then
             set_config_elt('interact_switch', 'true')
         -- output format
-        elseif (curr_arg == 'M') or (curr_arg == 'machine') then
+        elseif (curr_arg == '-M') or (curr_arg == '--machine') then
             set_config_elt('machine_switch', 'true')
         -- debug
-        elseif curr_arg == 'd' then
+        elseif curr_arg == '-d' then
             set_config_elt('debug_list', 'all')
-        elseif curr_arg == 'debug' then
+        elseif curr_arg == '--debug' then
+            if v == true then v = 'all' end
             set_config_elt('debug_list', v)
         -- verbosity
-        elseif (curr_arg == 'q') or (curr_arg == 'quiet') then
+        elseif (curr_arg == '-q') or (curr_arg == '--quiet') then
             set_config_elt('verbosity_level', C.min_verbosity)
-        elseif (curr_arg == 'v') or (curr_arg == 'verbose') then
+        elseif (curr_arg == '-v') or (curr_arg == '--verbose') then
             set_config_elt('verbosity_level', C.max_verbosity)
         -- problem
         else
