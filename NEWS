@@ -1,4 +1,5 @@
-$Id$
+NEWS for texdoc
+
 (This file public domain.)
 
 - In list mode (-l), just RET views first document in list.
