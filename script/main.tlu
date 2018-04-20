@@ -29,7 +29,7 @@ if action == 'help' then
     texdoc.print_usage(action_help)
     os.exit(exit_ok)
 elseif action == 'version' then
-    print(texdoc.const.progname .. ' ' .. texdoc.const.version_full)
+    print(texdoc.const.progname .. ' ' .. texdoc.const.version)
     print('\n' .. texdoc.const.copyright_msg)
     os.exit(exit_ok)
 elseif action == 'files' then

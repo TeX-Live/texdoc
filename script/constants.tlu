@@ -22,7 +22,6 @@ end
 fullname     = kpse.find_file('texdoc/texdoclib', 'lua')
 progname     = 'Texdoc'
 version      = '3.0'
-version_full = version .. ' (TeX Live 2018)'
 
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant
@@ -61,7 +60,7 @@ Repository: <https://github.com/TeX-Live/texdoc>
 Please email bugs to <texdoc@tug.org>.]]
 
 copyright_msg = [[
-Copyright (c) 2008 Manuel P'egouri'e-Gonnard, Takuto Asakura, and Karl Berry.
+Copyright 2018 Manuel P'egouri'e-Gonnard, Takuto Asakura, and Karl Berry.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.]]
 
