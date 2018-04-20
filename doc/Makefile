@@ -1,4 +1,4 @@
-# $Id$
+# $Id: Makefile 31 2018-04-19 23:34:49Z karl $
 # Makefile for texdoc documentation.
 # Public domain.
 
