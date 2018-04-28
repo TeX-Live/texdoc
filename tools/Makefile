@@ -1,4 +1,3 @@
-# $Id$
 # Public domain.
 
 tlbin = /usr/local/texlive/dev/bin/x86_64-linux

@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-# $Id$
 # Manuel Pégourié-Gonnard, 2010. WTFPL v2.
 # Updated 2017 Karl Berry.
 
