@@ -142,8 +142,8 @@ function setup_config_from_cl(arg)
     local function getopt(arg, options)
         local tmp
         local tab = {}
-        local tmp_arg = { table.unpack(arg) }
-        for k, v in ipairs(tmp_arg) do
+        local saved_arg = { table.unpack(arg) }
+        for k, v in ipairs(saved_arg) do
             if string.sub(v, 1, 2) == "--" then
                 table.remove(arg, 1)
                 local x = string.find(v, "=", 1, true)
@@ -162,7 +162,8 @@ function setup_config_from_cl(arg)
                             tmp = string.sub(v, y+1)
                             y = l
                         else
-                            tmp = arg[k + 1]
+                            table.remove(arg, 1)
+                            tmp = saved_arg[k + 1]
                         end
                         if string.match(tmp, '^%-') then
                             tab[jopt] = false
