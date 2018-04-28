@@ -31,8 +31,8 @@ my %cl_exit = (
     '--files'                        => 0,
     'foobarbaz'                      => 0,
     '--list -M -q texdoc'            => 0,
-    '-I --showall -d texlive-en'     => 0,
-    '-l -I --debug=files texlive-en' => 0,
+    '--showall -ID texlive-en'       => 0,
+    '-lI -dfiles texlive-en'         => 0,
 );
 
 # check that the command lines return the right exit code

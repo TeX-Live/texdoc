@@ -142,14 +142,16 @@ function setup_config_from_cl(arg)
     local function getopt(arg, options)
         local tmp
         local tab = {}
-        local opt_num = 0
-        for k, v in ipairs(arg) do
+        local tmp_arg = { table.unpack(arg) }
+        for k, v in ipairs(tmp_arg) do
             if string.sub(v, 1, 2) == "--" then
+                table.remove(arg, 1)
                 local x = string.find(v, "=", 1, true)
                 if x then tab[string.sub(v, 3, x-1)] = string.sub(v, x+1)
                 else      tab[string.sub(v, 3)] = true
                 end
             elseif string.sub(v, 1, 1) == "-" then
+                table.remove(arg, 1)
                 local y = 2
                 local l = string.len(v)
                 local jopt
@@ -172,13 +174,7 @@ function setup_config_from_cl(arg)
                     end
                     y = y + 1
                 end
-            else
-                for i = 1, opt_num do
-                    table.remove(arg, 1)
-                end
-                break
             end
-            opt_num = opt_num + 1
         end
         return tab
     end
@@ -321,7 +317,7 @@ function confline_to_config(line, file, pos)
 end
 
 -- return the list of configuration files
-function get_config_files ()
+function get_config_files()
     -- get names
     local platform = string.match (kpse.var_value ('SELFAUTOLOC'), '.*/(.*)$')
     local names = {
