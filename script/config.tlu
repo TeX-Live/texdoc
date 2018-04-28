@@ -139,12 +139,11 @@ function setup_config_from_cl(arg)
 
     -- modified Alternative Get Opt
     -- cf. http://lua-users.org/wiki/AlternativeGetOpt
-    function getopt(arg)
+    local function getopt(arg, options)
         local tmp
         local tab = {}
-        local tmp_arg = {table.unpack(arg)}
         local opt_num = 0
-        for k, v in ipairs(tmp_arg) do
+        for k, v in ipairs(arg) do
             if string.sub(v, 1, 2) == "--" then
                 local x = string.find(v, "=", 1, true)
                 if x then tab[string.sub(v, 3, x-1)] = string.sub(v, x+1)
@@ -156,18 +155,35 @@ function setup_config_from_cl(arg)
                 local jopt
                 while (y <= l) do
                     jopt = string.sub(v, y, y)
-                    tab[jopt] = true
+                    if string.find(options, jopt, 1, true) then
+                        if y < l then
+                            tmp = string.sub(v, y+1)
+                            y = l
+                        else
+                            tmp = arg[k + 1]
+                        end
+                        if string.match(tmp, '^%-') then
+                            tab[jopt] = false
+                        else
+                            tab[jopt] = tmp
+                        end
+                    else
+                        tab[jopt] = true
+                    end
                     y = y + 1
                 end
             else
+                for i = 1, opt_num do
+                    table.remove(arg, 1)
+                end
                 break
             end
-            table.remove(arg, 1)
+            opt_num = opt_num + 1
         end
         return tab
     end
 
-    opts = getopt(arg)
+    opts = getopt(arg, 'd')
     for k, v in pairs(opts) do
         if #k == 1 then
             curr_arg = '-' .. k
@@ -202,11 +218,11 @@ function setup_config_from_cl(arg)
         elseif (curr_arg == '-M') or (curr_arg == '--machine') then
             set_config_elt('machine_switch', 'true')
         -- debug
-        elseif curr_arg == '-d' then
-            set_config_elt('debug_list', 'all')
-        elseif curr_arg == '--debug' then
+        elseif (curr_arg == '-d') or (curr_arg == '--debug') then
             if v == true then v = 'all' end
             set_config_elt('debug_list', v)
+        elseif curr_arg == '-D' then
+            set_config_elt('debug_list', 'all')
         -- verbosity
         elseif (curr_arg == '-q') or (curr_arg == '--quiet') then
             set_config_elt('verbosity_level', C.min_verbosity)

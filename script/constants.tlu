@@ -36,18 +36,19 @@ Current settings:
 
 Actions:
 Options:
-  -w, --view            Use view mode: start a viewer. (default)
-  -m, --mixed           Use mixed mode (view or list).
-  -l, --list            Use list mode: show a list of results.
-  -s, --showall         Use showall mode: show also "bad" results.
+  -w, --view              Use view mode: start a viewer. (default)
+  -m, --mixed             Use mixed mode (view or list).
+  -l, --list              Use list mode: show a list of results.
+  -s, --showall           Use showall mode: show also "bad" results.
 
-  -i, --interact        Use interactive menus. (default)
-  -I, --nointeract      Use plain lists, no interaction required.
-  -M, --machine         Machine-readable output for lists (implies -I).
+  -i, --interact          Use interactive menus. (default)
+  -I, --nointeract        Use plain lists, no interaction required.
+  -M, --machine           Machine-readable output for lists (implies -I).
 
-  -q, --quiet           Suppress warnings and most error messages.
-  -v, --verbose         Print additional information (eg, viewer command).
-  -d, --debug[=LIST]    Activate debug output (restricted to LIST).
+  -q, --quiet             Suppress warnings and most error messages.
+  -v, --verbose           Print additional information (eg, viewer command).
+  -d LIST, --debug[=LIST] Activate debug output (restricted to LIST).
+  -D                      Equal to "--debug=all".
 
 Environment variables: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER,
 and texdoc_* of each.

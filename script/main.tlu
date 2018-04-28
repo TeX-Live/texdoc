@@ -13,10 +13,10 @@ local exit_usage = 2
 
 -- action command-line options
 local action_help = [[
-  -h, --help            Print this help message.
-  -V, --version         Print the version number.
-  -f, --files           Print the list of configuration files used.
-  --just-view FILE      Display FILE, given with full path (no searching).]]
+  -h, --help              Print this help message.
+  -V, --version           Print the version number.
+  -f, --files             Print the list of configuration files used.
+  --just-view FILE        Display FILE, given with full path (no searching).]]
 
 -- get configuration and parse command line
 local action = texdoc.setup_config_and_alias(arg)
