@@ -5,9 +5,9 @@
 # Public domain.
 
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-  TLBIN=$HOME/texlive/2017/bin/x86_64-darwin
+  TLBIN=$HOME/texlive/bin/x86_64-darwin
 else
-  TLBIN=$HOME/texlive/2017/bin/x86_64-linux
+  TLBIN=$HOME/texlive/bin/x86_64-linux
 fi
 
 ./tools/test-basic --tl=$TLBIN --td=.
