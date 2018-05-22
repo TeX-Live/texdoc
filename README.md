@@ -20,8 +20,7 @@ If you want to try/test the develop version, please see below.
 
 - `doc/` contains the documentation,
 - `texdoc.cnf` is the default configuration file,
-- `script/*.tlu` are the source code of Texdoc,
-- `script/*.lua` are distributed data files, generated with `tools/gen-datafiles`, and
+- `script/` contains the source code, and
 - `tools/` contains helper scripts for maintenance and/or testing; some of them might run properly only on particular machines.
 
 ## How to Install the Develop Version
