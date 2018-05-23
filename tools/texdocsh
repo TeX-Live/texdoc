@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-# $Id$
 # Start a shell or run command with the TdTools environment
 #
 # Manuel Pégourié-Gonnard, 2010-2018. WTFPL v2.

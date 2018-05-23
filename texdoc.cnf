@@ -85,6 +85,12 @@
 # basename_list    = readme, 00readme
 # badbasename_list = readme, 00readme
 
+## Fuzzy search
+
+# Built-in defaults (for reference):
+#
+# fuzzy_level  = 5
+
 # Known suffixes for documentation
 suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, -man, notes, -info, ref
 
@@ -126,14 +132,14 @@ adjscore gpl     = -10
 adjscore /tex-virtual-academy-pl/ = -50
 
 # test and example files are not likely the best documentation
-adjscore example   = -3
-adjscore examples  = -3
-adjscore sample    = -3
-adjscore samples   = -3
+adjscore example   = -1
+adjscore examples  = -1
+adjscore sample    = -1
+adjscore samples   = -1
 adjscore test      = -3
 adjscore tests     = -3
-adjscore /demo/    = -3
-adjscore /demos/   = -3
+adjscore /demo/    = -1
+adjscore /demos/   = -1
 adjscore /figures/ = -3
 adjscore /images/  = -3
 

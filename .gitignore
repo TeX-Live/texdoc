@@ -1,13 +1,26 @@
-# generated documents
+# LaTeX auxiliary files
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+
+# Build tool auxiliary files
+*.fdb_latexmk
+*.synctex
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
+
+# Generated documents
+*.dvi
+*.pdf
 doc/texdoc.1
 doc/texdoc.man1.html
-doc/texdoc.man1.pdf
-doc/texdoc.pdf
 
 # local
 script/tags
-
-# temporary files
-doc/texdoc.aux
-doc/texdoc.log
-doc/texdoc.fdb_latexmk
+.vimrc

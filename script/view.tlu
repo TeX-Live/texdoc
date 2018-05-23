@@ -1,4 +1,3 @@
--- $Id$
 -- view.tlu view a document and/or display the list of results in texdoc
 --
 -- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
