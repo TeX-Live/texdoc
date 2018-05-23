@@ -4,6 +4,8 @@ os:
 dist: trusty
 sudo: false
 
+language: ruby
+
 addons:
   apt:
     packages:
@@ -16,6 +18,7 @@ before_install:
 
 install:
   - . ./install-tex.sh
+  - bundle install
 
 script:
-  - ./tools/travis-ci
+  - bundle exec rspec
