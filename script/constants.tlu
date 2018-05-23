@@ -150,3 +150,5 @@ setmetatable(C, {
         error('Internal error: attempt to modify a constant.')
     end
 })
+
+-- vim: ft=lua:

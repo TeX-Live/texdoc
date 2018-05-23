@@ -691,3 +691,5 @@ return {
     init_databases = init_databases,
     get_doclist    = get_doclist,
 }
+
+-- vim: ft=lua:

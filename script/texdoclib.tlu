@@ -103,3 +103,5 @@ return {
     err_print              = err_print,
     const                  = C,
 }
+
+-- vim: ft=lua:

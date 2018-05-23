@@ -221,3 +221,5 @@ return {
     view_file       = view_file,
     deliver_results = deliver_results,
 }
+
+-- vim: ft=lua:

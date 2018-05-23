@@ -114,3 +114,5 @@ return {
     get_patterns      = get_patterns,
     aliased_names     = aliased_names,
 }
+
+-- vim: ft=lua:

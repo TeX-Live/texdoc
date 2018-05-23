@@ -131,3 +131,5 @@ return {
     print_usage = print_usage,
     path_parent = path_parent,
 }
+
+-- vim: ft=lua:

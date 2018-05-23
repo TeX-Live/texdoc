@@ -286,3 +286,5 @@ return {
     is_exact          = is_exact,
     confline_to_score = confline_to_score,
 }
+
+-- vim: ft=lua:

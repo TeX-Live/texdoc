@@ -68,3 +68,5 @@ end
 
 -- the end
 os.exit(exit_ok)
+
+-- vim: ft=lua:
