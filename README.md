@@ -38,9 +38,9 @@ Please see the [NEWS](./NEWS) in our repository.
 
 ## Copyright and License Information
 
-Copyright (c) 2008-2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining. All rights reserved.
+Copyright 2008-2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining. All rights reserved.
 
-This package is distributed under [GNU General Public License v3.0](./COPYING).
+This package is distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either [version 3](./COPYING) of the License, or (at your option) any later version.
 
 Previous work (texdoc program) in the public domain:
 
