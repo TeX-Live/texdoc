@@ -1,4 +1,4 @@
-% texdoc user manual
+% Texdoc user manual
 % Copyright 2018 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
 
@@ -42,17 +42,7 @@
   pdfsubject={Texdoc's user manual},
   pdfkeywords={Texdoc, TeX Live, manual, documentation}}
 
-\newcommand\CTAN[1]{%
-  \href{http://mirror.ctan.org/tex-archive/#1}{CTAN:#1}}
-\newcommand\mailto[1]{%
-  \href{mailto:#1}{#1}}
-\newcommand\package[1]{%
-  \href{http://ctan.org/pkg/#1}{#1}}
-\newcommand\http[1]{%
-  \href{http://#1}{#1}}
-
-\newcommand\texlive{%
-  \TeX~Live\xspace}
+\newcommand\texlive{\TeX~Live\xspace}
 
 \setlength\parindent{\baselineskip}
 
@@ -144,9 +134,9 @@
 
 \title{Texdoc}
 \subtitle{Find \& view documentation in \texlive\\
-  \href{http://tug.org/texdoc/}{http://tug.org/texdoc/}}
+  \href{https://tug.org/texdoc/}{https://tug.org/texdoc/}}
 \author{Manuel Pégourié-Gonnard\and Takuto Asakura}
-\date{v3.0 2018-04-30}
+\date{v3.0 2018-05-23}
 
 \begin{document}
 \VerbatimFootnotes
@@ -177,15 +167,15 @@ viewer. It is rather handy when you know what you want to read, and want to
 access it quickly. On the other hand, there may be other relevant documents
 for the given |«name»|, which are ignored in view mode.
 
-The so-called ``list mode'' makes texdoc list all relevant documentation and
+The so-called ``list mode'' makes Texdoc list all relevant documentation and
 ask you which one you want to view. It is useful when there a other
 interesting sources of information besides the package's main documentation.
 
 There is also a ``mixed'' mode, intended to combine the best of view mode and
-list mode: if there is only one relevant result, then texdoc opens it in a
+list mode: if there is only one relevant result, then Texdoc opens it in a
 viewer, else it offers you a menu.
 
-By default, texdoc hides the results it considers less relevant (unless it
+By default, Texdoc hides the results it considers less relevant (unless it
 finds no relevant result at all). In ``showall'' mode, it always shows all
 results.
 
@@ -195,7 +185,7 @@ for mixed mode, |-l| or |--list| for list mode, |-s| or |--showall| for
 showall mode.
 
 If you always (or mostly) use the same mode, you don't want to keep typing the
-same option. The next section describes how to customize texdoc using
+same option. The next section describes how to customize Texdoc using
 configurations files.
 
 \subsection{Configuration files}\label{ss-quick-file}
@@ -210,7 +200,7 @@ in this file, where |«yourmode»| is one of |view|, |mixed|, |list| or
 |showall|. To set your favorite language, use |lang = «2-letter code»|, though
 it is usually detected automatically.
 
-The configuration file can be used to tweak texdoc in many ways, the most
+The configuration file can be used to tweak Texdoc in many ways, the most
 useful of which is probably the selection of the viewers for various types of
 documents, explained in the next section.
 
@@ -232,7 +222,7 @@ insert the line |viewer_pdf = xpdf %s &| in your configuration file. Here,
 
 \subsection{You can stop reading now}
 
-The next part explains texdoc mechanisms for finding the best results and how
+The next part explains Texdoc mechanisms for finding the best results and how
 to cutomize them. The default configuration file tries hard to set appropriate
 values so that you normally don't need to fiddle with that, but you may be
 curious or have special needs.
@@ -244,13 +234,13 @@ present and next part.
 
 \section{File search, aliases, score}
 
-\subsection{An overview of how texdoc works}
+\subsection{An overview of how Texdoc works}
 
-When you type |texdoc «keyword»|, texdoc first makes a list of files, from two
+When you type |texdoc «keyword»|, Texdoc first makes a list of files, from two
 sources:
 \begin{enumerate}
   \item In the trees containing documentation (given by the
-    \href{http://www.tug.org/kpathsea/} {kpathsea} variable |TEXDOCS|), it
+    \href{https://www.tug.org/kpathsea/} {kpathsea} variable |TEXDOCS|), it
     selects all files containing |«keyword»| in their name (including the
     directory name);
   \item In the \texlive Database, it looks for packages named
@@ -258,7 +248,9 @@ sources:
     |sty| or |cls|, and selects all the documentation files from this package.
 \end{enumerate}
 Files are filtered by extension: only files with known extensions may be
-selected.
+selected. In case Texdoc cannot find any documentation here, fuzzy search will
+find the closest package name to the |«keyword»| and reselect the files (see
+\ref{ss-fuzzy}).
 
 The selected files are then score according to some simple heuristics.  For
 example, a file named |«keyword».pdf|, is good, |«keyword»-«lang».pdf| will
@@ -281,7 +273,7 @@ score are displayed, except in showall mode. Results with very bad scores
 \medskip
 
 This model for searching and scoring is quite efficient, but is unfortunately
-not perfect: texdoc may sometimes need a hint, either to find a relevant file
+not perfect: Texdoc may sometimes need a hint, either to find a relevant file
 or, more likely, to recognize which of the files found is the most relevant.
 
 For example, assume you are looking for the documentation of the shortvrb
@@ -291,7 +283,7 @@ which contains the string |shortverb|, it will sort them basically at random.
 
 Here comes the notion of \emph{alias}: in the default configuration file,
 |shortvrb| is aliased to |base/doc|, so that when you type |texdoc shortvrb|,
-texdoc knows it has to look primarily for |base/doc|. Note that texdoc will
+Texdoc knows it has to look primarily for |base/doc|. Note that Texdoc will
 also look for the original name, and that a name can be aliased to more than
 one new name.
 
@@ -317,7 +309,7 @@ case-insensitive):
   alias(«score») «original keyword» = «name»
 \end{htcode}
 
-You can define your own aliases in texdoc's configuration files
+You can define your own aliases in Texdoc's configuration files
 (see~\ref{ss-quick-file} or \ref{ss-prec}). For example,
 insert\footnote{Actually, you don't need to do this, the default configuration
   file already includes this directive.}
@@ -393,9 +385,9 @@ documentation. The value -10 is enough to ensure that those results will have
 a negative score, so wil not be displayed unless ``showall'' mode is active.
 
 \textbf{Warning}: Values of scores (like the default score for aliases, the
-range of heuristic scoring, etc.) may change in a future version of texdoc.
+range of heuristic scoring, etc.) may change in a future version of Texdoc.
 So, don't be surprised if you need to adapt your scoring directives after a
-future update of texdoc.  This warning will hopefully disappear at some point.
+future update of Texdoc.  This warning will hopefully disappear at some point.
 
 \subsection{File extensions and names}\label{ss-ext}
 
@@ -412,7 +404,7 @@ extension is ``bad'' according to this list will get a lesser score (currently
 
 Unfortunately, sometimes what follows a dot in a file name is not a ``real''
 extension. This often happens with readme files, for example |readme.fr| or
-|readme.texlive|. So, in addition to his list of known extensions, texdoc has
+|readme.texlive|. So, in addition to his list of known extensions, Texdoc has
 a list of known basenames, by default just |readme|.
 
 The corresponding settings are |basename_list| and |badbasename_list|; both
@@ -423,7 +415,7 @@ either is known to be ``bad.''
 \subsection{Variants}\label{ss-variants}
 
 The documentation for a given package is often found in a file named like
-|«package»-doc|. To handle this properlr, texdoc gives a special score files
+|«package»-doc|. To handle this properlr, Texdoc gives a special score files
 named |«package»«suffix»| where |«suffix»| is one element of the list given by
 the configuration setting |suffix_list|.
 
@@ -431,6 +423,16 @@ To customise this list, add a line with |suffix_list = «your, list»| in a
 configuration files. Be warned, it will replace the default list, no expand
 it. You'll find the default list in the shipped configuration file; feel free
 to suggest additions on the \tdml (with a real-life example).
+
+\subsection{Fuzzy search}\label{ss-fuzzy}
+
+When the normal search can't find any document in \texlive, Texdoc will execute
+fuzzy search without user-interactions. The results of fuzzy search are shown
+by as an informational message. (you can see that with option |-v|)
+
+The default allowance of Levenshtein distance is 5. You can change this
+default value by specifying |fuzzy_level| in your |texdoc.cnf| (see
+\ref{cf-fuzzy_level}).
 
 \clearpage
 
@@ -461,9 +463,9 @@ each directory, three files are recognized, in this order:
   \item |texdoc.cnf| is the recommended file for normal use.
   \item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
     (including its default configuration file) in your home while retaining
-    the use of the previous file for your personal setting;  see
-    \href{http://tug.org/texdoc/dev/}{the web page} for instructions on
-    running the development version.
+    the use of the previous file for your personal setting; see
+    \href{https://github.com/TeX-Live/texdoc}{our GitHub repository} for
+    instructions on running the development version.
 \end{enumerate}
 
 \subsection{Command-line options}\label{ss-cl}
@@ -501,7 +503,7 @@ platform, with their status (active, not found, or disabled
 Open «file» in the usual viewer. The file should be given with full path,
 absolutely no searching is done. This option is not really meant for users,
 but rather intended to be used from another program, like a GUI front-end to
-texdoc.
+Texdoc.
 
 \begin{cmdsubsub}{-w, -l, -m, -s, --view, --list, --mixed, --showall}{cl-mode}
   -w, --view, -l, --list, -m, --mixed, -s, --showall
@@ -544,7 +546,7 @@ without the list, activates all available debug items.
 
 They all correspond to some |viewer_«ext»| setting, and the reader is referred
 to~\ref{cf-viewer_*} for details. Also, environment variables used by older
-versions of texdoc are accepted. You can append |_texdoc| to every name in
+versions of Texdoc are accepted. You can append |_texdoc| to every name in
 the first column: this wins over every other name.
 
 \begin{center}
@@ -611,7 +613,7 @@ have been presented in~\ref{ss-modes}.
 \end{cmdsubsub}
 
 Turn on or off interaction.  Default is on.  Turning interaction off prevents
-texdoc from asking you to choose a file to view when there are multiple
+Texdoc from asking you to choose a file to view when there are multiple
 choices, so it just prints the list of files found.
 
 \begin{cmdsubsub}{suffix_list}{cf-suffix_list}
@@ -641,7 +643,7 @@ recognised:
 \end{itemize}
 
 There is a very special case: if the searched |«name»| has |.sty| extension,
-texdoc enters a special search mode for |.sty| files (not located in the same
+Texdoc enters a special search mode for |.sty| files (not located in the same
 place as real documentation files) for this |«name»|, independently of the
 current value of |ext_list| and |mode|. In an ideal world, this wouldn't be
 necessary since every sty file would have a proper documentation in pdf, html
@@ -649,7 +651,7 @@ or plain text, but\dots
 
 For each |«ext»| in |ext_list| there should be a corresponding |viewer_«ext»|
 value set.  Defaults are defined corresponding to the default |ext_list|, but
-you can add values if you want.  For example, if you want texdoc to be able
+you can add values if you want.  For example, if you want Texdoc to be able
 to find man pages and display them with the |man| command, you can use
 \begin{htcode}
   ext_list = pdf, html, htm, 1, 5, txt, dvi, ps,
@@ -746,7 +748,7 @@ of the line, but the first 3 fields will remain unchanged.
 Currently, there are two additional fields: a two-letter language code, and an
 unstructured description, both taken from the CTAN catalogue (via the \texlive
 database). These fields may be empty and they are not guaranteed to keep the
-same meaning in future versions of texdoc.
+same meaning in future versions of Texdoc.
 
 \begin{cmdsubsub}{zipext_list}{cf-zipext_list}
   zipext_list = «list»
@@ -787,11 +789,18 @@ Commands for removing files (resp. directories) on your system (defaults:
   lastfile_switch = «true, false»
 \end{cmdsubsub}
 
-If set to true, prevents texdoc from reading any other configuration file
+If set to true, prevents Texdoc from reading any other configuration file
 after this one (they will be reported as ``disabled'' by |texdoc -f|).  Mainly
-useful for installing a newer version of texdoc in your home and preventing
+useful for installing a newer version of Texdoc in your home and preventing
 the default configuration file from older versions to be used (see the
-\href{http://tug.org/texdoc/}{web site} for instructions on how to do so).
+\href{https://tug.org/texdoc/}{web site} for instructions on how to do so).
+
+\begin{cmdsubsub}{fuzzy_level}{cf-fuzzy_level}
+  fuzzy_level = «n»
+\end{cmdsubsub}
+
+Set the allowance of Levenshtein distance to |«n»| for the fuzzy search
+(default: 5). At level 0, the fuzzy search feature is disabled.
 
 \subsection{Exit codes}\label{ss-exit}
 
@@ -804,8 +813,8 @@ The current exit codes are:
 
 \section{Licence}\label{s-licence}
 
-The current texdoc program and its documentation are copyright 2008, 2009
-Manuel Pégourié-Gonnard.
+The current Texdoc program and its documentation are copyright 2008--2018
+Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining.
 
 They are free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
@@ -822,7 +831,7 @@ this program.  If not, see \url{http://www.gnu.org/licenses/}.
 
 \bigskip
 
-Previous work (texdoc program) in the public domain:
+Previous work (Texdoc program) in the public domain:
 \begin{itemize}
   \item Contributions from Reinhard Kotucha (2008).
   \item First texlua versions by Frank Küster (2007).
