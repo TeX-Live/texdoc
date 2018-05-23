@@ -2,37 +2,6 @@
 
 This file public domain.
 
-## For the next release (version 3.0)
-
-### Fuzzy search
-
-Texdoc will run fuzzy search when texdoc can't find any document with
-traditional searching method. The basic concept of the fuzzy search
-implementation is already written:
-
-* <https://gist.github.com/wtsnjp/2b193a5b8096126050055f12ea90ee43>
-
-Maybe we will provide a new config file option like:
-
-```
-fuzzy_search = true | false | interact
-```
-
-### New option parser
-
-We would like to follow POSIX demands as much as possible.
-
-* cf. <http://lua-users.org/wiki/AlternativeGetOpt>
-
-Texdoc will provide better error messages as well.
-
-### Documentation update
-
-Write explanations for new features and make the information (e.g. current
-maintainers) up-to-date.
-
-## Future works
-
 ### Documents not included in TeX Live
 
 #### Method 1
