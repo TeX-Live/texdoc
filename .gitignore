@@ -21,6 +21,10 @@
 doc/texdoc.1
 doc/texdoc.man1.html
 
+# Bundle
+.bundle
+vendor/*
+
 # local
 script/tags
 .vimrc
