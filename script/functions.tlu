@@ -94,24 +94,6 @@ end
 -- print a usage message, with the proper 'active values' line
 function print_usage(actions)
     local usage_msg = C.usage_msg
-    -- get current settings
-    local default, files = {}, {}
-    for _, param in ipairs(C.usage_settings) do
-        local display = param[config[param.name]]
-        if config[param.name..'_src'] == 'def' then
-            table.insert(default, display)
-        elseif config[param.name..'_src'] == 'file' then
-            table.insert(files, display)
-        end
-    end
-    -- format and include them
-    def = table.concat(default, ', ')
-    conf = table.concat(files, ', ')
-    if not (def == '')  then def = def..' (default)' end
-    if not (conf == '') then conf = conf..' (user config)' end
-    local sep = (def == '' or conf == '') and '' or '; '
-    local settings = C.usage_settings_ph..' '..def..sep..conf..'.'
-    usage_msg = usage_msg:gsub(C.usage_settings_ph, settings)
     -- include actions if any
     if actions then
         usage_msg = usage_msg:gsub(C.actions_ph,

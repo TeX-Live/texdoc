@@ -31,8 +31,6 @@ Usage: texdoc [OPTION]... NAME...
 Try to find appropriate TeX documentation for the specified NAME(s).
 Alternatively, perform the given ACTION and exit.
 
-Current settings:
-
 Actions:
 Options:
   -w, --view            Use view mode: start a viewer. (default)
@@ -50,7 +48,7 @@ Options:
   -dLIST, --debug=LIST  Activate debug output restricted to LIST.
 
 Environment variables: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER,
-and texdoc_* of each.
+and *_texdoc of each.
 
 Files: <TEXMF>/texdoc/texdoc.cnf; see output of the --files option.
 Full manual available via `texdoc texdoc'.
@@ -65,14 +63,6 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.]]
 
 actions_ph = 'Actions:\n'
-
-usage_settings_ph = 'Current settings:' -- keep ../doc/texdoc wrapper in sync!
-usage_settings = {
-    { name = 'mode', view = '--view', mixed = '--mixed', list = '--list',
-        showall = '--showall' },
-    { name = 'interact_switch',
-        [true] = '--interact', [false] = '--nointeract' },
-}
 
 known_options = {
     'viewer_.*',
