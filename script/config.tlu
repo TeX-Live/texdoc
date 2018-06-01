@@ -246,37 +246,18 @@ function setup_config_from_env ()
             end
         end
     end
-    local function set_config_elt_from_option_env(key, var)
-        if (os.type == "windows") then return end
-        local value = os.getenv(var)
-        if value then
-            for cmd in string.gmatch(value, '([^:]+)') do
-                if is_in_path(cmd) then
-                    set_config_element(key, cmd, {src='env', name=var})
-                    -- don't test other commands if we have found one
-                    break
-                end
-            end
-        end
-    end
     set_config_elt_from_vars('viewer_pdf',
-      {"PDFVIEWER_texdoc", "TEXDOCVIEW_pdf", "TEXDOC_VIEWER_PDF"})
-    set_config_elt_from_option_env('viewer_pdf', "PDFVIEWER")
+      {"PDFVIEWER_texdoc", "PDFVIEWER", "TEXDOCVIEW_pdf", "TEXDOC_VIEWER_PDF"})
     set_config_elt_from_vars('viewer_ps',
-      {"PSVIEWER_texdoc", "TEXDOCVIEW_ps", "TEXDOC_VIEWER_PS"})
-    set_config_elt_from_option_env('viewer_ps', "PSVIEWER")
+      {"PSVIEWER_texdoc", "PSVIEWER", "TEXDOCVIEW_ps", "TEXDOC_VIEWER_PS"})
     set_config_elt_from_vars('viewer_dvi',
-      {"DVIVIEWER_texdoc", "TEXDOCVIEW_dvi", "TEXDOC_VIEWER_DVI"})
-    set_config_elt_from_option_env('viewer_dvi', "DVIVIEWER")
+      {"DVIVIEWER_texdoc", "DVIVIEWER", "TEXDOCVIEW_dvi", "TEXDOC_VIEWER_DVI"})
     set_config_elt_from_vars('viewer_html',
-      {"BROWSER_texdoc", "TEXDOCVIEW_html", "TEXDOC_VIEWER_HTML"})
-    set_config_elt_from_option_env('viewer_html', "BROWSER")
+      {"BROWSER_texdoc", "BROWSER", "TEXDOCVIEW_html", "TEXDOC_VIEWER_HTML"})
     set_config_elt_from_vars('viewer_md',
-      {"MDVIEWER_texdoc", "TEXDOCVIEW_md", "TEXDOC_VIEWER_MD"})
-    set_config_elt_from_option_env('viewer_md', "PAGER")
+      {"MDVIEWER_texdoc", "PAGER", "TEXDOCVIEW_md", "TEXDOC_VIEWER_MD"})
     set_config_elt_from_vars('viewer_txt',
-      {"PAGER_texdoc", "TEXDOCVIEW_txt", "TEXDOC_VIEWER_TXT"})
-    set_config_elt_from_option_env('viewer_txt', "PAGER")
+      {"PAGER_texdoc", "PAGER", "TEXDOCVIEW_txt", "TEXDOC_VIEWER_TXT"})
 end
 
 ----------------------   options and aliases from files   ----------------------
