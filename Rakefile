@@ -23,11 +23,11 @@ task :install do
   # create target dirs if not exists
   texmf_scripts = texmf.join("scripts")
   texmf_texdoc = texmf.join("texdoc")
-  FileUtils.mkdir_p([texmf_scripts, texmf_texdoc], verbose: true)
+  FileUtils.mkdir_p([texmf_scripts, texmf_texdoc])
 
   # create the symbolic links
-  FileUtils.ln_s(texdoc_scriptdir, texmf_scripts.join("texdoc"), verbose: true)
-  FileUtils.ln_s(texdoc_cnf, texmf_texdoc.join("texdoc-dist.cnf"), verbose: true)
+  FileUtils.ln_s(texdoc_scriptdir, texmf_scripts.join("texdoc"))
+  FileUtils.ln_s(texdoc_cnf, texmf_texdoc.join("texdoc-dist.cnf"))
 end
 
 desc "Uninstall Texdoc from your system"
@@ -48,7 +48,7 @@ task :uninstall do
   end
 
   # execute unlink
-  FileUtils.safe_unlink([texdoc, texdoc_cnf], verbose: true)
+  FileUtils.safe_unlink([texdoc, texdoc_cnf])
 end
 
 desc "Run all tests"
@@ -58,21 +58,55 @@ end
 
 desc "Generate all documentation"
 task :doc do
+  origin = Pathname.pwd
+
+  # generate PDF documentation
   FileUtils.cd("doc")
-  sh "latexmk texdoc.tex"
+  sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}", verbose: false
+
+  # generate manpage
   FileUtils.cd("man")
-  sh "ronn --manual=\"Texdoc manual\" --organization=\"Texdoc #{TEXDOC_VERSION}\" texdoc.1.md"
+  opt_man = '--manual="Texdoc manual"'
+  opt_org = '--organization="Texdoc #{TEXDOC_VERSION}"'
+  sh "ronn -r #{opt_man} #{opt_org} texdoc.1.md 2> #{File::NULL}", verbose: false
+  sh "groff -man -rS11 texdoc.1 | ps2pdf -sPAPERSIZE=a4 - texdoc.man1.pdf", verbose: false
+
+  # finish
+  FileUtils.cd(origin)
 end
 
 desc "Cleanup the Texdoc directroy"
 task :clean do
-  FileUtils.rm_rf("tmp", verbose: true)
+  FileUtils.rm_rf("tmp")
+  FileUtils.rm_f(Dir.glob("texdoc-*.zip"))
   FileUtils.cd("doc")
-  sh "latexmk -C -quiet"
-  FileUtils.rm_rf(["man/texdoc.1.html", "man/texdoc.1"], verbose: true)
+  sh "latexmk -C -quiet", verbose: false
+  FileUtils.rm_f(["man/texdoc.1", "man/texdoc.man1.pdf"])
 end
 
 desc "Create archive for CTAN"
 task :ctan do
-  # not yet
+  # generate documentation
+  Rake::Task["doc"].invoke()
+
+  # prepare the structure under tmp
+  pkg_name = "texdoc-#{TEXDOC_VERSION}"
+  target = Pathname("tmp").join(pkg_name)
+  FileUtils.rm_rf(target)
+  FileUtils.mkdir_p(target)
+
+  script_dir = target.join("script")
+  FileUtils.mkdir_p(script_dir)
+  FileUtils.cp(["COPYING", "README.md", "NEWS", "texdoc.cnf"], target)
+  FileUtils.cp_r(Dir.glob("script/*"), script_dir)
+
+  doc_dir = Pathname("doc")
+  man_dir = doc_dir.join("man")
+  FileUtils.mkdir_p(target.join(man_dir))
+  FileUtils.cp([doc_dir.join("texdoc.tex"), doc_dir.join("texdoc.pdf")], target.join(doc_dir))
+  FileUtils.cp([man_dir.join("texdoc.1"), man_dir.join("texdoc.man1.pdf")], target.join(man_dir))
+
+  # create zip archive
+  sh "zip -q -r #{pkg_name}.zip #{target}", verbose: false
 end
+

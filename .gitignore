@@ -25,7 +25,10 @@ doc/man/texdoc.1.html
 .bundle
 vendor/*
 
+# Temporaly
+tmp/*
+texdoc-*.zip
+
 # local
 script/tags
 .vimrc
-tmp/*
