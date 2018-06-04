@@ -1,3 +1,6 @@
+# Rakefile for Texdoc.
+# Public domain.
+
 require 'rake'
 require 'pathname'
 require 'fileutils'
@@ -18,11 +21,11 @@ task :install do
   # create target dirs if not exists
   texmf_scripts = texmf.join("scripts")
   texmf_texdoc = texmf.join("texdoc")
-  FileUtils.mkdir_p([texmf_scripts, texmf_texdoc])
+  FileUtils.mkdir_p([texmf_scripts, texmf_texdoc], verbose: true)
 
   # create the symbolic links
-  FileUtils.ln_s(texdoc_scriptdir, texmf_scripts.join("texdoc"))
-  FileUtils.ln_s(texdoc_cnf, texmf_texdoc.join("texdoc-dist.cnf"))
+  FileUtils.ln_s(texdoc_scriptdir, texmf_scripts.join("texdoc"), verbose: true)
+  FileUtils.ln_s(texdoc_cnf, texmf_texdoc.join("texdoc-dist.cnf"), verbose: true)
 end
 
 desc "Uninstall Texdoc from your system"
@@ -43,11 +46,22 @@ task :uninstall do
   end
 
   # execute unlink
-  texdoc.unlink
-  texdoc_cnf.unlink
+  FileUtils.safe_unlink([texdoc, texdoc_cnf], verbose: true)
 end
 
 desc "Run all tests"
 task :test do
   sh "bundle exec rspec"
+end
+
+desc "Cleanup the Texdoc directroy"
+task :clean do
+  FileUtils.rm_rf("tmp", verbose: true)
+  FileUtils.cd("doc")
+  sh "latexmk -C -quiet"
+end
+
+desc "Create archive for CTAN"
+task :ctan do
+  # not yet
 end
