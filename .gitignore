@@ -18,8 +18,8 @@
 # Generated documents
 *.dvi
 *.pdf
-doc/texdoc.1
-doc/texdoc.man1.html
+doc/man/texdoc.1
+doc/man/texdoc.1.html
 
 # Bundle
 .bundle

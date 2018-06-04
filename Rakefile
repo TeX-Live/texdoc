@@ -5,6 +5,8 @@ require 'rake'
 require 'pathname'
 require 'fileutils'
 
+TEXDOC_VERSION = "3.0"
+
 desc "Install Texdoc to your system"
 task :install do
   # check the existence of the texdoc source
@@ -54,11 +56,20 @@ task :test do
   sh "bundle exec rspec"
 end
 
+desc "Generate all documentation"
+task :doc do
+  FileUtils.cd("doc")
+  sh "latexmk texdoc.tex"
+  FileUtils.cd("man")
+  sh "ronn --manual=\"Texdoc manual\" --organization=\"Texdoc #{TEXDOC_VERSION}\" texdoc.1.md"
+end
+
 desc "Cleanup the Texdoc directroy"
 task :clean do
   FileUtils.rm_rf("tmp", verbose: true)
   FileUtils.cd("doc")
   sh "latexmk -C -quiet"
+  FileUtils.rm_rf(["man/texdoc.1.html", "man/texdoc.1"], verbose: true)
 end
 
 desc "Create archive for CTAN"
