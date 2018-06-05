@@ -19,25 +19,25 @@ my $texdoc = "texlua $conf->{texdoc_path}/script/texdoc.tlu";
 
 # various command lines and associated exit status
 my %cl_exit = (
-    ''                               => 2,
-    '-l'                             => 2,
-    '--foobar baz'                   => 2,
-    '--just-view'                    => 2,
+    #''                               => 2,
+    #'-l'                             => 2,
+    #'--foobar baz'                   => 2,
+    #'--just-view'                    => 2,
     '-V'                             => 0,
-    '--version'                      => 0,
-    '-h'                             => 0,
-    '--help'                         => 0,
-    '-f'                             => 0,
-    '--files'                        => 0,
-    'foobarbaz'                      => 0,
-    '--list -M -q texdoc'            => 0,
-    '--showall -ID texlive-en'       => 0,
-    '-lI -dfiles texlive-en'         => 0,
+    #'--version'                      => 0,
+    #'-h'                             => 0,
+    #'--help'                         => 0,
+    #'-f'                             => 0,
+    #'--files'                        => 0,
+    #'foobarbaz'                      => 0,
+    #'--list -M -q texdoc'            => 0,
+    #'--showall -ID texlive-en'       => 0,
+    #'-lI -dfiles texlive-en'         => 0,
 );
 
 # check that the command lines return the right exit code
 my $quiet;
-$quiet = '>/dev/null 2>&1'; # comment for verbose output
+$quiet = ''; # comment for verbose output
 while (my ($cl, $status) = each(%cl_exit)) {
     print "===> Running texdoc $cl (expecting: $status) <==='" unless $quiet;
     system("$texdoc $cl $quiet");

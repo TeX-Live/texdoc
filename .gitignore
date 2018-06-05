@@ -18,8 +18,15 @@
 # Generated documents
 *.dvi
 *.pdf
-doc/texdoc.1
-doc/texdoc.man1.html
+*.1
+
+# Bundle
+.bundle
+vendor/*
+
+# Temporaly
+tmp/*
+texdoc-*.zip
 
 # local
 script/tags

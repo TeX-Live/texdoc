@@ -16,14 +16,24 @@ Texdoc is part of the TeX Live distribution. Generally, you don't have to instal
 
 If you want to try/test the develop version, please see below.
 
-## Files in This Repository
-
-- `doc/` contains the documentation,
-- `texdoc.cnf` is the default configuration file,
-- `script/` contains the source code, and
-- `tools/` contains helper scripts for maintenance and/or testing; some of them might run properly only on particular machines.
-
 ## How to Install the Develop Version
+
+### Using Bundler
+
+The easiest way to install the develop version of Texdoc is using [Bundler](https://bundler.io/):
+
+```
+$ bundle install
+$ bundle exec rake install
+```
+
+If you want to uninstall the develop version (to use the TeX Live version), just try:
+
+```
+$ bundle exec rake uninstall
+```
+
+### Installing manually
 
 Here, `$TEXDOC` means the path to the texdoc dev sources you cloned (or downloaded), and `$TEXMFHOME` denotes your personal TEXMF tree (you can get its location with `kpsewhich --var-value TEXMFHOME`).
 
@@ -32,9 +42,13 @@ Here, `$TEXDOC` means the path to the texdoc dev sources you cloned (or download
 
 You can make sure that the right files are used by running `texdoc --files`: the first line contains the full path to the version of used `texdoclib.tlu`, and the rest lists the configuration files in use.
 
-## What's New
+## Files in This Repository
 
-Please see the [NEWS](./NEWS) in our repository.
+- `doc/` contains the documentation,
+- `texdoc.cnf` is the default configuration file,
+- `script/` contains the source code,
+- `spec/` is a directory for testing scripts, and
+- `tools/` is **deprecated**; tools in this directory exist only because of historical reasons, but we will remove this directory soon enough.
 
 ## Copyright and License Information
 
