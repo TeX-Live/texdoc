@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-`texdoc` [OPTION...] NAME... 
+`texdoc` [OPTION...] NAME...  
 `texdoc` ACTION
 
 ## DESCRIPTION
@@ -44,7 +44,7 @@ Try to find appropriate TeX documentation for the specified NAME(s). Alternative
   Print additional information (eg, viewer command).
 * `-D`, `--debug`:
   Activate all debug output (equal to "--debug=all").
-* `-d`, `--debug`=LIST:
+* `-d`LIST, `--debug`=LIST:
   Activate debug output restricted to LIST.
 
 ## ENVIRONMENT
