@@ -20,17 +20,17 @@ If you want to try/test the develop version, please see below.
 
 ### Using Bundler
 
-The easiest way to install the develop version of Texdoc is using [Bundler](https://bundler.io/):
+The easiest way to install the develop version of Texdoc is using [Bundler](https://bundler.io/) and [Rake](https://github.com/ruby/rake):
 
 ```
 $ bundle install
-$ bundle exec rake install
+$ rake install
 ```
 
 If you want to uninstall the develop version (to use the TeX Live version), just try:
 
 ```
-$ bundle exec rake uninstall
+$ rake uninstall
 ```
 
 ### Installing manually
@@ -48,9 +48,43 @@ You can make sure that the right files are used by running `texdoc --files`: the
 - `texdoc.cnf` is the default configuration file,
 - `script/` contains the source code,
 - `spec/` is a directory for testing scripts, and
-- `tools/` is **deprecated**; tools in this directory exist only because of historical reasons, but we will remove this directory soon enough.
+- `tools/` is **outdated**; tools in this directory exist only because of historical reasons, but we will remove this directory in the future.
 
-## Copyright and License Information
+## Building and Testing
+
+Many building tasks are defined as [Rake](https://github.com/ruby/rake) tasks:
+
+* Generating all documentation (the PDF and manpage)
+
+```
+$ rake doc
+```
+
+* Generating a pre-hashed cache file (Data.tlpdb.lua)
+
+```
+$ rake gen_datafile
+```
+
+* Running all tests
+
+```
+$ rake test
+```
+
+* List all available rake tasks
+
+```
+$ rake -T
+```
+
+## Further Information
+
+More specific information (e.g. TODO) can be found in the Wiki of our GitHub repository. Please visit:
+
+* <https://github.com/TeX-Live/texdoc/wiki>
+
+## Copyright and License
 
 Copyright 2008-2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining. All rights reserved.
 
