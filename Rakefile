@@ -64,9 +64,18 @@ task :doc do
   sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}", verbose: false
 
   # generate manpage
-  opt_man = '--manual="Texdoc manual"'
-  opt_org = '--organization="Texdoc #{TEXDOC_VERSION}"'
-  sh "ronn -r #{opt_man} #{opt_org} texdoc.1.md 2> #{File::NULL}", verbose: false
+  opt_man = "--manual=\"Texdoc manual\""
+  opt_org = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
+  sh "bundle exec ronn -r #{opt_man} #{opt_org} texdoc.1.md 2> #{File::NULL}", verbose: false
+end
+
+desc "Preview the manpage"
+task :man do
+  FileUtils.cd("doc")
+
+  opt_man = "--manual=\"Texdoc manual\""
+  opt_org = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
+  sh "bundle exec ronn -m #{opt_man} #{opt_org} texdoc.1.md", verbose: false
 end
 
 desc "Cleanup the Texdoc directroy"
