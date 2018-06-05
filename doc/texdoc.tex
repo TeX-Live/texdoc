@@ -545,19 +545,21 @@ without the list, activates all available debug items.
 \subsection{Environment variables}\label{ss-envvar}
 
 They all correspond to some |viewer_«ext»| setting, and the reader is referred
-to~\ref{cf-viewer_*} for details. Also, environment variables used by older
-versions of Texdoc are accepted. You can append |_texdoc| to every name in
-the first column: this wins over every other name.
+to~\ref{cf-viewer_*} for details.\footnote{Old names of environment variables,
+namely |TEXDOCVIEW_{txt,html,dvi,ps,pdf}| and
+|TEXDOC_VIEWER_{TXT,HTML,DVI,PS,PDF}|, are deprecated but still work.} You can
+append |_texdoc| to every name in the first column: this wins over every other
+name.
 
 \begin{center}
-  \begin{tabular}{*4l}
-    New name    & Old name 1        & Old name 2           & Config. item  \\
-    |PAGER|     & |TEXDOCVIEW_txt|  & |TEXDOC_VIEWER_TXT|  & |viewer_txt|  \\
-    |BROWSER|   & |TEXDOCVIEW_html| & |TEXDOC_VIEWER_HTML| & |viewer_html| \\
-    |DVIVIEWER| & |TEXDOCVIEW_dvi|  & |TEXDOC_VIEWER_DVI|  & |viewer_dvi|  \\
-    |PSVIEWER|  & |TEXDOCVIEW_ps|   & |TEXDOC_VIEWER_PS|   & |viewer_ps|   \\
-    |PDFVIEWER| & |TEXDOCVIEW_pdf|  & |TEXDOC_VIEWER_PDF|  & |viewer_pdf|  \\
-  \end{tabular}
+\begin{tabular}{ll}
+Environment variables & Configuration items \\
+|PAGER|               & |viewer_txt|        \\
+|BROWSER|             & |viewer_html|       \\
+|DVIVIEWER|           & |viewer_dvi|        \\
+|PSVIEWER|            & |viewer_ps|         \\
+|PDFVIEWER|           & |viewer_pdf|        \\
+\end{tabular}
 \end{center}
 
 Also, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
