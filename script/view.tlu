@@ -1,6 +1,7 @@
 -- view.tlu view a document and/or display the list of results in texdoc
 --
--- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
+-- see texdoclib.tlu for details
 
 -----------------------------   view a document   -----------------------------
 

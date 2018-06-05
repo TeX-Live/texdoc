@@ -1,6 +1,7 @@
 -- search.tlu: file searching functions for texdoc.
 --
--- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
+-- see texdoclib.tlu for details
 
 -- Warning: every single function here assumes init_databases() has been called.
 

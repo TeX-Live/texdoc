@@ -1,6 +1,7 @@
 -- config.tlu: configuration handling for texdoc
 --
--- Manuel Pégourié-Gonnard, GPLv3+, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
+-- see texdoclib.tlu for details
 
 --------------------------   hide the config table   --------------------------
 

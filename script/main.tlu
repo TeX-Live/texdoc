@@ -1,6 +1,7 @@
 -- main.tlu: default command-line interface of texdoc
 --
--- Manuel Pégourié-Gonnard, GPLv3, see texdoclib.tlu for details
+-- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
+-- see texdoclib.tlu for details
 
 -- load texdoclib (kpse initialized by the wrapper)
 local texdoc = require('texdoc.texdoclib')
