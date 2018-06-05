@@ -58,36 +58,31 @@ end
 
 desc "Generate all documentation"
 task :doc do
-  origin = Pathname.pwd
+  FileUtils.cd("doc")
 
   # generate PDF documentation
-  FileUtils.cd("doc")
   sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}", verbose: false
 
   # generate manpage
-  FileUtils.cd("man")
   opt_man = '--manual="Texdoc manual"'
   opt_org = '--organization="Texdoc #{TEXDOC_VERSION}"'
   sh "ronn -r #{opt_man} #{opt_org} texdoc.1.md 2> #{File::NULL}", verbose: false
-  sh "groff -man -rS11 texdoc.1 | ps2pdf -sPAPERSIZE=a4 - texdoc.man1.pdf", verbose: false
-
-  # finish
-  FileUtils.cd(origin)
 end
 
 desc "Cleanup the Texdoc directroy"
 task :clean do
   FileUtils.rm_rf("tmp")
-  FileUtils.rm_f(Dir.glob("texdoc-*.zip"))
   FileUtils.cd("doc")
   sh "latexmk -C -quiet", verbose: false
-  FileUtils.rm_f(["man/texdoc.1", "man/texdoc.man1.pdf"])
+  FileUtils.rm_f("texdoc.1")
 end
 
 desc "Create archive for CTAN"
 task :ctan do
   # generate documentation
+  origin = Pathname.pwd
   Rake::Task["doc"].invoke()
+  FileUtils.cd(origin)
 
   # prepare the structure under tmp
   pkg_name = "texdoc-#{TEXDOC_VERSION}"
@@ -101,12 +96,12 @@ task :ctan do
   FileUtils.cp_r(Dir.glob("script/*"), script_dir)
 
   doc_dir = Pathname("doc")
-  man_dir = doc_dir.join("man")
-  FileUtils.mkdir_p(target.join(man_dir))
-  FileUtils.cp([doc_dir.join("texdoc.tex"), doc_dir.join("texdoc.pdf")], target.join(doc_dir))
-  FileUtils.cp([man_dir.join("texdoc.1"), man_dir.join("texdoc.man1.pdf")], target.join(man_dir))
+  docs = ["texdoc.tex", "texdoc.pdf", "texdoc.1"].map{ |n| doc_dir.join(n) }
+  FileUtils.mkdir_p(target.join(doc_dir))
+  FileUtils.cp(docs, target.join(doc_dir))
 
   # create zip archive
-  sh "zip -q -r #{pkg_name}.zip #{target}", verbose: false
+  FileUtils.cd("tmp")
+  sh "zip -q -r #{pkg_name}.zip #{pkg_name}", verbose: false
 end
 
