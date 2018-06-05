@@ -1,54 +1,77 @@
 # Rakefile for Texdoc.
 # Public domain.
 
-require 'rake'
+require 'rake/clean'
 require 'pathname'
-require 'fileutils'
 
+# basics
 TEXDOC_VERSION = "3.0"
+PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
+
+# woking/temporaly dirs
+PWD = Pathname.pwd
+TMP_DIR = PWD + "tmp"
+
+# Texdoc files/dirs
+TEXDOC_SCRIPT_DIR = PWD + "script"
+TEXDOC_CNF = PWD + "texdoc.cnf"
+TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
+
+# TEXMFHOME
+TEXMFHOME = Pathname(`kpsewhich --var-value TEXMFHOME`.chomp)
+TEXMFHOME_SCRIPTS_DIR = TEXMFHOME + "scripts"
+TEXMFHOME_TEXDOC_DIR = TEXMFHOME + "texdoc"
+directory TEXMFHOME_SCRIPTS_DIR
+directory TEXMFHOME_TEXDOC_DIR
+
+# TEXMFVAR
+TEXMFVAR = Pathname(`kpsewhich --var-value TEXMFVAR`.chomp)
+
+# symlinks
+TEXDOC_LINK = TEXMFHOME_SCRIPTS_DIR + "texdoc"
+TEXDOC_CNF_LINK = TEXMFHOME_TEXDOC_DIR + "texdoc-dist.cnf"
+
+# pseudo TEXMF
+PS_TEXMF = TMP_DIR + "texmf"
+PS_TEXMF_SCRIPTS_DIR = PS_TEXMF + "scripts"
+PS_TEXMF_TEXDOC_DIR = PS_TEXMF + "texdoc"
+directory PS_TEXMF_SCRIPTS_DIR
+directory PS_TEXMF_TEXDOC_DIR
+
+# options for ronn
+OPT_MAN = "--manual=\"Texdoc manual\""
+OPT_ORG = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
+
+# cleaning
+CLEAN.include(["doc/*", "tmp"])
+CLEAN.exclude(["doc/*.md", "doc/*.tex", "doc/*.pdf"])
+CLOBBER.include(["doc/*.pdf", "script/*.lua", "*.zip"])
 
 desc "Install Texdoc to your system"
-task :install do
+task :install => [TEXMFHOME_SCRIPTS_DIR, TEXMFHOME_TEXDOC_DIR] do
   # check the existence of the texdoc source
-  texdoc_scriptdir = Pathname.pwd.join("script")
-  texdoc_cnf = Pathname.pwd.join("texdoc.cnf")
-  texdoc_tlu = texdoc_scriptdir.join("texdoc.tlu")
-  fail("Directory #{texdoc_scriptdir} does not exists") if !texdoc_scriptdir.directory?
-  fail("File #{texdoc_cnf} does not exists") if !texdoc_cnf.file?
-  fail("File #{texdoc_tlu} does not exists") if !texdoc_tlu.file?
-
-  # get TEXMFHOME
-  texmf = Pathname(`kpsewhich --var-value TEXMFHOME`.chomp)
-
-  # create target dirs if not exists
-  texmf_scripts = texmf.join("scripts")
-  texmf_texdoc = texmf.join("texdoc")
-  FileUtils.mkdir_p([texmf_scripts, texmf_texdoc])
+  fail "Directory #{TEXDOC_SCRIPT_DIR} does not exists" if !TEXDOC_SCRIPT_DIR.directory?
+  fail "File #{TEXDOC_CNF} does not exists" if !TEXDOC_CNF.file?
+  fail "File #{TEXDOC_TLU} does not exists" if !TEXDOC_TLU.file?
 
   # create the symbolic links
-  FileUtils.ln_s(texdoc_scriptdir, texmf_scripts.join("texdoc"))
-  FileUtils.ln_s(texdoc_cnf, texmf_texdoc.join("texdoc-dist.cnf"))
+  ln_s TEXDOC_SCRIPT_DIR, TEXDOC_LINK
+  ln_s TEXDOC_CNF, TEXDOC_CNF_LINK
 end
 
 desc "Uninstall Texdoc from your system"
 task :uninstall do
-  # get TEXMFHOME
-  texmf = Pathname(`kpsewhich --var-value TEXMFHOME`.chomp)
-
   # check the symlinks
-  texdoc = texmf.join("scripts/texdoc")
-  texdoc_cnf = texmf.join("texdoc/texdoc-dist.cnf")
-  fail("#{texdoc} is not a symbolic link") if !texdoc.symlink?
-  fail("#{texdoc_cnf} is not a symbolic link") if !texdoc_cnf.symlink?
+  fail "#{TEXDOC_LINK} is not a symbolic link" if !TEXDOC_LINK.symlink?
+  fail "#{TEXDOC_CNF_LINK} is not a symbolic link" if !TEXDOC_CNF_LINK.symlink?
 
   # check this Texdoc is installed to the system
-  if texdoc.readlink != Pathname.pwd.join("script") \
-      or texdoc_cnf.readlink != Pathname.pwd.join("texdoc.cnf")
+  if TEXDOC_LINK.readlink != TEXDOC_SCRIPT_DIR or TEXDOC_CNF_LINK.readlink != TEXDOC_CNF
     fail("Another texdoc is installed; stop uninstalling")
   end
 
   # execute unlink
-  FileUtils.safe_unlink([texdoc, texdoc_cnf])
+  safe_unlink [TEXDOC_LINK, TEXDOC_CNF_LINK]
 end
 
 desc "Run all tests"
@@ -57,92 +80,53 @@ task :test do
 end
 
 desc "Generate a pre-hashed cache file"
-task :gen_datafile do
-  # construct pseudo TEXMF
-  texdoc_scriptdir = Pathname.pwd.join("script")
-  texdoc_cnf = Pathname.pwd.join("texdoc.cnf")
-  texdoc_tlu = texdoc_scriptdir.join("texdoc.tlu")
-
-  texdoc_tmpdir = Pathname.pwd.join("tmp")
-  texmf = Pathname(texdoc_tmpdir).join("texmf")
-
-  texmf_scripts = texmf.join("scripts")
-  texmf_texdoc = texmf.join("texdoc")
-  FileUtils.mkdir_p([texmf_scripts, texmf_texdoc])
-  FileUtils.ln_s(texdoc_scriptdir, texmf_scripts.join("texdoc"))
-  FileUtils.ln_s(texdoc_cnf, texmf_texdoc.join("texdoc.cnf"))
-
-  # set ENV
-  ENV["TEXMFHOME"] = texmf.to_s
-  ENV["LC_ALL"] = "C"
+task :gen_datafile => [PS_TEXMF_TEXDOC_DIR, PS_TEXMF_SCRIPTS_DIR] do
+  # constract pseudo TEXMF
+  ln_s TEXDOC_SCRIPT_DIR, PS_TEXMF_SCRIPTS_DIR + "texdoc"
+  ln_s TEXDOC_CNF, PS_TEXMF_TEXDOC_DIR + "texdoc.cnf"
+  ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
   # run Texdoc to generate a flesh cache file
-  sh "texlua #{texdoc_tlu.to_s} -lM texlive-en > #{File::NULL}", verbose: false
+  sh "texlua #{TEXDOC_TLU} -lM texlive-en > #{File::NULL}"
 
   # copy the cache file
-  cache = Pathname(`kpsewhich --var-value TEXMFVAR`.chomp).join("texdoc/cache-tlpdb.lua")
-  FileUtils.cp(cache, texdoc_scriptdir.join("Data.tlpdb.lua"))
-
-  # remove pseudo TEXMF
-  FileUtils.rm_rf(texmf)
+  cp TEXMFVAR + "texdoc/cache-tlpdb.lua", TEXDOC_SCRIPT_DIR + "Data.tlpdb.lua"
 end
 
 desc "Generate all documentation"
 task :doc do
-  FileUtils.cd("doc")
-
-  # generate PDF documentation
-  sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}", verbose: false
-
-  # generate manpage
-  opt_man = "--manual=\"Texdoc manual\""
-  opt_org = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
-  sh "bundle exec ronn -r #{opt_man} #{opt_org} texdoc.1.md 2> #{File::NULL}", verbose: false
+  cd "doc"
+  sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}"
+  sh "bundle exec ronn -r #{OPT_MAN} #{OPT_ORG} texdoc.1.md 2> #{File::NULL}"
 end
 
 desc "Preview the manpage"
 task :man do
-  FileUtils.cd("doc")
-
-  opt_man = "--manual=\"Texdoc manual\""
-  opt_org = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
-  sh "bundle exec ronn -m #{opt_man} #{opt_org} texdoc.1.md", verbose: false
-end
-
-desc "Cleanup the Texdoc directroy"
-task :clean do
-  FileUtils.rm_rf("tmp")
-  FileUtils.rm_f("script/Data.tlpdb.lua")
-  FileUtils.cd("doc")
-  sh "latexmk -C -quiet", verbose: false
-  FileUtils.rm_f("texdoc.1")
+  cd "doc"
+  sh "bundle exec ronn -m #{OPT_MAN} #{OPT_ORG} texdoc.1.md"
 end
 
 desc "Create archive for CTAN"
-task :ctan do
-  # generate documentation
-  origin = Pathname.pwd
-  Rake::Task["doc"].invoke()
-  FileUtils.cd(origin)
+task :ctan => :doc do
+  # initialize the target
+  TARGET_DIR = TMP_DIR + PKG_NAME
+  TARGET_SCRIPT_DIR, TARGET_DOC_DIR = TARGET_DIR + "script", TARGET_DIR + "doc"
+  rm_rf TARGET_DIR
+  mkdir_p [TARGET_SCRIPT_DIR, TARGET_DOC_DIR]
 
-  # prepare the structure under tmp
-  pkg_name = "texdoc-#{TEXDOC_VERSION}"
-  target = Pathname("tmp").join(pkg_name)
-  FileUtils.rm_rf(target)
-  FileUtils.mkdir_p(target)
+  ## copy all required files
+  cd PWD
+  cp ["COPYING", "README.md", "NEWS", "texdoc.cnf"], TARGET_DIR
+  cp_r Dir.glob("script/*.tlu"), TARGET_SCRIPT_DIR
 
-  script_dir = target.join("script")
-  FileUtils.mkdir_p(script_dir)
-  FileUtils.cp(["COPYING", "README.md", "NEWS", "texdoc.cnf"], target)
-  FileUtils.cp_r(Dir.glob("script/*"), script_dir)
+  docs = ["texdoc.tex", "texdoc.pdf", "texdoc.1"]
+  docs.each do |name|
+    cp "doc/#{name}", TARGET_DOC_DIR
+  end
 
-  doc_dir = Pathname("doc")
-  docs = ["texdoc.tex", "texdoc.pdf", "texdoc.1"].map{ |n| doc_dir.join(n) }
-  FileUtils.mkdir_p(target.join(doc_dir))
-  FileUtils.cp(docs, target.join(doc_dir))
-
-  # create zip archive
-  FileUtils.cd("tmp")
-  sh "zip -q -r #{pkg_name}.zip #{pkg_name}", verbose: false
+  ## create zip archive
+  cd TMP_DIR
+  sh "zip -q -r #{PKG_NAME}.zip #{PKG_NAME}"
+  cp "#{PKG_NAME}.zip", PWD
 end
 
