@@ -25,7 +25,7 @@ version      = '3.0'
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant
 usage_msg = [[
-Usage: texdoc [OPTION]... NAME...
+Usage: texdoc [OPTION...] NAME...
   or:  texdoc ACTION
 
 Try to find appropriate TeX documentation for the specified NAME(s).

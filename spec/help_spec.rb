@@ -5,7 +5,7 @@ RSpec.describe "Showing help", :type => :aruba do
 
   let(:help_head) do
 <<~EXPECTED
-Usage: texdoc [OPTION]... NAME...
+Usage: texdoc [OPTION...] NAME...
   or:  texdoc ACTION
 
 Try to find appropriate TeX documentation for the specified NAME(s).
