@@ -8,6 +8,13 @@ This version has two big features:
 - Fuzzy search
 - New option parser
 
+And also includes a lot of small improvements:
+- Get rid of Data.tlpdb.lua
+- Documentation update
+- Bug fix around environment variables
+- Other small improvements including score adjustments
+- Sources moved to https://github.com/TeX-Live/texdoc
+
 Version 2.0171
 --------------
 - In list mode (-l), just RET views first document in list.
