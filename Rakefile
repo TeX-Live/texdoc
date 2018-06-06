@@ -38,6 +38,15 @@ PS_TEXMF_TEXDOC_DIR = PS_TEXMF + "texdoc"
 directory PS_TEXMF_SCRIPTS_DIR
 directory PS_TEXMF_TEXDOC_DIR
 
+PS_TEXDOC_LINK = PS_TEXMF_SCRIPTS_DIR + "texdoc"
+PS_TEXDOC_CNF_LINK = PS_TEXMF_TEXDOC_DIR + "texdoc.cnf"
+file PS_TEXDOC_LINK => PS_TEXMF_SCRIPTS_DIR do
+  ln_s TEXDOC_SCRIPT_DIR, PS_TEXDOC_LINK
+end
+file PS_TEXDOC_CNF_LINK => PS_TEXMF_TEXDOC_DIR do
+  ln_s TEXDOC_CNF, PS_TEXDOC_CNF_LINK
+end
+
 # options for ronn
 OPT_MAN = "--manual=\"Texdoc manual\""
 OPT_ORG = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
@@ -80,10 +89,8 @@ task :test do
 end
 
 desc "Generate a pre-hashed cache file"
-task :gen_datafile => [PS_TEXMF_TEXDOC_DIR, PS_TEXMF_SCRIPTS_DIR] do
+task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   # constract pseudo TEXMF
-  ln_s TEXDOC_SCRIPT_DIR, PS_TEXMF_SCRIPTS_DIR + "texdoc"
-  ln_s TEXDOC_CNF, PS_TEXMF_TEXDOC_DIR + "texdoc.cnf"
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
   # run Texdoc to generate a flesh cache file
@@ -114,19 +121,19 @@ task :ctan => :doc do
   rm_rf TARGET_DIR
   mkdir_p [TARGET_SCRIPT_DIR, TARGET_DOC_DIR]
 
-  ## copy all required files
+  # copy all required files
   cd PWD
   cp ["COPYING", "README.md", "NEWS", "texdoc.cnf"], TARGET_DIR
-  cp_r Dir.glob("script/*.tlu"), TARGET_SCRIPT_DIR
+  cp Dir.glob("script/*.tlu"), TARGET_SCRIPT_DIR
 
   docs = ["texdoc.tex", "texdoc.pdf", "texdoc.1"]
   docs.each do |name|
     cp "doc/#{name}", TARGET_DOC_DIR
   end
 
-  ## create zip archive
+  # create zip archive
   cd TMP_DIR
   sh "zip -q -r #{PKG_NAME}.zip #{PKG_NAME}"
-  cp "#{PKG_NAME}.zip", PWD
+  mv "#{PKG_NAME}.zip", PWD
 end
 
