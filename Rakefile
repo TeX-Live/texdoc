@@ -84,13 +84,17 @@ task :uninstall do
 end
 
 desc "Run all tests"
-task :test do
+task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+  # use controlled environment
+  ENV["TEXMFHOME"] = PS_TEXMF.to_s
+
+  # run rspec
   sh "bundle exec rspec"
 end
 
 desc "Generate a pre-hashed cache file"
 task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
-  # constract pseudo TEXMF
+  # use controlled environment
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
   # run Texdoc to generate a flesh cache file

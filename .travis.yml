@@ -21,4 +21,4 @@ install:
   - bundle install
 
 script:
-  - bundle exec rspec
+  - bundle exec rake test

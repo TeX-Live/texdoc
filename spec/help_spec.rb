@@ -1,8 +1,11 @@
 require 'spec_helper'
+require 'texdoc_helper'
+
+RSpec.configure do |c|
+  c.include Helplers
+end
 
 RSpec.describe "Showing help", :type => :aruba do
-  include_context "environment"
-
   let(:help_head) do
 <<~EXPECTED
 Usage: texdoc [OPTION...] NAME...
@@ -12,6 +15,8 @@ Try to find appropriate TeX documentation for the specified NAME(s).
 Alternatively, perform the given ACTION and exit.
 EXPECTED
   end
+
+  before(:context) { set_default_env }
 
   context "with --help" do
     before(:each) { run_texdoc "--help" }

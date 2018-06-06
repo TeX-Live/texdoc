@@ -1,9 +1,14 @@
 require 'spec_helper'
+require 'texdoc_helper'
+
+RSpec.configure do |c|
+  c.include Helplers
+end
 
 RSpec.describe "Showing version", :type => :aruba do
-  include_context "environment"
-
   let(:version) { "3.0" }
+
+  before(:context) { set_default_env }
 
   context "with --version" do
     before(:each) { run_texdoc "--version" }
