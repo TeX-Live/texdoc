@@ -45,10 +45,9 @@ You can make sure that the right files are used by running `texdoc --files`: the
 ## Files in This Repository
 
 - `doc/` contains the documentation,
-- `texdoc.cnf` is the default configuration file,
 - `script/` contains the source code,
 - `spec/` is a directory for testing scripts, and
-- `tools/` is **outdated**; tools in this directory exist only because of historical reasons, but we will remove this directory in the future.
+- `texdoc.cnf` is the default configuration file,
 
 ## Building and Testing
 
