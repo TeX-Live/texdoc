@@ -47,31 +47,39 @@ You can make sure that the right files are used by running `texdoc --files`: the
 - `doc/` contains the documentation,
 - `script/` contains the source code,
 - `spec/` is a directory for testing scripts, and
-- `texdoc.cnf` is the default configuration file,
+- `texdoc.cnf` is the default configuration file.
 
 ## Building and Testing
 
 Many building tasks are defined as [Rake](https://github.com/ruby/rake) tasks:
 
-* Generating all documentation (the PDF and manpage)
+### Generating all documentation
+
+This will generate both the PDF and the manpage in `doc/` directory.
 
 ```
 $ rake doc
 ```
 
-* Generating a pre-hashed cache file (Data.tlpdb.lua)
+### Generating a pre-hashed cache file
+
+This will generate a pre-hashed cache file `script/Data.tlpdb.lua`. This task have to be done under a TeX Live setup with tlpdb.
 
 ```
 $ rake gen_datafile
 ```
 
-* Running all tests
+### Running all tests
+
+This will run all tests in `spec/` directory.
 
 ```
 $ rake test
 ```
 
-* List all available rake tasks
+### Showing all available tasks
+
+This will show all available tasks with a short discription.
 
 ```
 $ rake -T
