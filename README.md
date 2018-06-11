@@ -79,7 +79,7 @@ $ rake test
 
 ### Showing all available tasks
 
-This will show all available tasks with a short discription.
+This will show all available tasks with a short description.
 
 ```
 $ rake -T

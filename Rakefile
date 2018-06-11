@@ -117,7 +117,7 @@ task :man do
   sh "bundle exec ronn -m #{OPT_MAN} #{OPT_ORG} texdoc.1.md"
 end
 
-desc "Create archive for CTAN"
+desc "Create an archive for CTAN"
 task :ctan => :doc do
   # initialize the target
   TARGET_DIR = TMP_DIR + PKG_NAME
