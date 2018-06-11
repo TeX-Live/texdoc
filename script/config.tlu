@@ -147,8 +147,10 @@ function setup_config_from_cl(arg)
             if string.sub(v, 1, 2) == "--" then
                 table.remove(arg, 1)
                 local x = string.find(v, "=", 1, true)
-                if x then tab[string.sub(v, 3, x-1)] = string.sub(v, x+1)
-                else      tab[string.sub(v, 3)] = true
+                if x then
+                    table.insert(tab, { string.sub(v, 3, x-1), string.sub(v, x+1) })
+                else
+                    table.insert(tab, { string.sub(v, 3), true })
                 end
             elseif string.sub(v, 1, 1) == "-" then
                 table.remove(arg, 1)
@@ -166,12 +168,12 @@ function setup_config_from_cl(arg)
                             tmp = saved_arg[k + 1]
                         end
                         if string.match(tmp, '^%-') then
-                            tab[jopt] = false
+                            table.insert(tab, { jopt, false })
                         else
-                            tab[jopt] = tmp
+                            table.insert(tab, { jopt, tmp })
                         end
                     else
-                        tab[jopt] = true
+                        table.insert(tab, { jopt, true })
                     end
                     y = y + 1
                 end
@@ -181,7 +183,8 @@ function setup_config_from_cl(arg)
     end
 
     opts = getopt(arg, 'd')
-    for k, v in pairs(opts) do
+    for _, tp in ipairs(opts) do
+        k, v = tp[1], tp[2]
         if #k == 1 then
             curr_arg = '-' .. k
         else
