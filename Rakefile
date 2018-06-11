@@ -39,7 +39,7 @@ directory PS_TEXMF_SCRIPTS_DIR
 directory PS_TEXMF_TEXDOC_DIR
 
 PS_TEXDOC_LINK = PS_TEXMF_SCRIPTS_DIR + "texdoc"
-PS_TEXDOC_CNF_LINK = PS_TEXMF_TEXDOC_DIR + "texdoc.cnf"
+PS_TEXDOC_CNF_LINK = PS_TEXMF_TEXDOC_DIR + "texdoc-dist.cnf"
 file PS_TEXDOC_LINK => PS_TEXMF_SCRIPTS_DIR do
   ln_s TEXDOC_SCRIPT_DIR, PS_TEXDOC_LINK
 end
@@ -64,6 +64,7 @@ task :install => [TEXMFHOME_SCRIPTS_DIR, TEXMFHOME_TEXDOC_DIR] do
   fail "File #{TEXDOC_TLU} does not exists" if !TEXDOC_TLU.file?
 
   # create the symbolic links
+  fail "Local Texdoc is already installed" if TEXDOC_LINK.file? or TEXDOC_CNF_LINK.file?
   ln_s TEXDOC_SCRIPT_DIR, TEXDOC_LINK
   ln_s TEXDOC_CNF, TEXDOC_CNF_LINK
 end
@@ -87,6 +88,9 @@ desc "Run all tests"
 task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   # use controlled environment
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
+
+  # check version
+  sh "texlua #{TEXDOC_TLU} -f"
 
   # run rspec
   sh "bundle exec rspec"
