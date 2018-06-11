@@ -30,4 +30,4 @@ texdoc-*.zip
 
 # local
 Makefile
-.vimrc
+*.vimrc
