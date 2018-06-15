@@ -454,6 +454,13 @@ function init_tlp_database()
         deb_print('tlpdb', 'Using shipped tlpdb data.')
         get_tlpinfo_from_dist()
     end
+    if ((config.cache_d ~= nil) and (config.cache_d ~= '') and lfs.isdir(config.cache_d)) then
+        for file in lfs.dir(config.cache_d) do
+            if string.match(string.lower(file), '%.([^/.]*)$') == 'lua' then
+                merge_into_cache(config.cache_d..'/'..file)
+            end
+        end
+    end
 end
 
 do -- begin scope of tlpinfo tables
@@ -568,6 +575,14 @@ end
 function get_tlpinfo_from_dist()
     local f = assert(kpse.find_file(C.data_tlpdb_name, 'texmfscripts'))
     s_meta, tlp_from_runfile, tlp_doclist = dofile(f)
+end
+
+-- merge pre-hashed data into current cache
+function merge_into_cache(filename)
+    local part_s_meta, part_tlp_from_runfile, part_tlp_doclist = dofile(filename)
+    for k,v in pairs(part_s_meta) do s_meta[k] = v end
+    for k,v in pairs(part_tlp_from_runfile) do tlp_from_runfile[k] = v end
+    for k,v in pairs(part_tlp_doclist) do tlp_doclist[k] = v end
 end
 
 -- get docfiles for pattern using specific tlpdb information
