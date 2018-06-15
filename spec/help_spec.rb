@@ -6,13 +6,44 @@ RSpec.configure do |c|
 end
 
 RSpec.describe "Showing help", :type => :aruba do
-  let(:help_head) do
+  let(:help_text) do
 <<~EXPECTED
 Usage: texdoc [OPTION...] NAME...
   or:  texdoc ACTION
 
 Try to find appropriate TeX documentation for the specified NAME(s).
 Alternatively, perform the given ACTION and exit.
+
+Actions:
+  -h, --help            Print this help message.
+  -V, --version         Print the version number.
+  -f, --files           Print the list of configuration files used.
+  --just-view FILE      Display FILE, given with full path (no searching).
+
+Options:
+  -w, --view            Use view mode: start a viewer. (default)
+  -m, --mixed           Use mixed mode (view or list).
+  -l, --list            Use list mode: show a list of results.
+  -s, --showall         Use showall mode: show also "bad" results.
+
+  -i, --interact        Use interactive menus. (default)
+  -I, --nointeract      Use plain lists, no interaction required.
+  -M, --machine         Machine-readable output for lists (implies -I).
+
+  -q, --quiet           Suppress warnings and most error messages.
+  -v, --verbose         Print additional information (eg, viewer command).
+  -D, --debug           Activate all debug output (equal to "--debug=all").
+  -dLIST, --debug=LIST  Activate debug output restricted to LIST.
+
+Environment variables: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER,
+and *_texdoc of each.
+
+Files: <TEXMF>/texdoc/texdoc.cnf; see output of the --files option.
+Full manual available via `texdoc texdoc'.
+
+Website: <https://tug.org/texdoc/>
+Repository: <https://github.com/TeX-Live/texdoc>
+Please email bugs to <texdoc@tug.org>.
 EXPECTED
   end
 
@@ -22,20 +53,20 @@ EXPECTED
     before(:each) { run_texdoc "--help" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to start_with help_head }
+    it { expect(last_command_started.stdout).to eq help_text }
   end
 
   context "with -h" do
     before(:each) { run_texdoc "-h" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to start_with help_head }
+    it { expect(last_command_started.stdout).to eq help_text }
   end
 
   context "with -h -l" do
     before(:each) { run_texdoc "-h -l" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to start_with help_head }
+    it { expect(last_command_started.stdout).to eq help_text }
   end
 end

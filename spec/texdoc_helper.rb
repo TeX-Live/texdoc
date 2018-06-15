@@ -7,7 +7,7 @@ module Helplers
   TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
 
   def run_texdoc(arg)
-    run("texlua #{TEXDOC_TLU} #{arg}")
+    run "texlua #{TEXDOC_TLU} #{arg}"
   end
 
   def set_default_env
