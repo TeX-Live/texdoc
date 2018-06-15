@@ -85,6 +85,7 @@ known_options = {
     'max_lines',
     'lang',
     'fuzzy_level',
+    'cache_d',
 }
 
 error_msg = [[
