@@ -7,6 +7,7 @@ end
 
 RSpec.describe "Showing version", :type => :aruba do
   let(:version) { "3.0" }
+
   let(:version_text) do
 <<~EXPECTED
 Texdoc #{version}
@@ -17,7 +18,7 @@ This is free software: you are free to change and redistribute it.
 EXPECTED
   end
 
-  before(:context) { set_default_env }
+  before(:all) { set_default_env }
 
   context "with --version" do
     before(:each) { run_texdoc "--version" }

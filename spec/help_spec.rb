@@ -47,7 +47,7 @@ Please email bugs to <texdoc@tug.org>.
 EXPECTED
   end
 
-  before(:context) { set_default_env }
+  before(:all) { set_default_env }
 
   context "with --help" do
     before(:each) { run_texdoc "--help" }
