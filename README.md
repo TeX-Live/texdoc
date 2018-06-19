@@ -1,6 +1,7 @@
 # Texdoc (v3.0)
 
 [![Build Status](https://travis-ci.org/TeX-Live/texdoc.svg?branch=master)](https://travis-ci.org/TeX-Live/texdoc)
+[![Build status](https://ci.appveyor.com/api/projects/status/uq28ms7eba7ns6d3/branch/master?svg=true)](https://ci.appveyor.com/project/wtsnjp/texdoc/branch/master)
 
 Texdoc is a command line program to find and view documentation in TeX Live.
 

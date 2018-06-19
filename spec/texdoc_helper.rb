@@ -7,6 +7,7 @@ module Helplers
   TEXDOC_SCRIPT_DIR = PWD + "script"
   TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
 
+  PATH = ENV["PATH"]
   TEXMFHOME = ENV["TEXMFHOME"]
   LC_ALL = "C"
 
@@ -21,6 +22,7 @@ module Helplers
     ENV.clear
 
     # set the default values
+    ENV["PATH"] = PATH
     ENV["TEXMFHOME"] = TEXMFHOME
     ENV["LC_ALL"] = LC_ALL
   end
