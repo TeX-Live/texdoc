@@ -35,7 +35,9 @@ module Helplers
     ENV["LC_ALL"] = LC_ALL
 
     # prevent to pop-up documents during testing
-    viewer_list = ["PAGER", "MDVIEWER", "BROWSER", "DVIVIEWER", "PSVIEWER"]
+    viewer_list = [
+      "PAGER", "BROWSER", "DVIVIEWER", "PSVIEWER", "PDFVIEWER", "MDVIEWER"
+    ]
     viewer_list.each { |v| ENV[v + "_texdoc"] = ":" }
   end
 end

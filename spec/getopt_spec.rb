@@ -7,13 +7,12 @@ end
 
 RSpec.describe "Running Texdoc", :type => :aruba do
   before(:all) { set_default_env }
-  let(:sample) { "texlive-docindex" }
+  let(:sample) { "texlive-en" }
 
   context "without any option and argument" do
     before(:each) { run_texdoc }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to have_exit_status(2) }
-    it { expect(last_command_started.stdout).to be_empty }
     it { expect(last_command_started.stderr).to include("texdoc error: no action specified") }
   end
 
@@ -21,14 +20,12 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     before(:each) { run_texdoc sample }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to be_empty }
   end
 
   context "with option -D" do
     before(:each) { run_texdoc ["-D", sample] }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to be_empty }
     it { expect(last_command_started.stderr).to include("texdoc debug-version:") }
   end
 
@@ -36,7 +33,6 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     before(:each) { run_texdoc ["--debug", sample] }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to be_empty }
     it { expect(last_command_started.stderr).to include("texdoc debug-version:") }
   end
 
@@ -44,7 +40,6 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     before(:each) { run_texdoc ["-dconfig", sample] }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to be_empty }
     it { expect(last_command_started.stderr).to include("texdoc debug-config:") }
   end
 
@@ -52,7 +47,6 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     before(:each) { run_texdoc ["--debug=config", sample] }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout).to be_empty }
     it { expect(last_command_started.stderr).to include("texdoc debug-config:") }
   end
 
