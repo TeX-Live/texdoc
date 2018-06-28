@@ -12,15 +12,11 @@ module Helplers
   LC_ALL = "C"
 
   # running the target texdoc
-  def run_texdoc(arg=[])
-    if arg.kind_of?(Array)
-      if arg.size > 0
-        run "texlua #{TEXDOC_TLU} #{arg.join(' ')}"
-      else
-        run "texlua #{TEXDOC_TLU}"
-      end
+  def run_texdoc(*args)
+    if args.size > 0
+      run "texlua #{TEXDOC_TLU} #{args.join(' ')}"
     else
-      run "texlua #{TEXDOC_TLU} #{arg}"
+      run "texlua #{TEXDOC_TLU}"
     end
   end
 
@@ -39,5 +35,18 @@ module Helplers
       "PAGER", "BROWSER", "DVIVIEWER", "PSVIEWER", "PDFVIEWER", "MDVIEWER"
     ]
     viewer_list.each { |v| ENV[v + "_texdoc"] = ":" }
+  end
+
+  # generate debug line
+  def error_line(msg)
+    return "texdoc error: #{msg}"
+  end
+
+  def debug_line(cat, msg="")
+    if msg.empty?
+      return "texdoc debug-#{cat}:"
+    else
+      return "texdoc debug-#{cat}: #{msg}"
+    end
   end
 end

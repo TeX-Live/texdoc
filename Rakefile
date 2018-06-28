@@ -84,8 +84,8 @@ task :uninstall do
   safe_unlink [TEXDOC_LINK, TEXDOC_CNF_LINK]
 end
 
-desc "Run all tests"
-task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+desc "Run tests (only listed specs, if specified)"
+task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do |task, args|
   # use controlled environment
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
@@ -93,7 +93,13 @@ task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   sh "texlua #{TEXDOC_TLU} -f"
 
   # run rspec
-  sh "bundle exec rspec"
+  args = args.to_a
+  if args.size > 0
+    f_list = args.map{|f| "spec/#{f}_spec.rb"}.join(" ")
+    sh "bundle exec rspec #{f_list}"
+  else
+    sh "bundle exec rspec"
+  end
 end
 
 desc "Generate a pre-hashed cache file"
