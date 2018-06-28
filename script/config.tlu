@@ -8,12 +8,12 @@
 -- config is read-only (but not "deep" read-only)
 function set_read_only(table, name)
     assert(next(table) == nil,
-        'Internal error: '..name..' should be empty at this point.')
+        'Internal error: ' .. name .. ' should be empty at this point.')
     local ro = 'Internal error: attempt to update read-only table '
     local real = {}
     setmetatable(table, {
         __index = real,
-        __newindex = function () error(ro..name..'.') end,
+        __newindex = function() error(ro..name..'.') end,
     })
     return function(k, v) real[k] = v end
 end
@@ -25,7 +25,7 @@ real_set_config = set_read_only(config, 'config')
 
 -- set a config parameter, but don't overwrite it if already set
 -- three special types: *_list (list), *_switch (boolean), *_level (number)
-function set_config_element (key, value, context)
+function set_config_element(key, value, context)
     local is_known = false -- is key a valid option?
     local option
     for _, option in ipairs(C.known_options) do
@@ -36,13 +36,14 @@ function set_config_element (key, value, context)
     -- exit if key is already set (/!\ must test for nil, not false)
     if not (config[key] == nil) then
         if context.src ~= 'def' then
-            deb_print('config', "Ignoring '"..key.."="..value.."' "
-                ..context_to_string(context)..'.')
+            deb_print('config',
+                'Ignoring "' .. key .. '=' .. value .. '" ' ..
+                context_to_string(context) .. '.')
         end
         return nil
     end
     -- record the source of the setting
-    real_set_config(key..'_src', context.src)
+    real_set_config(key .. '_src', context.src)
     -- detect the type of the key
     if string.match(key, '_list$') then
         -- coma-separated list
@@ -60,58 +61,58 @@ function set_config_element (key, value, context)
             inverse[j] = i -- ... and build inverse mapping on the way
         end
         real_set_config(key, values)
-        real_set_config(key..'_inv', inverse)
-        real_set_config(key..'_max', #values)
-    elseif string.find (key, '_switch$') then
+        real_set_config(key .. '_inv', inverse)
+        real_set_config(key .. '_max', #values)
+    elseif string.find(key, '_switch$') then
         -- boolean
         if value == 'true' then
             real_set_config(key, true)
         elseif value == 'false' then
             real_set_config(key, false)
         else
-            config_warn (key, value, context)
+            config_warn(key, value, context)
         end
-    elseif string.find (key, '_level$') then
+    elseif string.find(key, '_level$') then
         -- integer
-        local val = tonumber (value)
+        local val = tonumber(value)
         if val then
             real_set_config(key, val)
         else
-            config_warn (key, value, context)
+            config_warn(key, value, context)
         end
     else -- string
         real_set_config(key, value)
     end
     -- special case: if we just set debug_list, print version info now
     if key == 'debug_list' then
-        deb_print('version', C.fullname..' version '..C.version)
+        deb_print('version', C.fullname .. ' version ' .. C.version)
     end
     -- now tell what we have just done, for debugging
     deb_print('config',
-        "Setting '"..key.."="..value.."' "..context_to_string(context)..'.')
+        'Setting "' .. key .. '=' .. value .. '" ' ..
+        context_to_string(context) .. '.')
 end
 
 -- a helper function for warning messages in the above
-function config_warn (key, value, context, unknown)
+function config_warn(key, value, context, unknown)
     local begin = unknown
-        and 'Unknown option "'..key..'"'
-        or 'Illegal value "'..tostring(value)..'" for option "'..key..'"'
-    local ending = '.  Skipping.'
-    err_print('warning', begin..' '..context_to_string(context)..ending)
+        and 'Unknown option "' .. key .. '"'
+        or 'Illegal value "' .. tostring(value) .. '" for option "' .. key .. '"'
+    err_print('warning', begin .. ' ' .. context_to_string(context) .. '.  Skipping.')
 end
 
 -- interpreting 'context' for the previous functions
 function context_to_string(context)
     if not context then return '(no context)' end
-    if      context.src == 'cl' then
-        return 'from command line option "'..context.name..'"'
-    elseif  context.src == 'env' then
-        return 'from environment variable "'..context.name..'"'
-    elseif  context.src == 'loc' then
+    if context.src == 'cl' then
+        return 'from command line option "' .. context.name .. '"'
+    elseif context.src == 'env' then
+        return 'from environment variable "' .. context.name .. '"'
+    elseif context.src == 'loc' then
         return 'from operating system locale'
-    elseif  context.src == 'file' then
-        return 'in file "'..context.file..'" on line '..context.line
-    elseif  context.src == 'def' then
+    elseif context.src == 'file' then
+        return 'in file "' .. context.file .. '" on line ' .. context.line
+    elseif context.src == 'def' then
         return 'from built-in defaults'
     else
         return 'from unkown source (should not happen, please report)'
@@ -119,9 +120,9 @@ function context_to_string(context)
 end
 
 -- set a whole list, also whithout overwriting
-function set_config_list (conf, context)
+function set_config_list(conf, context)
     for key, value in pairs(conf) do
-        set_config_element (key, value, context)
+        set_config_element(key, value, context)
     end
 end
 
@@ -144,15 +145,15 @@ function setup_config_from_cl(arg)
         local tab = {}
         local saved_arg = { table.unpack(arg) }
         for k, v in ipairs(saved_arg) do
-            if string.sub(v, 1, 2) == "--" then
+            if string.sub(v, 1, 2) == '--' then
                 table.remove(arg, 1)
-                local x = string.find(v, "=", 1, true)
+                local x = string.find(v, '=', 1, true)
                 if x then
                     table.insert(tab, { string.sub(v, 3, x-1), string.sub(v, x+1) })
                 else
                     table.insert(tab, { string.sub(v, 3), true })
                 end
-            elseif string.sub(v, 1, 1) == "-" then
+            elseif string.sub(v, 1, 1) == '-' then
                 table.remove(arg, 1)
                 local y = 2
                 local l = string.len(v)
@@ -230,7 +231,7 @@ function setup_config_from_cl(arg)
             set_config_elt('verbosity_level', C.max_verbosity)
         -- problem
         else
-            err_print('error', "unknown option: "..curr_arg)
+            err_print('error', 'unknown option: ' .. curr_arg)
             err_print('error', C.error_msg)
             return false
         end
@@ -241,7 +242,7 @@ end
 -------------------------   config from environment   --------------------------
 
 -- set config from environment if available
-function setup_config_from_env ()
+function setup_config_from_env()
     local function set_config_elt_from_vars(key, vars)
         for _, var in ipairs(vars) do
             local value = os.getenv(var)
@@ -251,17 +252,17 @@ function setup_config_from_env ()
         end
     end
     set_config_elt_from_vars('viewer_pdf',
-      {"PDFVIEWER_texdoc", "PDFVIEWER", "TEXDOCVIEW_pdf", "TEXDOC_VIEWER_PDF"})
+      {'PDFVIEWER_texdoc', 'PDFVIEWER', 'TEXDOCVIEW_pdf', 'TEXDOC_VIEWER_PDF'})
     set_config_elt_from_vars('viewer_ps',
-      {"PSVIEWER_texdoc", "PSVIEWER", "TEXDOCVIEW_ps", "TEXDOC_VIEWER_PS"})
+      {'PSVIEWER_texdoc', 'PSVIEWER', 'TEXDOCVIEW_ps', 'TEXDOC_VIEWER_PS'})
     set_config_elt_from_vars('viewer_dvi',
-      {"DVIVIEWER_texdoc", "DVIVIEWER", "TEXDOCVIEW_dvi", "TEXDOC_VIEWER_DVI"})
+      {'DVIVIEWER_texdoc', 'DVIVIEWER', 'TEXDOCVIEW_dvi', 'TEXDOC_VIEWER_DVI'})
     set_config_elt_from_vars('viewer_html',
-      {"BROWSER_texdoc", "BROWSER", "TEXDOCVIEW_html", "TEXDOC_VIEWER_HTML"})
+      {'BROWSER_texdoc', 'BROWSER', 'TEXDOCVIEW_html', 'TEXDOC_VIEWER_HTML'})
     set_config_elt_from_vars('viewer_md',
-      {"MDVIEWER_texdoc", "PAGER", "TEXDOCVIEW_md", "TEXDOC_VIEWER_MD"})
+      {'MDVIEWER_texdoc', 'PAGER', 'TEXDOCVIEW_md', 'TEXDOC_VIEWER_MD'})
     set_config_elt_from_vars('viewer_txt',
-      {"PAGER_texdoc", "PAGER", "TEXDOCVIEW_txt", "TEXDOC_VIEWER_TXT"})
+      {'PAGER_texdoc', 'PAGER', 'TEXDOCVIEW_txt', 'TEXDOC_VIEWER_TXT'})
 end
 
 ----------------------   options and aliases from files   ----------------------
@@ -285,7 +286,7 @@ function read_config_file(configfile)
         -- complain if it failed
         if not ok then
             err_print('warning',
-            'syntax error in '..configfile..' at line '..lineno..'.')
+                'syntax error in ' .. configfile .. ' at line ' .. lineno .. '.')
         end
     end
     cnf:close()
@@ -304,9 +305,9 @@ end
 -- return the list of configuration files
 function get_config_files()
     -- get names
-    local platform = string.match (kpse.var_value ('SELFAUTOLOC'), '.*/(.*)$')
+    local platform = string.match(kpse.var_value('SELFAUTOLOC'), '.*/(.*)$')
     local names = {
-        'texdoc-'..platform..'.cnf',
+        'texdoc-' .. platform .. '.cnf',
         'texdoc.cnf',
         'texdoc-dist.cnf',
     }
@@ -332,33 +333,33 @@ do
 local config_files = {}
 
 -- set config/aliases from all config files
-function setup_config_from_files ()
+function setup_config_from_files()
     local file_list = get_config_files()
-    for i, file in ipairs (file_list) do
+    for i, file in ipairs(file_list) do
         local status = config.lastfile_switch and 'disabled' or 'active'
         config_files[i] = {
             path = file,
             status = status,
         }
         if status == 'active' then
-            read_config_file (file)
+            read_config_file(file)
         end
     end
 end
 
 -- now a special information function (see -f,--file option)
-function show_config_files (print_fun, verbose)
+function show_config_files(print_fun, verbose)
     local pref = verbose and '    ' or ''
-    print_fun("Configuration files are:")
-    for i, file in ipairs (config_files) do
-        print_fun(pref..file.status..'\t'..w32_path(file.path))
+    print_fun('Configuration files are:')
+    for i, file in ipairs(config_files) do
+        print_fun(pref .. file.status .. '\t' .. w32_path(file.path))
     end
     if verbose then
         print_fun('Recommended file(s) for personal settings:')
         local sep = (os.type == 'windows') and ';' or ':'
         local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
         for _, home in ipairs(texmfhomes) do
-            print_fun(pref..home..'/texdoc/texdoc.cnf')
+            print_fun(pref .. home .. '/texdoc/texdoc.cnf')
         end
     end
 end
@@ -368,13 +369,13 @@ end -- scope of config_files
 ----------------------   config from locale settings   -------------------------
 
 function setup_config_from_locale()
-    local current = os.setlocale(nil, "all")
-    os.setlocale("", "all")
-    local native = os.setlocale(nil, "time")
-    os.setlocale(current, "all")
-    local lang = string.match(native, "^[a-z][a-z]")
+    local current = os.setlocale(nil, 'all')
+    os.setlocale('', 'all')
+    local native = os.setlocale(nil, 'time')
+    os.setlocale(current, 'all')
+    local lang = string.match(native, '^[a-z][a-z]')
     if lang then
-        set_config_element("lang", lang, {src="loc"})
+        set_config_element('lang', lang, {src='loc'})
     end
 end
 
@@ -386,10 +387,10 @@ end
 -- check if "name" is the name of a file in the path
 -- Warning: to be used only on Unix! (separators, and PATH irrelevant on win32)
 -- the value of PATH is cached
-do local path_list = string.explode(os.getenv("PATH"), ':')
+do local path_list = string.explode(os.getenv('PATH'), ':')
 function is_in_path(name)
     for _, path in ipairs(path_list) do
-        if lfs.isfile(path..'/'..name) then return true end
+        if lfs.isfile(path .. '/' .. name) then return true end
     end
     return false
 end
@@ -443,80 +444,80 @@ end
 -- set viewers from defaults (done only if necessary)
 function get_default_viewers()
     local function set_config_ls(ls) set_config_list(ls, {src='def'}) end
-    if (os.type == "windows") then
+    if (os.type == 'windows') then
         set_config_ls {
             -- Use 'start' to get file associations.
             -- We need to quote the filenames, but the first quoted argument
             -- is considered as the title by start, so we provide a dummy title.
             -- Also, since the command line parser removes quotes if there
             -- is no space inside, the dummy title must contain spaces.
-            viewer_dvi    = 'start "texdoc dvi viewer"',
-            viewer_html   = 'start "texdoc html viewer"',
-            viewer_pdf    = 'start "texdoc pdf viewer"',
-            viewer_ps     = 'start "texdoc ps viewer"',
+            viewer_dvi = 'start "texdoc dvi viewer"',
+            viewer_html = 'start "texdoc html viewer"',
+            viewer_pdf = 'start "texdoc pdf viewer"',
+            viewer_ps = 'start "texdoc ps viewer"',
             -- 'more' is always available.
             -- However, we can't assume texdoc is called from a cmd.exe window
             -- (it can be run from the start->run menu), hence we make sure
             -- to open a new window if needed.
-            viewer_txt    = 'start cmd /k more',
-            viewer_md     = viewer_txt,
+            viewer_txt = 'start cmd /k more',
+            viewer_md = viewer_txt,
         }
     elseif (os.name == 'macosx') then
         set_config_ls {
-            viewer_dvi    = 'open',
-            viewer_html   = 'open',
-            viewer_pdf    = 'open',
-            viewer_ps     = 'open',
-            viewer_txt    = 'less',
-            viewer_md     = viewer_txt,
+            viewer_dvi = 'open',
+            viewer_html = 'open',
+            viewer_pdf = 'open',
+            viewer_ps = 'open',
+            viewer_txt = 'less',
+            viewer_md = viewer_txt,
         }
     else -- generic Unix
         set_config_ls {
-            viewer_dvi      = guess_viewer {
-                {'xdvi',        '(xdvi %s) &'},
-                {'evince',      '(evince %s) &'},
-                {'okular',      '(okular %s) &'},
-                {'kdvi',        '(kdvi %s) &'},
-                {'xgdvi',       '(xgdvi %s) &'},
-                {'spawg',       '(spawg %s) &'},
-                {'spawx11',     '(spawx11 %s) &'},
-                {'tkdvi',       '(tkdvi %s) &'},
-                {'dvilx',       '(dvilx %s) &'},
-                {'advi',        '(advi %s) &'},
-                {'xdvik-ja',    '(xdvik-ja %s) &'},
-                {'see',         '(see %s) &'}
+            viewer_dvi = guess_viewer {
+                {'xdvi', '(xdvi %s) &'},
+                {'evince', '(evince %s) &'},
+                {'okular', '(okular %s) &'},
+                {'kdvi', '(kdvi %s) &'},
+                {'xgdvi', '(xgdvi %s) &'},
+                {'spawg', '(spawg %s) &'},
+                {'spawx11', '(spawx11 %s) &'},
+                {'tkdvi', '(tkdvi %s) &'},
+                {'dvilx', '(dvilx %s) &'},
+                {'advi', '(advi %s) &'},
+                {'xdvik-ja', '(xdvik-ja %s) &'},
+                {'see', '(see %s) &'}
             },
-            viewer_html     = guess_viewer {
-                {'firefox',     '(firefox %s) &'},
-                {'seamonkey',   '(seamonkey %s) &'},
-                {'mozilla',     '(mozilla %s) &'},
-                {'konqueror',   '(konqueror %s) &'},
-                {'epiphany',    '(epiphany %s) &'},
-                {'opera',       '(opera %s) &'},
-                {'w3m',         'w3m'},
-                {'links',       'links'},
-                {'lynx',        'lynx'},
-                {'see',         'see'}
+            viewer_html = guess_viewer {
+                {'firefox', '(firefox %s) &'},
+                {'seamonkey', '(seamonkey %s) &'},
+                {'mozilla', '(mozilla %s) &'},
+                {'konqueror', '(konqueror %s) &'},
+                {'epiphany', '(epiphany %s) &'},
+                {'opera', '(opera %s) &'},
+                {'w3m', 'w3m'},
+                {'links', 'links'},
+                {'lynx', 'lynx'},
+                {'see', 'see'}
             },
-            viewer_pdf      = guess_viewer {
-                {'xpdf',        '(xpdf %s) &'},
-                {'evince',      '(evince %s) &'},
-                {'okular',      '(okular %s) &'},
-                {'kpdf',        '(kpdf %s) &'},
-                {'acroread',    '(xpdf %s) &'},
-                {'see',         '(see %s) &'}
+            viewer_pdf = guess_viewer {
+                {'xpdf', '(xpdf %s) &'},
+                {'evince', '(evince %s) &'},
+                {'okular', '(okular %s) &'},
+                {'kpdf', '(kpdf %s) &'},
+                {'acroread', '(xpdf %s) &'},
+                {'see', '(see %s) &'}
             },
-            viewer_ps       = guess_viewer {
-                {'gv',          '(gv %s) &'},
-                {'evince',      '(evince %s) &'},
-                {'okular',      '(okular %s) &'},
-                {'kghostview',  '(kghostview %s) &'},
-                {'see',         '(see %s) &'}
+            viewer_ps = guess_viewer {
+                {'gv', '(gv %s) &'},
+                {'evince', '(evince %s) &'},
+                {'okular', '(okular %s) &'},
+                {'kghostview', '(kghostview %s) &'},
+                {'see', '(see %s) &'}
             },
-            viewer_txt      = guess_viewer {
-                {'most',        'most'},
-                {'less',        'less'},
-                {'more',        'more'}
+            viewer_txt = guess_viewer {
+                {'most', 'most'},
+                {'less', 'less'},
+                {'more', 'more'}
             },
             viewer_md = viewer_txt,
         }
@@ -531,24 +532,24 @@ function setup_config_from_defaults()
     end
     -- various, platform independent, stuff
     set_config_ls {
-        mode                = 'view',
-        interact_switch     = 'true',
-        machine_switch      = 'false',
-        ext_list            = 'pdf, htm, html, txt, ps, dvi, ',
-        basename_list       = 'readme, 00readme',
-        badext_list         = 'txt, ',
-        badbasename_list    = 'readme, 00readme',
-        suffix_list         = '',
-        verbosity_level     = C.def_verbosity,
-        debug_list          = '',
-        max_lines           = '20',
-        fuzzy_level         = '5',
+        mode = 'view',
+        interact_switch = 'true',
+        machine_switch = 'false',
+        ext_list = 'pdf, htm, html, txt, ps, dvi, ',
+        basename_list = 'readme, 00readme',
+        badext_list = 'txt, ',
+        badbasename_list = 'readme, 00readme',
+        suffix_list = '',
+        verbosity_level = C.def_verbosity,
+        debug_list = '',
+        max_lines = '20',
+        fuzzy_level = '5',
     }
     -- zip-related options
     set_config_ls {
-        zipext_list         = '',
-        rm_file             = 'rm -f',
-        rm_dir              = 'rmdir',
+        zipext_list = '',
+        rm_file = 'rm -f',
+        rm_dir = 'rmdir',
     }
 end
 
@@ -578,9 +579,9 @@ end
 
 return {
     setup_config_and_alias = setup_config_and_alias,
-    get_default_viewers    = get_default_viewers,
-    show_config_files      = show_config_files,
-    read_config_file       = read_config_file,
+    get_default_viewers = get_default_viewers,
+    show_config_files = show_config_files,
+    read_config_file = read_config_file,
 }
 
 -- vim: ft=lua:
