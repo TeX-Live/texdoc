@@ -549,19 +549,20 @@ without the list, activates all available debug items.
 
 They all correspond to some |viewer_«ext»| setting, and the reader is referred
 to~\ref{cf-viewer_*} for details.\footnote{Old names of environment variables,
-namely |TEXDOCVIEW_{txt,html,dvi,ps,pdf}| and
-|TEXDOC_VIEWER_{TXT,HTML,DVI,PS,PDF}|, are deprecated but still work.} You can
+namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
+|TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You can
 append |_texdoc| to every name in the first column: this wins over every other
 name.
 
 \begin{center}
 \begin{tabular}{ll}
 Environment variables & Configuration items \\
-|PAGER|               & |viewer_txt|        \\
 |BROWSER|             & |viewer_html|       \\
 |DVIVIEWER|           & |viewer_dvi|        \\
-|PSVIEWER|            & |viewer_ps|         \\
+|MDVIEWER|            & |viewer_md|         \\
+|PAGER|               & |viewer_txt|        \\
 |PDFVIEWER|           & |viewer_pdf|        \\
+|PSVIEWER|            & |viewer_ps|         \\
 \end{tabular}
 \end{center}
 

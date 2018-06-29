@@ -49,7 +49,7 @@ Try to find appropriate TeX documentation for the specified NAME(s). Alternative
 
 ## ENVIRONMENT
 
-PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER, and *_texdoc of each.
+BROWSER, DVIVIEWER, MDVIEWER, PAGER, PDFVIEWER, PSVIEWER, and *_texdoc of each.
 
 ## FILES
 

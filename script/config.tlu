@@ -260,7 +260,7 @@ function setup_config_from_env()
     set_config_elt_from_vars('viewer_html',
       {'BROWSER_texdoc', 'BROWSER', 'TEXDOCVIEW_html', 'TEXDOC_VIEWER_HTML'})
     set_config_elt_from_vars('viewer_md',
-      {'MDVIEWER_texdoc', 'PAGER', 'TEXDOCVIEW_md', 'TEXDOC_VIEWER_MD'})
+      {'MDVIEWER_texdoc', 'MDVIEWER', 'TEXDOCVIEW_md', 'TEXDOC_VIEWER_MD'})
     set_config_elt_from_vars('viewer_txt',
       {'PAGER_texdoc', 'PAGER', 'TEXDOCVIEW_txt', 'TEXDOC_VIEWER_TXT'})
 end

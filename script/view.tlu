@@ -20,56 +20,72 @@ end
 -- unzips it in a tempdir so that the viewer command can use the unzipped file.
 function view_file(filename)
     local viewer, viewer_replacement
+
     -- check if the file is zipped
     local nozipname, zipext = parse_zip(filename)
+
     -- determine viewer_replacement
     if zipext then
         local unzip_cmd = config['unzip_' .. zipext]
+
         if not unzip_cmd then
             err_print('error',
                 'No unzip command for ".' .. zipext .. '" files, skipping ' .. filename)
             return false
         end
+
         local tmpdir = os.tmpdir('/tmp/texdoc.XXXXXX')
         if not tmpdir then
             err_print('error', 'Failed to create tempdir to unzip.')
             return false
         end
+
         local basename = string.match(nozipname, '.*/(.*)$') or nozipname
         local tmpfile = '"' .. tmpdir .. '/' .. basename .. '"'
         local unzip = unzip_cmd .. ' "' .. filename .. '">' .. tmpfile
         deb_print('view', 'Unzip command: ' .. unzip)
+
         if not os.execute(unzip) then
             err_print('error', 'Failed to unzip ' .. filename)
             os.remove(tmpfile)
             os.remove(tmpdir)
             return false
         end
+
         viewer_replacement = tmpfile .. '; ' .. config.rm_file .. ' ' ..
             tmpfile .. '; ' .. config.rm_dir .. ' ' .. tmpdir
         filename = nozipname
     else
         viewer_replacement = '"' .. w32_path(filename) .. '"'
     end
+
     -- files without extension are assumed to be text
     local viewext = (filename:match('.*%.([^/]*)$') or 'txt'):lower()
+
     -- special case : sty files use txt viewer
-    if viewext == 'sty' then viewext = 'txt' end
     -- FIXME: hardcoding such cases this way is not very clean
+    if viewext == 'sty' then viewext = 'txt' end
     if viewext == 'texlive' then viewext = 'txt' end
     if viewext == 'htm' then viewext = 'html' end
+
     -- get a viewer from built-in defaults if not already set
     if not config['viewer_' .. viewext] then
         get_default_viewers()
     end
+
     -- still no viewers? use txt as a fallback
     if not config['viewer_' .. viewext] then
         err_print('warning',
-            'No "viewer_' .. viewext .. '" specified, using "viewer_txt" instead.')
+            'No viewer defined for ".' .. viewext ..
+            '" files, using "viewer_txt" instead.')
         viewext = 'txt'
     end
-    assert(config['viewer_' .. viewext], 'Internal error: no viewer found.')
-    return try_viewing(config['viewer_' .. viewext], viewer_replacement)
+
+    -- finally, check validity of the viewer
+    viewer = config['viewer_' .. viewext]
+    assert(viewer, 'Internal error: no viewer found.')
+
+    return try_viewing(viewer, viewer_replacement)
 end
 
 -- view a file, if possible

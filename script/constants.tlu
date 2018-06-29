@@ -48,8 +48,8 @@ Options:
   -D, --debug           Activate all debug output (equal to "--debug=all").
   -dLIST, --debug=LIST  Activate debug output restricted to LIST.
 
-Environment variables: PAGER, BROWSER, PDFVIEWER, PSVIEWER, DVIVIEWER,
-and *_texdoc of each.
+Environment variables: BROWSER, DVIVIEWER, MDVIEWER, PAGER, PDFVIEWER,
+PSVIEWER, and *_texdoc of each.
 
 Files: <TEXMF>/texdoc/texdoc.cnf; see output of the --files option.
 Full manual available via `texdoc texdoc'.
