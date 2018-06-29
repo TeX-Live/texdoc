@@ -14,12 +14,6 @@ Usage: texdoc [OPTION...] NAME...
 Try to find appropriate TeX documentation for the specified NAME(s).
 Alternatively, perform the given ACTION and exit.
 
-Actions:
-  -h, --help            Print this help message.
-  -V, --version         Print the version number.
-  -f, --files           Print the list of configuration files used.
-  --just-view FILE      Display FILE, given with full path (no searching).
-
 Options:
   -w, --view            Use view mode: start a viewer. (default)
   -m, --mixed           Use mixed mode (view or list).
@@ -34,6 +28,12 @@ Options:
   -v, --verbose         Print additional information (eg, viewer command).
   -D, --debug           Activate all debug output (equal to "--debug=all").
   -dLIST, --debug=LIST  Activate debug output restricted to LIST.
+
+Actions:
+  -h, --help            Print this help message.
+  -V, --version         Print the version number.
+  -f, --files           Print the list of configuration files used.
+  --just-view FILE      Display FILE, given with full path (no searching).
 
 Environment variables: BROWSER, DVIVIEWER, MDVIEWER, PAGER, PDFVIEWER,
 PSVIEWER, and *_texdoc of each.

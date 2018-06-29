@@ -92,27 +92,18 @@ function parse_zip(file)
     return file, nil
 end
 
--- print a usage message, with the proper 'active values' line
-function print_usage(actions)
-    local usage_msg = C.usage_msg
-    -- include actions if any
-    if actions then
-        usage_msg = usage_msg:gsub(C.actions_ph,
-            C.actions_ph .. actions .. '\n\n')
-    else
-        usage_msg = usage_msg:gsub(C.actions_ph, '')
-    end
-    -- finally print it
-    print(usage_msg)
+-- print a usage message
+function print_usage()
+    print(C.usage_msg)
 end
 
 return {
-    err_print   = err_print,
-    deb_print   = deb_print,
-    w32_path    = w32_path,
-    parse_zip   = parse_zip,
-    print_usage = print_usage,
+    err_print = err_print,
+    deb_print = deb_print,
+    w32_path = w32_path,
+    parse_zip = parse_zip,
     path_parent = path_parent,
+    print_usage = print_usage,
 }
 
 -- vim: ft=lua:

@@ -56,7 +56,7 @@ Many building tasks are defined as [Rake](https://github.com/ruby/rake) tasks:
 
 ### Generating all documentation
 
-This will generate both the PDF and the manpage in `doc/` directory.
+Following will generate both the PDF and the manpage in `doc/` directory.
 
 ```
 $ rake doc
@@ -64,23 +64,29 @@ $ rake doc
 
 ### Generating a pre-hashed cache file
 
-This will generate a pre-hashed cache file `script/Data.tlpdb.lua`. This task have to be done under a TeX Live setup with tlpdb.
+Following will generate a pre-hashed cache file `script/Data.tlpdb.lua`. This task have to be done under a TeX Live setup with tlpdb.
 
 ```
 $ rake gen_datafile
 ```
 
-### Running all tests
+### Running tests
 
-This will run all tests in `spec/` directory.
+Following will run all tests in `spec/` directory.
 
 ```
 $ rake test
 ```
 
+Alternatively, you can give spec names as the arguments for this task. E.g., following will run only `help_spec.rb` and `version_spec.rb`:
+
+```
+$ rake "test[help,version]"
+```
+
 ### Showing all available tasks
 
-This will show all available tasks with a short description.
+Following will show all available tasks with a short description.
 
 ```
 $ rake -T

@@ -9,17 +9,6 @@
 
 Try to find appropriate TeX documentation for the specified NAME(s). Alternatively, perform the given ACTION and exit.
 
-## ACTIONS
-
-* `-h`, `--help`:
-  Print this help message.
-* `-V`, `--version`:
-  Print the version number.
-* `-f`, `--files`:
-  Print the list of configuration files used.
-* `--just-view FILE`:
-  Display file, given with full path (no searching).
-
 ## OPTIONS
 
 * `-w`, `--view`:
@@ -46,6 +35,17 @@ Try to find appropriate TeX documentation for the specified NAME(s). Alternative
   Activate all debug output (equal to "--debug=all").
 * `-d`LIST, `--debug`=LIST:
   Activate debug output restricted to LIST.
+
+## ACTIONS
+
+* `-h`, `--help`:
+  Print this help message.
+* `-V`, `--version`:
+  Print the version number.
+* `-f`, `--files`:
+  Print the list of configuration files used.
+* `--just-view FILE`:
+  Display file, given with full path (no searching).
 
 ## ENVIRONMENT
 

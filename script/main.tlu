@@ -11,13 +11,6 @@ local exit_ok = 0
 local exit_error = 1 -- apparently hard-coded in Lua
 local exit_usage = 2
 
--- action command-line options
-local action_help = [[
-  -h, --help            Print this help message.
-  -V, --version         Print the version number.
-  -f, --files           Print the list of configuration files used.
-  --just-view FILE      Display FILE, given with full path (no searching).]]
-
 -- get configuration and parse command line
 local action = texdoc.setup_config_and_alias(arg)
 if not action then
@@ -26,7 +19,7 @@ end
 
 -- handle action options
 if action == 'help' then
-    texdoc.print_usage(action_help)
+    texdoc.print_usage()
     os.exit(exit_ok)
 elseif action == 'version' then
     print(texdoc.const.progname .. ' ' .. texdoc.const.version)

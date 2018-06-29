@@ -92,17 +92,17 @@ texdoc_do('view')
 
 return {
     setup_config_and_alias = setup_config_and_alias,
-    read_config_file       = read_config_file,
-    init_databases         = init_databases,
-    print_usage            = print_usage,
-    get_doclist            = get_doclist,
-    deliver_results        = deliver_results,
-    aliased_names          = aliased_names,
-    show_config_files      = show_config_files,
-    config                 = config,
-    view_file              = view_file,
-    err_print              = err_print,
-    const                  = C,
+    read_config_file = read_config_file,
+    init_databases = init_databases,
+    print_usage = print_usage,
+    get_doclist = get_doclist,
+    deliver_results = deliver_results,
+    aliased_names = aliased_names,
+    show_config_files = show_config_files,
+    config = config,
+    view_file = view_file,
+    err_print = err_print,
+    const = C,
 }
 
 -- vim: ft=lua:
