@@ -84,6 +84,7 @@ function view_file(filename)
     -- finally, check validity of the viewer
     viewer = config['viewer_' .. viewext]
     assert(viewer, 'Internal error: no viewer found.')
+    deb_print('view', 'Using "viewer_' .. viewext .. '" to open the file.')
 
     return try_viewing(viewer, viewer_replacement)
 end
