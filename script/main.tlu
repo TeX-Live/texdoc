@@ -31,7 +31,7 @@ elseif action == 'files' then
     os.exit(exit_ok)
 elseif action == 'view' then
     if not arg[1] then
-        texdoc.err_print('error', "missing file operand to --just-view")
+        texdoc.err_print('error', 'missing file operand to --just-view')
         texdoc.err_print('error', texdoc.const.error_msg)
         os.exit(exit_usage)
     end
@@ -41,7 +41,7 @@ end
 
 -- make sure we actually have argument(s)
 if not arg[1] then
-    texdoc.err_print('error', "no action specified")
+    texdoc.err_print('error', 'no action specified')
     texdoc.err_print('error', texdoc.const.error_msg)
     os.exit(exit_usage)
 end

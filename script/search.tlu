@@ -83,7 +83,7 @@ tree = - 1 if and only if file is a sty file. Here name is absolute.
 local Docfile = {}
 function Docfile:__index(key)
     if Docfile[key] then return Docfile[key] end
-    local getter = Docfile['get_'..key]
+    local getter = Docfile['get_' .. key]
     if getter then
         rawset(self, key, getter(self))
         return rawget(self, key)
@@ -124,7 +124,7 @@ function Docfile:get_realpath()
         return texdocs_tree_to_path(self.tree, self.name)
     elseif self.tree == 0 then
         if vanilla then
-            return get_tlroot()..'/'..self.name
+            return get_tlroot() .. '/' .. self.name
         else
             return kpse.find_file(self.normname, 'TeX system documentation')
         end
@@ -230,7 +230,7 @@ end
 
 -- return the real path from a texdocs tree number + relative path
 function texdocs_tree_to_path(tree, rel)
-    return doc_roots[tree].path..'/'..rel
+    return doc_roots[tree].path .. '/' .. rel
 end
 
 -- find docfiles in texdocs directories
@@ -248,13 +248,13 @@ function lsr_root (path)
     local root, shift = path, ''
     if string.sub(root, -1) == '/' then root = string.sub(root, 1, -2) end
     while string.find(root, '/', 1, true) do
-        if lfs.isfile(root..'/ls-R') then
+        if lfs.isfile(root .. '/ls-R') then
             return root, shift
         end
         local last_comp = string.match(root, '^.*/(.*)$')
         -- /!\ cannot put last_comp in a regex: can contain special char
         root = string.sub(root, 1, - (#last_comp + 2))
-        shift = last_comp..'/'..shift
+        shift = last_comp .. '/' .. shift
     end
 end
 
@@ -275,7 +275,7 @@ function init_lsr_db(root, shift)
         local dir_line = maybe_dir and string.match(line, '^%./(.*):$')
         if dir_line then
             maybe_dir = false -- next line may not be a dir
-            if string.sub(dir_line..'/', 1, l) == shift then
+            if string.sub(dir_line .. '/', 1, l) == shift then
                 isdoc = true
                 current_dir = string.sub(dir_line, l+1)
                 db[current_dir] = nil
@@ -283,7 +283,7 @@ function init_lsr_db(root, shift)
                 break -- we're exiting the ./doc (or shift) dir, so it's over
             end
         elseif isdoc then
-            local file = (current_dir == '') and line or current_dir..'/'..line
+            local file = (current_dir == '') and line or current_dir .. '/' .. line
             if check_ext(line) then db[file] = line end
         end
     end
@@ -295,9 +295,9 @@ end
 function init_tree_db(base, recurse)
     local db = {}
     local function init_tree_db_rec(dir)
-        for file in lfs.dir(base..'/'..dir) do
+        for file in lfs.dir(base .. '/' .. dir) do
             if file ~= '.' and file ~= '..' then
-                local f = (dir == '') and file or dir..'/'..file
+                local f = (dir == '') and file or dir .. '/' .. file
                 if lfs.isdir(base..'/'..f) then
                     if recurse then init_tree_db_rec(f) end
                 else
@@ -343,7 +343,7 @@ function check_ext(file)
     end
     -- is the basename good?
     for _, b in ipairs(config.basename_list) do
-        if file:find('^'..b..'$') or file:find('^'..b..'%.') then
+        if file:find('^' .. b .. '$') or file:find('^' .. b .. '%.') then
             return true
         end
     end
@@ -366,8 +366,8 @@ function process_file(patlist, file, pathfile, code)
     for _, pattern in ipairs(patlist) do
         if matches(pattern, pathfile) then
             local info = {
-                name    = pathfile,
-                tree    = code,
+                name = pathfile,
+                tree = code,
                 pattern = pattern,
             }
             if docfile then
@@ -388,8 +388,8 @@ function get_doclist_sty(patlist)
         local file = kpse.find_file(pat.name)
         if file then
             local df = Docfile:new({
-                name    = file,
-                tree    = -1,
+                name = file,
+                tree = -1,
                 pattern = pat,
             })
             s_doclist:add(df)
@@ -430,21 +430,21 @@ end
 -- get tlpinfo tables initialised by whatever mean
 function init_tlp_database()
     local TEXMFVAR = kpse.var_value('TEXMFVAR')
-    local cache_file = TEXMFVAR..'/'..C.cache_name
-    local texlive_tlpdb = get_tlroot()..'/tlpkg/texlive.tlpdb'
+    local cache_file = TEXMFVAR .. '/' .. C.cache_name
+    local texlive_tlpdb = get_tlroot() .. '/tlpkg/texlive.tlpdb'
     vanilla = lfs.isfile(texlive_tlpdb)
     if vanilla then
         if good_cache(cache_file, texlive_tlpdb) then
-            deb_print('tlpdb', 'Using cached data from '..cache_file)
+            deb_print('tlpdb', 'Using cached data from ' .. cache_file)
             get_tlpinfo_from_cache(cache_file)
         else
-            deb_print('tlpdb', 'Getting data from tlpdb file '..texlive_tlpdb)
+            deb_print('tlpdb', 'Getting data from tlpdb file ' .. texlive_tlpdb)
             get_tlpinfo_from_tlpdb(texlive_tlpdb)
-            deb_print('tlpdb', 'Writing data in cache file '..cache_file)
+            deb_print('tlpdb', 'Writing data in cache file ' .. cache_file)
             local ok, msg = mkdir_p(path_parent(cache_file))
             if not ok then
                 err_print('warning',
-                'Failed to create cache file in '..cache_file..':')
+                    'Failed to create cache file in ' .. cache_file .. ':')
                 err_print('warning', msg)
             else
                 print_out_tlpinfo(cache_file)
@@ -577,9 +577,9 @@ function get_doclist_tlpdb(pattern)
         for tlp in pairs(tlp_from_runfile[pattern]) do
             for _, file in ipairs(tlp_doclist[tlp]) do
                 s_doclist:add(Docfile:new{
-                    name        = file,
-                    tree        = 0,
-                    runtodoc    = true,
+                    name = file,
+                    tree = 0,
+                    runtodoc = true,
                 })
             end
         end
@@ -588,9 +588,9 @@ function get_doclist_tlpdb(pattern)
     if tlp_doclist[pattern] then
         for _, file in ipairs(tlp_doclist[pattern]) do
             s_doclist:add(Docfile:new{
-                name            = file,
-                tree            = 0,
-                tlptodoc        = true,
+                name = file,
+                tree = 0,
+                tlptodoc = true,
             })
         end
     end
@@ -690,7 +690,7 @@ end
 
 return {
     init_databases = init_databases,
-    get_doclist    = get_doclist,
+    get_doclist = get_doclist,
 }
 
 -- vim: ft=lua:

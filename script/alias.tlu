@@ -68,9 +68,9 @@ function get_patterns(name, no_alias)
         for _, entry in ipairs(lang) do
             if not entry.original then
                 table.insert(res, {
-                    name    = entry.name,
-                    score   = entry.score,
-                    locale  = true,
+                    name = entry.name,
+                    score = entry.score,
+                    locale = true,
                 })
             end
         end
@@ -112,8 +112,8 @@ end
 
 return {
     confline_to_alias = confline_to_alias,
-    get_patterns      = get_patterns,
-    aliased_names     = aliased_names,
+    get_patterns = get_patterns,
+    aliased_names = aliased_names,
 }
 
 -- vim: ft=lua:

@@ -19,9 +19,9 @@ end
 -- BEGIN constants
 
 -- progname and version
-fullname     = kpse.find_file('texdoc/texdoclib', 'lua')
-progname     = 'Texdoc'
-version      = '3.0'
+fullname = kpse.find_file('texdoc/texdoclib', 'lua')
+progname = 'Texdoc'
+version = '3.0'
 
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant
@@ -142,7 +142,7 @@ assert(next(C) == nil,
     'Internal error: table of constants should be empty at this point')
 setmetatable(C, {
     __index = constants,
-    __newindew = function ()
+    __newindew = function()
         error('Internal error: attempt to modify a constant.')
     end
 })

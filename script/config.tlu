@@ -13,7 +13,7 @@ function set_read_only(table, name)
     local real = {}
     setmetatable(table, {
         __index = real,
-        __newindex = function() error(ro..name..'.') end,
+        __newindex = function() error(ro .. name .. '.') end,
     })
     return function(k, v) real[k] = v end
 end
@@ -423,7 +423,7 @@ end
 -- logic stolen from xdg-open (http://www.freedesktop.org/) and adapted
 function desktop_environment_viewer()
     if os.getenv('KDE_SESSION_VERSION') and is_in_path('kde-open') then
-        return '(kde-open %s) &'                     -- kde 4 (or greater)
+        return '(kde-open %s) &'                    -- kde 4 (or greater)
     end
     if os.getenv('KDE_FULL_SESSION') and is_in_path('kfmclient') then
         return '(kfmclient exec %s) &'              -- kde < 4

@@ -6,12 +6,12 @@
 -- change '/' to '\' on windows
 -- Use: internal representation of files always use forward slashes.
 -- This function should be called only before displaying a file name.
-if os.type == "windows" then
-    function w32_path (path)
-        return (string.gsub (path, '/', '\\'))
+if os.type == 'windows' then
+    function w32_path(path)
+        return (string.gsub(path, '/', '\\'))
     end
 else
-    function w32_path (path)
+    function w32_path(path)
         return path
     end
 end
@@ -28,11 +28,11 @@ else
 end
 
 -- generic error display function (see the err_priority constant)
-function err_print (lvl, msg)
+function err_print(lvl, msg)
     -- be careful: maybe config.verbosity_level is not set yet
     local verbosity_level = config.verbosity_level or tonumber(C.def_verbosity)
     if C.err_priority[lvl] <= verbosity_level then
-        io.stderr:write ("texdoc "..lvl..": "..msg.."\n")
+        io.stderr:write('texdoc ' .. lvl .. ': ' .. msg .. '\n')
     end
 end
 
@@ -45,7 +45,7 @@ function deb_print(cat, msg)
     if not active_debugs then set_active_debugs() end
     -- print message it belongs to an active category
     if active_debugs and active_debugs[cat] or cat == 'XXX' then
-        io.stderr:write ("texdoc debug-"..cat..": "..msg.."\n")
+        io.stderr:write("texdoc debug-" .. cat .. ": " .. msg .. "\n")
     end
 end
 
@@ -72,20 +72,20 @@ function set_active_debugs()
             active_debugs[deb] = true
             for _, d in ipairs(deps) do active_debugs[d] = true end
         else
-            err_print('warning', "Unknown debug category '"..deb.."'.")
+            err_print('warning', 'Unknown debug category "' .. deb .. '".')
         end
     end
 end
 
 end -- scope of active_debugs
 
--- if file is base..'.'..zip with zip in zipext_list, return: base, zip
+-- if file is base .. '.' .. zip with zip in zipext_list, return: base, zip
 -- otherwise, return: file, nil
 function parse_zip(file) 
     local zip
     for _, zip in ipairs(config.zipext_list) do
         local l = #zip + 1
-        if string.sub(file, -l, -1) == '.'..zip then
+        if string.sub(file, -l, -1) == '.' .. zip then
             return string.sub(file, 1, -l - 1), zip
         end
     end

@@ -18,7 +18,7 @@ function confline_to_score(line, file, pos)
     end
     -- try keyword specific adjscore
     keyw, pat, val = string.match(line,
-    '^adjscore%(([%w%p]+)%)%s+([%w%p]+)%s*=%s*([%d+-.]+)')
+        '^adjscore%(([%w%p]+)%)%s+([%w%p]+)%s*=%s*([%d+-.]+)')
     if keyw and pat and val then 
         keyw = string.lower(keyw)
         spec_adjscore[keyw] = spec_adjscore[keyw] or {}
@@ -52,8 +52,8 @@ function set_score(df, original_kw)
     -- scoring is case-insenstitive (patterns are already lowercased)
     local name = string.lower(df.shortname)
     deb_print('score', '----------')
-    deb_print('score', 'Start scoring '..df.realpath)
-    deb_print('score', 'Name used: '..name)
+    deb_print('score', 'Start scoring ' .. df.realpath)
+    deb_print('score', 'Name used: ' .. name)
     -- get score from patterns
     local score = -10
     for _, pat in ipairs(df.matches) do
@@ -68,21 +68,21 @@ function set_score(df, original_kw)
             end
             s = (pat.score or 10) + bonus -- default alias score is 10
             deb_print('score', string.format(
-                "Matching alias '%s', score: %g%s", pat.name, s, msg))
+                'Matching alias "%s", score: %g%s', pat.name, s, msg))
         end
         if s > score then score = s end
     end
-    deb_print('score', 'Max pattern score: '..tostring(score))
+    deb_print('score', 'Max pattern score: ' .. tostring(score))
     -- get score from tlp associations
     if score == -10 and df.tlptodoc then
         score = -1
-        deb_print('score', 'New score: '..tostring(score)
-            ..' from package name association')
+        deb_print('score', 'New score: ' .. tostring(score) ..
+            ' from package name association')
     end
     if score == -10 and df.runtodoc then
         score = -5
-        deb_print('score', 'New score: '..tostring(score)
-            ..' from sty/cls association')
+        deb_print('score', 'New score: ' .. tostring(score) ..
+            ' from sty/cls association')
     end
     -- bonus for metadata
     if df.details then
@@ -97,37 +97,37 @@ function set_score(df, original_kw)
     -- adjust from keyword-specific tables
     if df.tree > -1 and spec_adjscore[original_kw] then
         for pat, val in pairs(spec_adjscore[original_kw]) do
-            if val and is_subword('/'..name, pat) then
+            if val and is_subword('/' .. name, pat) then
                 score = score + val
                 deb_print('score', string.format(
-                    "Adjust by %g from specific pattern '%s'", val, pat))
+                    'Adjust by %g from specific pattern "%s"', val, pat))
             end
         end
     end
     -- adjust from global tables
     if df.tree > -1 then
         for pat, val in pairs(global_adjscore) do
-            if val and is_subword('/'..name, pat) then
+            if val and is_subword('/' .. name, pat) then
                 if score > -10 or val < 0 then score = score + val end
                 deb_print('score', string.format(
-                    "Adjust by %g from global pattern '%s'", val, pat))
+                    'Adjust by %g from global pattern "%s"', val, pat))
             end
         end
     end
-    deb_print('score', 'Final score: '..tostring(score))
+    deb_print('score', 'Final score: ' .. tostring(score))
     df.score = score
 end
 
 -- compute a heuristic score -10 <= s < 10
 function heuristic_score(file, pat)
-    deb_print('score', 'Start heuristic scoring with pattern: '..pat)
+    deb_print('score', 'Start heuristic scoring with pattern: ' .. pat)
     -- score management
     local score = -10
     local function upscore(s, reason, force)
         if s > score or force then
             score = s
-            deb_print('score', 'New heuristic score: '..tostring(s)
-                ..'. Reason: '..reason)
+            deb_print('score', 'New heuristic score: ' .. tostring(s) ..
+                '. Reason: ' .. reason)
         end
     end
     local slash = not not string.find(pat, '/', 1, true)
@@ -144,9 +144,9 @@ function heuristic_score(file, pat)
         for _, suffix in ipairs(config.suffix_list) do
             local deriv = pat..suffix
             if is_exact(file, deriv) then
-                upscore(3, 'exact match for derived pattern: '..deriv)
+                upscore(3, 'exact match for derived pattern: ' .. deriv)
             elseif is_subword(file, deriv) then
-                upscore(2, 'subword match for derived pattern: '..deriv)
+                upscore(2, 'subword match for derived pattern: ' .. deriv)
             end
         end
     end
@@ -160,11 +160,11 @@ function heuristic_score(file, pat)
         upscore(0.1, 'bad basename', true)
     end
     -- bonus for being in the right directory
-    if string.find('/'..file, '/'..pat..'/', 1, true) and not slash then
+    if string.find('/' .. file, '/' .. pat .. '/', 1, true) and not slash then
         upscore(score + 1.5, 'directory bonus')
     end
     -- done
-    deb_print('score', 'Final heuristic score: '..tostring(score))
+    deb_print('score', 'Final heuristic score: ' .. tostring(score))
     return score
 end
 
@@ -172,11 +172,11 @@ end
 function is_exact(file, pat)
     file = parse_zip(file)
     local slashes = string.gsub(pat, '[^/]+', '[^/]+')
-    basename = string.match(file, slashes..'$')
+    basename = string.match(file, slashes .. '$')
     if not basename then return nil end
     if basename == pat then return true end
     for _, ext in ipairs(config.ext_list) do
-        if ext ~= '' and ext ~= '*' and basename == pat..'.'..ext then
+        if ext ~= '' and ext ~= '*' and basename == pat .. '.' .. ext then
             return true
         end
     end
@@ -214,7 +214,7 @@ end
 function has_bad_basename(file)
     file = file:gsub('.*/', '')
     for _, b in ipairs(config.badbasename_list) do
-        if file:find('^'..b..'$') or file:find('^'..b..'%.') then
+        if file:find('^' .. b .. '$') or file:find('^' .. b .. '%.') then
             return true
         end
     end
@@ -228,12 +228,12 @@ end
 -- 4. then by tree.
 -- return true if a is better than b
 function docfile_order (a, b)
-    if     a.score > b.score        then return true
-    elseif a.score < b.score        then return false
-    elseif a.ext_pos < b.ext_pos    then return true
-    elseif a.ext_pos > b.ext_pos    then return false
-    elseif a.basename < b.basename  then return true
-    elseif a.basename > b.basename  then return false
+    if     a.score > b.score       then return true
+    elseif a.score < b.score       then return false
+    elseif a.ext_pos < b.ext_pos   then return true
+    elseif a.ext_pos > b.ext_pos   then return false
+    elseif a.basename < b.basename then return true
+    elseif a.basename > b.basename then return false
     else return (a.tree > b.tree)
     end
 end
@@ -252,7 +252,7 @@ function ext_pos(file)
             pos, ext = p, e
         elseif (e == '') and not string.find(file, '.', 1, true) then
             pos, ext = p, e
-        elseif string.sub(file, -string.len(e)-1) == '.'..e then
+        elseif string.sub(file, -string.len(e)-1) == '.' .. e then
             if (ext == nil) or (ext == '*')
                 or (string.len(e) > string.len(ext)) then
                 pos, ext = p, e
@@ -281,10 +281,10 @@ function sort_doclist(dl, original_kw)
 end
 
 return {
-    sort_doclist      = sort_doclist,
-    docfile_quality   = docfile_quality,
-    ext_pos           = ext_pos,
-    is_exact          = is_exact,
+    sort_doclist = sort_doclist,
+    docfile_quality = docfile_quality,
+    ext_pos = ext_pos,
+    is_exact = is_exact,
     confline_to_score = confline_to_score,
 }
 

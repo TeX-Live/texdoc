@@ -49,17 +49,19 @@ end
 local function import_symbols(symbols, name)
     for sym, val in pairs(symbols) do
         assert(val ~= nil,
-            'Internal error: '..name..' exporting undefined symbol '..sym..'.')
+            'Internal error: ' .. name .. ' exporting undefined symbol ' ..
+            sym .. '.')
         assert(prv_env[sym] == nil,
-            'Internal error: '..name..' exporting existing symbol '..sym..'.')
+            'Internal error: ' .. name .. ' exporting existing symbol ' ..
+            sym .. '.')
         prv_env[sym] = val
     end
 end
 
 -- load a submodule of texdoc
 local function texdoc_do(name)
-    local pathname = kpse.find_file('texdoc/'..name, 'lua')
-    assert(pathname, 'Internal error: missing submodule: '..name)
+    local pathname = kpse.find_file('texdoc/' .. name, 'lua')
+    assert(pathname, 'Internal error: missing submodule: ' .. name)
     local submod
     if setfenv then
         submod = assert(loadfile (pathname))
