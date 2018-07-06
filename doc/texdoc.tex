@@ -2,8 +2,9 @@
 % Copyright 2018 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
 
-%!TEX encoding=utf-8
-%!TEX program=xelatex
+% +++
+% latex = "xelatex"
+% +++
 
 \setlength\overfullrule{5pt}
 
@@ -518,7 +519,7 @@ Set |mode| to the given value, see~\ref{cf-mode}.
   -i, --interact, -I, --nointeract
 \end{cmdsubsub}
 
-Set |interact_switch| to true (resp. false), see~\ref{cf-interact_switch}.
+Set |interact_switch| to true (or false), see~\ref{cf-interact_switch}.
 
 \begin{cmdsubsub}{-M, --machine}{cl-M}
   -M, --machine
@@ -539,11 +540,11 @@ Set |verbosity_level| to minimum, see~\ref{cf-verbosity_level}.
 Set |verbosity_level| to maximum, see~\ref{cf-verbosity_level}.
 
 \begin{cmdsubsub}{-d, -D, --debug}{cl-d}
-  -d «list», --debug=«list», -D, --debug
+  -d «cat», --debug=«cat», -D, --debug
 \end{cmdsubsub}
 
 Set |debug_list|, see~\ref{cf-debug_list}. If you specify |-D| or |--debug|
-without the list, activates all available debug items.
+without specifying a category, activates all available debug items.
 
 \subsection{Environment variables}\label{ss-envvar}
 

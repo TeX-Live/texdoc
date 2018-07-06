@@ -27,7 +27,7 @@ Options:
   -q, --quiet           Suppress warnings and most error messages.
   -v, --verbose         Print additional information (eg, viewer command).
   -D, --debug           Activate all debug output (equal to "--debug=all").
-  -dLIST, --debug=LIST  Activate debug output restricted to LIST.
+  -d CAT, --debug=CAT   Activate debug output restricted to CAT.
 
 Actions:
   -h, --help            Print this help message.
