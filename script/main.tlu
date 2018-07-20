@@ -6,44 +6,35 @@
 -- load texdoclib (kpse initialized by the wrapper)
 local texdoc = require('texdoc.texdoclib')
 
--- exit codes
-local exit_ok = 0
-local exit_error = 1 -- apparently hard-coded in Lua
-local exit_usage = 2
-
 -- get configuration and parse command line
 local action = texdoc.setup_config_and_alias(arg)
 if not action then
-    os.exit(exit_usage)
+    os.exit(texdoc.const.exit_usage)
 end
 
 -- handle action options
 if action == 'help' then
     texdoc.print_usage()
-    os.exit(exit_ok)
+    os.exit(texdoc.const.exit_ok)
 elseif action == 'version' then
     print(texdoc.const.progname .. ' ' .. texdoc.const.version)
     print('\n' .. texdoc.const.copyright_msg)
-    os.exit(exit_ok)
+    os.exit(texdoc.const.exit_ok)
 elseif action == 'files' then
     print(texdoc.const.fullname .. ' ' .. texdoc.const.version)
     texdoc.show_config_files(print, true)
-    os.exit(exit_ok)
+    os.exit(texdoc.const.exit_ok)
 elseif action == 'view' then
     if not arg[1] then
         texdoc.err_print('error', 'missing file operand to --just-view')
-        texdoc.err_print('error', texdoc.const.error_msg)
-        os.exit(exit_usage)
     end
     local ok = texdoc.view_file(arg[1])
-    os.exit(ok and exit_ok or exit_error)
+    os.exit(ok and texdoc.const.exit_ok or texdoc.const.exit_error)
 end
 
 -- make sure we actually have argument(s)
 if not arg[1] then
     texdoc.err_print('error', 'no action specified')
-    texdoc.err_print('error', texdoc.const.error_msg)
-    os.exit(exit_usage)
 end
 
 -- initialise databases
@@ -61,6 +52,6 @@ for _, docname in ipairs(arg) do
 end
 
 -- the end
-os.exit(exit_ok)
+os.exit(texdoc.const.exit_ok)
 
 -- vim: ft=lua:

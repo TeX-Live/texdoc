@@ -92,14 +92,16 @@ known_options = {
     'fuzzy_level',
 }
 
-error_msg = [[
-Try `texdoc --help' for short help, `texdoc texdoc' for full manual.]]
-
 notfound_msg = [[
 Sorry, no documentation found for PKGNAME.
 If you are unsure about the name, try searching CTAN's TeX catalogue at
 http://ctan.org/search.html#byDescription.]]
 notfound_msg_ph = 'PKGNAME'
+
+-- exit codes
+exit_ok = 0
+exit_error = 1 -- apparently hard-coded in Lua
+exit_usage = 2
 
 err_priority = {
     error   = 1,

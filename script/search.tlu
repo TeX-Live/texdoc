@@ -261,7 +261,7 @@ end
 -- build a db from a ls-R file
 function init_lsr_db(root, shift)
     -- open the file
-    local lsr = assert(io.open(root..'/ls-R', 'r'))
+    local lsr = assert(io.open(root .. '/ls-R', 'r'))
     local _ = lsr:read('*line') -- throw away first line (comment)
     -- scan it
     local db = {}
@@ -566,7 +566,10 @@ end
 
 -- get pre-hashed tlpdb info from a pseudo-cache file
 function get_tlpinfo_from_dist()
-    local f = assert(kpse.find_file(C.data_tlpdb_name, 'texmfscripts'))
+    local f = kpse.find_file(C.data_tlpdb_name, 'texmfscripts')
+    if not f then
+        err_print('error', 'No texlive.tlpdb nor shipped tlpdb data found')
+    end
     s_meta, tlp_from_runfile, tlp_doclist = dofile(f)
 end
 
