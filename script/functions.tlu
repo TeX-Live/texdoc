@@ -33,9 +33,6 @@ function err_print(lvl, msg)
     local verbosity_level = config.verbosity_level or tonumber(C.def_verbosity)
     if C.err_priority[lvl] <= verbosity_level then
         io.stderr:write('texdoc ' .. lvl .. ': ' .. msg .. '\n')
-        if lvl == 'error' then
-            os.exit(C.exit_error)
-        end
     end
 end
 

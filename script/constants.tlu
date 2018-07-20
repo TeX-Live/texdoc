@@ -92,6 +92,9 @@ known_options = {
     'fuzzy_level',
 }
 
+error_msg = [[
+Try `texdoc --help' for short help, `texdoc texdoc' for full manual.]]
+
 notfound_msg = [[
 Sorry, no documentation found for PKGNAME.
 If you are unsure about the name, try searching CTAN's TeX catalogue at

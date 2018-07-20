@@ -22,7 +22,7 @@ RSpec.describe "Running Texdoc", :type => :aruba do
   context "without any option and argument" do
     before(:each) { run_texdoc }
     before(:each) { stop_all_commands }
-    it { expect(last_command_started).to have_exit_status(1) }
+    it { expect(last_command_started).to have_exit_status(2) }
     it { expect(stderr).to include(error_line "no action specified") }
   end
 

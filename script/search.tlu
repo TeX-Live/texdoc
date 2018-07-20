@@ -569,6 +569,7 @@ function get_tlpinfo_from_dist()
     local f = kpse.find_file(C.data_tlpdb_name, 'texmfscripts')
     if not f then
         err_print('error', 'No texlive.tlpdb nor shipped tlpdb data found')
+        os.exit(C.exit_usage)
     end
     s_meta, tlp_from_runfile, tlp_doclist = dofile(f)
 end
