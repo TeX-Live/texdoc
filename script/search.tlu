@@ -403,7 +403,7 @@ end
 
 -- find the TeX Live root
 function get_tlroot()
-    local tlroot = kpse.var_value('SELFAUTOPARENT')
+    local tlroot = kpse.var_value('TEXMFROOT')
     get_tlroot = function() return tlroot end
     return tlroot
 end
