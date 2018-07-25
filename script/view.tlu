@@ -8,18 +8,25 @@
 -- view a document
 -- see search.tlu for the structure of the argument
 function view_doc(docfile)
-    return view_file(docfile.realpath)
+    view_file(docfile.realpath)
 end
 
 -- get viewer and viewer_replacement before calling try_viewing
--- returns false of failure, true on success
--- viewer_replacement is either:
--- 1. the filename, quoted with "
--- 2. the filename, quoted with " followed by some rm commands
--- The second case happens when the doc was zipped. In the case, this function
--- unzips it in a tempdir so that the viewer command can use the unzipped file.
+-- returns false of failure, true on success viewer_replacement is either:
+--
+--     1. the filename, quoted with ""
+--     2. the filename, quoted with "" and followed by some rm commands
+--
+-- The second case happens when the doc is zipped. In the case, this function
+-- unzips it in a tmpdir so that the viewer command can use the unzipped file.
 function view_file(filename)
     local viewer, viewer_replacement
+
+    -- check the existence of the file
+    if not lfs.isfile(filename) then
+        err_print('error', 'File "' .. filename .. '" does not exist.')
+        os.exit(C.exit_error)
+    end
 
     -- check if the file is zipped
     local nozipname, zipext = parse_zip(filename)
@@ -30,14 +37,14 @@ function view_file(filename)
 
         if not unzip_cmd then
             err_print('error',
-                'No unzip command for ".' .. zipext .. '" files, skipping ' .. filename)
-            return false
+                'No unzip command for ".' .. zipext .. '" files.')
+            os.exit(C.exit_error)
         end
 
         local tmpdir = os.tmpdir('/tmp/texdoc.XXXXXX')
         if not tmpdir then
             err_print('error', 'Failed to create tempdir to unzip.')
-            return false
+            os.exit(C.exit_error)
         end
 
         local basename = string.match(nozipname, '.*/(.*)$') or nozipname
@@ -49,7 +56,7 @@ function view_file(filename)
             err_print('error', 'Failed to unzip ' .. filename)
             os.remove(tmpfile)
             os.remove(tmpdir)
-            return false
+            os.exit(C.exit_error)
         end
 
         viewer_replacement = tmpfile .. '; ' .. config.rm_file .. ' ' ..
@@ -119,17 +126,15 @@ function try_viewing(view_command, viewer_replacement)
     end
 
     -- the big casino: run the external command.
-    if not os.execute(view_command) then
+    if os.execute(view_command) ~= 0 then
         err_print('error', 'Failed to execute: ' .. view_command)
-        return false
+        os.exit(C.exit_error)
     end
     
     -- reset back to "C" (should always be C and always happen, but in case...)
     if (luatex_lc_ctype) then
         os.setenv('LC_CTYPE', luatex_lc_ctype)
     end
-
-    return true
 end
 
 -- Explanation of locale madness:
@@ -222,7 +227,7 @@ function deliver_results(name, doclist, many)
     end
     -- view result or show menu based on mode and number of results
     if (config.mode == 'view')
-        or config.mode == 'mixed' and (not doclist[2]
+            or config.mode == 'mixed' and (not doclist[2]
             or (doclist[2].quality ~= 'good' and not showall)) then
         view_doc(doclist[1])
     else

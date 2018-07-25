@@ -98,7 +98,7 @@ Try `texdoc --help' for short help, `texdoc texdoc' for full manual.]]
 notfound_msg = [[
 Sorry, no documentation found for PKGNAME.
 If you are unsure about the name, try searching CTAN's TeX catalogue at
-http://ctan.org/search.html#byDescription.]]
+https://ctan.org/search.html#byDescription.]]
 notfound_msg_ph = 'PKGNAME'
 
 -- exit codes
