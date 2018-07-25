@@ -126,7 +126,7 @@ function try_viewing(view_command, viewer_replacement)
     end
 
     -- the big casino: run the external command.
-    if os.execute(view_command) ~= 0 then
+    if os.execute(view_command) > 0 then
         err_print('error', 'Failed to execute: ' .. view_command)
         os.exit(C.exit_error)
     end
