@@ -105,6 +105,7 @@ notfound_msg_ph = 'PKGNAME'
 exit_ok = 0
 exit_error = 1 -- apparently hard-coded in Lua
 exit_usage = 2
+exit_notfound = 3
 
 err_priority = {
     error   = 1,
