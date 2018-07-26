@@ -34,4 +34,10 @@ RSpec.describe "Error case:", :type => :aruba do
     it { expect(last_command_started).to have_exit_status(1) }
     it { expect(stderr).to include(error_line 'File "not_exist" does not exist.') }
   end
+
+  context "when any document for input cannot be found" do
+    before(:each) { run_texdoc "never_never_existing_package_foooooooooo" }
+    before(:each) { stop_all_commands }
+    it { expect(last_command_started).to have_exit_status(3) }
+  end
 end

@@ -571,6 +571,7 @@ function get_tlpinfo_from_dist()
         err_print('error', 'No texlive.tlpdb nor shipped tlpdb data found')
         os.exit(C.exit_usage)
     end
+    deb_print('tlpdb', 'Getting data from shipped tlpdb data file ' .. f)
     s_meta, tlp_from_runfile, tlp_doclist = dofile(f)
 end
 

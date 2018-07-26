@@ -213,11 +213,9 @@ end
 function deliver_results(name, doclist, many)
     -- ensure that results were found or apologize
     if not doclist[1] or doclist[1].quality == 'killed' then
-        if not config.machine_switch then
-            local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
-            print(msg) -- get rid of gsub's 2nd value
-        end
-        return
+        local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
+        io.stderr:write(msg .. '\n') -- get rid of gsub's 2nd value
+        os.exit(C.exit_notfound)
     end
     -- shall we show all of them or only the "good" ones?
     local showall = (config.mode == 'showall')
