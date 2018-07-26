@@ -57,6 +57,7 @@ end
 # options for ronn
 OPT_MAN = "--manual=\"Texdoc manual\""
 OPT_ORG = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
+OPT_DATE = "--date=\"#{Time.now.strftime('%F')}\""
 
 # cleaning
 CLEAN.include(["doc/*", "tmp"])
@@ -125,13 +126,13 @@ desc "Generate all documentation"
 task :doc do
   cd "doc"
   sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}"
-  sh "bundle exec ronn -r #{OPT_MAN} #{OPT_ORG} texdoc.1.md 2> #{File::NULL}"
+  sh "bundle exec ronn -r #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md 2> #{File::NULL}"
 end
 
 desc "Preview the manpage"
 task :man do
   cd "doc"
-  sh "bundle exec ronn -m #{OPT_MAN} #{OPT_ORG} texdoc.1.md"
+  sh "bundle exec ronn -m #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md"
 end
 
 desc "Create an archive for CTAN"
@@ -198,9 +199,9 @@ task :setup_travis do
     end
 
     # run install script
-    arg_profile = "-profile ./texdoc.profile"
-    arg_repo = "-repository http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
-    sh "./install-tl #{arg_profile} #{arg_repo}"
+    opt_profile = "-profile ./texdoc.profile"
+    opt_repo = "-repository http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
+    sh "./install-tl #{opt_profile} #{opt_repo}"
     sh "tlmgr init-usertree"
 
     # finish
@@ -245,9 +246,9 @@ task :setup_appveyor do
     File.open("texdoc.profile", "w") {|f| f.puts(profile)}
 
     # run install script
-    arg_profile = "-profile ./texdoc.profile"
-    arg_repo = "-repository http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
-    sh "echo y | install-tl-windows.bat #{arg_profile} #{arg_repo}"
+    opt_profile = "-profile ./texdoc.profile"
+    opt_repo = "-repository http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
+    sh "echo y | install-tl-windows.bat #{opt_profile} #{opt_repo}"
     sh "tlmgr.bat init-usertree"
 
     # finish
