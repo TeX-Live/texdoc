@@ -40,7 +40,7 @@ do --scope of active_debugs
 local active_debugs
 
 -- generic debug function
-function deb_print(cat, msg)
+function dbg_print(cat, msg)
     -- make sure active_debugs is set
     if not active_debugs then set_active_debugs() end
     -- print message it belongs to an active category
@@ -99,7 +99,7 @@ end
 
 return {
     err_print = err_print,
-    deb_print = deb_print,
+    dbg_print = dbg_print,
     w32_path = w32_path,
     parse_zip = parse_zip,
     path_parent = path_parent,

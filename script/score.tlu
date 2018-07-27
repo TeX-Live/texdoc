@@ -51,9 +51,9 @@ end
 function set_score(df, original_kw)
     -- scoring is case-insenstitive (patterns are already lowercased)
     local name = string.lower(df.shortname)
-    deb_print('score', '----------')
-    deb_print('score', 'Start scoring ' .. df.realpath)
-    deb_print('score', 'Name used: ' .. name)
+    dbg_print('score', '----------')
+    dbg_print('score', 'Start scoring ' .. df.realpath)
+    dbg_print('score', 'Name used: ' .. name)
     -- get score from patterns
     local score = -10
     for _, pat in ipairs(df.matches) do
@@ -67,31 +67,31 @@ function set_score(df, original_kw)
                 bonus, msg = 5, ', (language-based)'
             end
             s = (pat.score or 10) + bonus -- default alias score is 10
-            deb_print('score', string.format(
+            dbg_print('score', string.format(
                 'Matching alias "%s", score: %g%s', pat.name, s, msg))
         end
         if s > score then score = s end
     end
-    deb_print('score', 'Max pattern score: ' .. tostring(score))
+    dbg_print('score', 'Max pattern score: ' .. tostring(score))
     -- get score from tlp associations
     if score == -10 and df.tlptodoc then
         score = -1
-        deb_print('score', 'New score: ' .. tostring(score) ..
+        dbg_print('score', 'New score: ' .. tostring(score) ..
             ' from package name association')
     end
     if score == -10 and df.runtodoc then
         score = -5
-        deb_print('score', 'New score: ' .. tostring(score) ..
+        dbg_print('score', 'New score: ' .. tostring(score) ..
             ' from sty/cls association')
     end
     -- bonus for metadata
     if df.details then
         if string.find(string.lower(df.details), 'readme') then
             score = score + 0.1
-            deb_print('score', 'Catalogue "readme" bonus: +0.1')
+            dbg_print('score', 'Catalogue "readme" bonus: +0.1')
         else
             score = score + 1.5
-            deb_print('score', 'Catalogue details bonus: +1.5')
+            dbg_print('score', 'Catalogue details bonus: +1.5')
         end
     end
     -- adjust from keyword-specific tables
@@ -99,7 +99,7 @@ function set_score(df, original_kw)
         for pat, val in pairs(spec_adjscore[original_kw]) do
             if val and is_subword('/' .. name, pat) then
                 score = score + val
-                deb_print('score', string.format(
+                dbg_print('score', string.format(
                     'Adjust by %g from specific pattern "%s"', val, pat))
             end
         end
@@ -109,24 +109,24 @@ function set_score(df, original_kw)
         for pat, val in pairs(global_adjscore) do
             if val and is_subword('/' .. name, pat) then
                 if score > -10 or val < 0 then score = score + val end
-                deb_print('score', string.format(
+                dbg_print('score', string.format(
                     'Adjust by %g from global pattern "%s"', val, pat))
             end
         end
     end
-    deb_print('score', 'Final score: ' .. tostring(score))
+    dbg_print('score', 'Final score: ' .. tostring(score))
     df.score = score
 end
 
 -- compute a heuristic score -10 <= s < 10
 function heuristic_score(file, pat)
-    deb_print('score', 'Start heuristic scoring with pattern: ' .. pat)
+    dbg_print('score', 'Start heuristic scoring with pattern: ' .. pat)
     -- score management
     local score = -10
     local function upscore(s, reason, force)
         if s > score or force then
             score = s
-            deb_print('score', 'New heuristic score: ' .. tostring(s) ..
+            dbg_print('score', 'New heuristic score: ' .. tostring(s) ..
                 '. Reason: ' .. reason)
         end
     end
@@ -164,7 +164,7 @@ function heuristic_score(file, pat)
         upscore(score + 1.5, 'directory bonus')
     end
     -- done
-    deb_print('score', 'Final heuristic score: ' .. tostring(score))
+    dbg_print('score', 'Final heuristic score: ' .. tostring(score))
     return score
 end
 

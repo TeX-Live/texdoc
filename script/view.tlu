@@ -50,7 +50,7 @@ function view_file(filename)
         local basename = string.match(nozipname, '.*/(.*)$') or nozipname
         local tmpfile = '"' .. tmpdir .. '/' .. basename .. '"'
         local unzip = unzip_cmd .. ' "' .. filename .. '">' .. tmpfile
-        deb_print('view', 'Unzip command: ' .. unzip)
+        dbg_print('view', 'Unzip command: ' .. unzip)
 
         if not os.execute(unzip) then
             err_print('error', 'Failed to unzip ' .. filename)
@@ -91,7 +91,7 @@ function view_file(filename)
     -- finally, check validity of the viewer
     viewer = config['viewer_' .. viewext]
     assert(viewer, 'Internal error: no viewer found.')
-    deb_print('view', 'Using "viewer_' .. viewext .. '" to open the file.')
+    dbg_print('view', 'Using "viewer_' .. viewext .. '" to open the file.')
 
     return try_viewing(viewer, viewer_replacement)
 end

@@ -36,7 +36,7 @@ function set_config_element(key, value, context)
     -- exit if key is already set (/!\ must test for nil, not false)
     if not (config[key] == nil) then
         if context.src ~= 'def' then
-            deb_print('config',
+            dbg_print('config',
                 'Ignoring "' .. key .. '=' .. value .. '" ' ..
                 context_to_string(context) .. '.')
         end
@@ -85,10 +85,10 @@ function set_config_element(key, value, context)
     end
     -- special case: if we just set debug_list, print version info now
     if key == 'debug_list' then
-        deb_print('version', C.fullname .. ' version ' .. C.version)
+        dbg_print('version', C.fullname .. ' version ' .. C.version)
     end
     -- now tell what we have just done, for debugging
-    deb_print('config',
+    dbg_print('config',
         'Setting "' .. key .. '=' .. value .. '" ' ..
         context_to_string(context) .. '.')
 end
@@ -572,7 +572,7 @@ function setup_config_and_alias(arg)
         real_set_config('verbosity_level', tonumber(C.max_verbosity))
     end
     -- we were waiting for config.debug_list to be known to do this
-    show_config_files(function(s) deb_print('files', s) end)
+    show_config_files(function(s) dbg_print('files', s) end)
     -- propagated return value of _from_cl()
     return ret
 end
