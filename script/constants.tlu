@@ -108,22 +108,23 @@ exit_usage = 2
 exit_notfound = 3
 
 err_priority = {
-    error   = 1,
+    error = 1,
     warning = 2,
-    info    = 3,
+    info = 3,
 }
-min_verbosity='0'  -- (nothing at all)
-max_verbosity='3'
-def_verbosity='2'
+min_verbosity = '0'  -- (nothing at all)
+max_verbosity = '3'
+def_verbosity = '2'
 
 known_debugs = {
-    version = {},
-    files   = {},
-    config  = {'files'},
-    view    = {},
+    config = {'files'},
+    files = {},
+    search = {},
+    score = {},
     texdocs = {},
-    score   = {},
-    tlpdb   = {}
+    tlpdb = {},
+    version = {},
+    view = {},
 }
 
 -- various cache or non-cache files

@@ -35,7 +35,17 @@ end
 
 -- add a docfile to a list
 function Doclist:add(df)
-    if not df.realpath then return end -- useful if vanilla == false
+    -- if no realpath information, unable to add
+    -- (useful if vanilla == false)
+    if not df.realpath then return end
+    -- check the existence of the file
+    if not lfs.isfile(df.realpath) then
+        dbg_print('search', 'File ' .. df.realpath .. ' not found; skipping.')
+        return
+    else
+        dbg_print('search', 'File ' .. df.realpath .. ' found.')
+    end
+    -- add the docfile to the list
     local index = self.inv[df.realpath:lower()]
     if index then
         self[index]:mergein(df)
