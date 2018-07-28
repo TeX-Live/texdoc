@@ -540,11 +540,11 @@ Set |verbosity_level| to minimum, see~\ref{cf-verbosity_level}.
 Set |verbosity_level| to maximum, see~\ref{cf-verbosity_level}.
 
 \begin{cmdsubsub}{-d, -D, --debug}{cl-d}
-  -d «cat», --debug=«cat», -D, --debug
+  -d «list», --debug=«list», -D, --debug
 \end{cmdsubsub}
 
 Set |debug_list|, see~\ref{cf-debug_list}. If you specify |-D| or |--debug|
-without specifying a category, activates all available debug items.
+without specifying a list, activates all available debug items.
 
 \subsection{Environment variables}\label{ss-envvar}
 
@@ -723,9 +723,10 @@ recommended).
   debug_list = «list»
 \end{cmdsubsub}
 
-Set the list of activated debug items (default: none; if the command-line
-option is used without arguments, the list defaults to all known debug items).
-Implies |--verbose|. Debug information is printed on standard error.
+Set the list of activated debug items (default: none). Available debug items
+are |config|, |files|, |search|, |score|, |texdocs|, |tlpdb|, |version|,
+|view|, and |all| to activate all of these. Implies |--verbose|. Debug
+information are printed on standard error.
 
 \begin{cmdsubsub}{max_line}{cf-max_lines}
   max_lines = «number»

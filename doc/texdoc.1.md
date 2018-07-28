@@ -7,7 +7,8 @@
 
 ## DESCRIPTION
 
-Try to find appropriate TeX documentation for the specified NAME(s). Alternatively, perform the given ACTION and exit.
+Try to find appropriate TeX documentation for the specified NAME(s).
+Alternatively, perform the given ACTION and exit.
 
 ## OPTIONS
 
@@ -30,11 +31,13 @@ Try to find appropriate TeX documentation for the specified NAME(s). Alternative
 * `-q`, `--quiet`:
   Suppress warnings and most error messages.
 * `-v`, `--verbose`:
-  Print additional information (eg, viewer command).
+  Print additional information (e.g., viewer command).
 * `-D`, `--debug`:
   Activate all debug output (equal to "--debug=all").
-* `-d`LIST, `--debug`=LIST:
-  Activate debug output restricted to LIST.
+* `-d` LIST, `--debug`=LIST:
+  Activate debug output restricted to the items specified in LIST.  
+  Available items: `config`, `files`, `search`, `score`, `texdocs`,
+  `tlpdb`, `version`, `view`, and `all` to activate all of these.
 
 ## ACTIONS
 
@@ -44,16 +47,46 @@ Try to find appropriate TeX documentation for the specified NAME(s). Alternative
   Print the version number.
 * `-f`, `--files`:
   Print the list of configuration files used.
-* `--just-view FILE`:
-  Display file, given with full path (no searching).
+* `--just-view` FILE:
+  Display FILE, given with full path (no searching).
 
 ## ENVIRONMENT
 
-BROWSER, DVIVIEWER, MDVIEWER, PAGER, PDFVIEWER, PSVIEWER, and *_texdoc of each.
+* `BROWSER`, `BROWSER_texdoc`:
+  Set the command to be used for HTML documents.
+* `DVIVIEWER`, `DVIVIEWER_texdoc`:
+  Set the command to be used for DVI documents.
+* `MDVIEWER`, `MDVIEWER_texdoc`:
+  Set the command to be used for Markdown documents.
+* `PAGER`, `PAGER_texdoc`:
+  Set the command to be used for text documents.
+* `PDFVIEWER`, `PDFVIEWER_texdoc`:
+  Set the command to be used for PDF documents.
+* `PSVIEWER`, `PSVIEWER_texdoc`:
+  Set the command to be used for PS documents.
+* `LANG`, `LC_ALL` and so on:
+  Set the locale (which will influence on the search results).
+* `TEXDOCS`:
+  In addition to the documents included in the TeX Live database, Texdoc also
+  searches documentation under TEXMF trees specified by the kpathsea variable
+  `TEXDOCS`.
 
 ## FILES
 
 `<texmf>/texdoc/texdoc.cnf`, see output of the `--files` option.
+
+## EXIT STATUS
+
+The `texdoc` command exists with one of the following values:
+
+* 0:
+  Success.
+* 1:
+  Internal error.
+* 2:
+  Usage error.
+* 3:
+  No documentation found.
 
 ## REPORTING BUGS
 
@@ -63,7 +96,8 @@ Source: <https://github.com/TeX-Live/texdoc>
 
 ## COPYRIGHT
 
-Copyright 2018 Manuel Pe'gourie'-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining.  
+Copyright 2018 Manuel Pe'gourie'-Gonnard, Takuto Asakura, Karl Berry, and
+Norbert Preining.  
 License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.  
 This is free software: you are free to change and redistribute it.
 
