@@ -22,12 +22,6 @@ end
 function view_file(filename)
     local viewer, viewer_replacement
 
-    -- check the existence of the file
-    if not lfs.isfile(filename) then
-        err_print('error', 'File "' .. filename .. '" does not exist.')
-        os.exit(C.exit_error)
-    end
-
     -- check if the file is zipped
     local nozipname, zipext = parse_zip(filename)
 
