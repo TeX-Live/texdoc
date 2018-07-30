@@ -82,8 +82,8 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     it { expect(stderr).to include(ignore_cmo_line "debug_list=config", "-d") }
   end
 
-  context 'with option "-D -c \"fuzzy_level = 0\" -qv"' do
-    before(:each) { run_texdoc "-D", '-c "fuzzy_level = 0"', "-qv", sample }
+  context 'with option "-D -c fuzzy_level=0 -qv"' do
+    before(:each) { run_texdoc "-D", "-c fuzzy_level=0", "-qv", sample }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
     it { expect(stderr).to include(set_cmo_line "fuzzy_level=0", "-c") }
