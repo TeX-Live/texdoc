@@ -546,6 +546,13 @@ Set |verbosity_level| to maximum, see~\ref{cf-verbosity_level}.
 Set |debug_list|, see~\ref{cf-debug_list}. If you specify |-D| or |--debug|
 without specifying a list, activates all available debug items.
 
+\begin{cmdsubsub}{-c}{cl-c}
+  -c «name»=«value»
+\end{cmdsubsub}
+
+Set configuration item |«name»| to |«value»|. This is a general way to access
+any configuration items listed in \ref{ss-conf} from command line.
+
 \subsection{Environment variables}\label{ss-envvar}
 
 They all correspond to some |viewer_«ext»| setting, and the reader is referred

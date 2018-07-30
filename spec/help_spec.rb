@@ -29,6 +29,7 @@ Options:
   -D, --debug       Activate all debug output (equal to "--debug=all").
   -d LIST, --debug=LIST
                     Activate debug output restricted to LIST.
+  -c NAME=VALUE     Set configuration item NAME to VALUE.
 
 Actions:
   -h, --help        Print this help message.

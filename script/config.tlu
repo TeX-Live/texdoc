@@ -183,7 +183,7 @@ function setup_config_from_cl(arg)
         return tab
     end
 
-    opts = getopt(arg, 'd')
+    opts = getopt(arg, 'cd')
     for _, tp in ipairs(opts) do
         k, v = tp[1], tp[2]
         if #k == 1 then
@@ -218,6 +218,10 @@ function setup_config_from_cl(arg)
         -- output format
         elseif (curr_arg == '-M') or (curr_arg == '--machine') then
             set_config_elt('machine_switch', 'true')
+        -- config
+        elseif curr_arg == '-c' then
+            local item, value = string.match(v, '^([%a%d_]+)%s*=%s*(.+)')
+            set_config_elt(item, value)
         -- debug
         elseif (curr_arg == '-d') or (curr_arg == '--debug') then
             if v == true then v = 'all' end

@@ -38,6 +38,8 @@ Alternatively, perform the given ACTION and exit.
   Activate debug output restricted to the items specified in LIST.  
   Available items: `config`, `files`, `search`, `score`, `texdocs`,
   `tlpdb`, `version`, `view`, and `all` to activate all of these.
+* `-c` NAME=VALUE:
+  Set configuration item NAME to VALUE.
 
 ## ACTIONS
 
