@@ -106,7 +106,11 @@ function set_score(df, original_kw)
     end
     -- adjust from global tables
     if df.tree > -1 then
-        for pat, val in pairs(global_adjscore) do
+        local tkeys = {}
+        for k in pairs(global_adjscore) do table.insert(tkeys, k) end
+        table.sort(tkeys)
+        for _, pat in ipairs(tkeys) do
+            val = global_adjscore[pat]
             if val and is_subword('/' .. name, pat) then
                 if score > -10 or val < 0 then score = score + val end
                 dbg_print('score', string.format(

@@ -324,8 +324,11 @@ end
 
 -- scan a database
 function scan_db(patlist, code, lsr_db)
-    for file, basename in pairs(lsr_db) do
-        local df = process_file(patlist, basename, file, code)
+    local tkeys = {}
+    for k in pairs(lsr_db) do table.insert(tkeys, k) end
+    table.sort(tkeys)
+    for _, file in ipairs(tkeys) do
+        local df = process_file(patlist, lsr_db[file], file, code)
         if df then s_doclist:add(df) end
     end
 end

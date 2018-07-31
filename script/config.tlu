@@ -121,8 +121,11 @@ end
 
 -- set a whole list, also whithout overwriting
 function set_config_list(conf, context)
-    for key, value in pairs(conf) do
-        set_config_element(key, value, context)
+    local tkeys = {}
+    for k in pairs(conf) do table.insert(tkeys, k) end
+    table.sort(tkeys)
+    for _, key in ipairs(tkeys) do
+        set_config_element(key, conf[key], context)
     end
 end
 
