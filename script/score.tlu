@@ -224,7 +224,7 @@ end
 -- compare two docfile's: (see search.tlu for structure)
 -- 1. by score
 -- 2. then by extensions (ordered as in ext_list),
--- 3. then lexicographically by filename.
+-- 3. then lexicographically by fullpath.
 -- 4. then by tree.
 -- return true if a is better than b
 function docfile_order (a, b)
@@ -232,8 +232,8 @@ function docfile_order (a, b)
     elseif a.score < b.score       then return false
     elseif a.ext_pos < b.ext_pos   then return true
     elseif a.ext_pos > b.ext_pos   then return false
-    elseif a.basename < b.basename then return true
-    elseif a.basename > b.basename then return false
+    elseif a.realpath < b.realpath then return true
+    elseif a.realpath > b.realpath then return false
     else return (a.tree > b.tree)
     end
 end
