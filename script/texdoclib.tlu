@@ -77,7 +77,7 @@ local function texdoc_do(name)
     if symbols then import_symbols(symbols, name) end
 end
 
-------------------------   initilisation & main code   -------------------------
+------------------------   initialisation & main code   ------------------------
 
 -- pre-declare variables in the shared environment
 C = {}      -- constants

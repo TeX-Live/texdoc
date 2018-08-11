@@ -227,7 +227,7 @@ insert the line |viewer_pdf = xpdf %s &| in your configuration file. Here,
 \subsection{You can stop reading now}
 
 The next part explains Texdoc mechanisms for finding the best results and how
-to cutomize them. The default configuration file tries hard to set appropriate
+to customize them. The default configuration file tries hard to set appropriate
 values so that you normally don't need to fiddle with that, but you may be
 curious or have special needs.
 
@@ -248,7 +248,7 @@ sources:
     selects all files containing |«keyword»| in their name (including the
     directory name);
   \item In the \texlive Database, it looks for packages named
-    |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may me
+    |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may be
     |sty| or |cls|, and selects all the documentation files from this package.
 \end{enumerate}
 Files are filtered by extension: only files with known extensions may be
@@ -419,7 +419,7 @@ either is known to be ``bad.''
 \subsection{Variants}\label{ss-variants}
 
 The documentation for a given package is often found in a file named like
-|«package»-doc|. To handle this properlr, Texdoc gives a special score files
+|«package»-doc|. To handle this properly, Texdoc gives a special score files
 named |«package»«suffix»| where |«suffix»| is one element of the list given by
 the configuration setting |suffix_list|.
 
@@ -682,7 +682,7 @@ viewer is used and a warning is issued.
 \end{cmdsubsub}
 
 Set the list of ``bad'' extensions to |«list»|.  Default is ``|txt,|''. Files
-with those extensions get a malus of |1| on their heurisitc score if it was
+with those extensions get a malus of |1| on their heuristic score if it was
 previously positive.
 
 \begin{cmdsubsub}{basename_list}{cf-basename_list}
@@ -698,7 +698,7 @@ extension is unknown, the text viewer will be used to view the file.
 \end{cmdsubsub}
 
 Set the list of ``bad'' base names to |«list»|.  Default is ``|readme|''. Files
-with those names get a malus of |1| on their heurisitc score if it was
+with those names get a malus of |1| on their heuristic score if it was
 previously positive.
 
 \begin{cmdsubsub}{viewer_*}{cf-viewer_*}
@@ -754,7 +754,7 @@ output is
   «argument»\t«score»\t«filename»
 \end{htcode}
 where |«argument»| is the name of the argument to which the results correspond
-(mainly useful if there were many arguments), |\t| is the tab (ascii 9)
+(mainly useful if there were many arguments), |\t| is the tab (ASCII \#9)
 character, and the other entries are pretty self-explanatory. Nothing else is
 printed on stdout, except if a internal error occurs (in which case exit code
 will be 1). In the future, more tab-separated fields may be added at the end
