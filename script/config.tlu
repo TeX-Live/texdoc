@@ -26,6 +26,7 @@ real_set_config = set_read_only(config, 'config')
 -- set a config parameter, but don't overwrite it if already set
 -- three special types: *_list (list), *_switch (boolean), *_level (number)
 function set_config_element(key, value, context)
+    local parse_error = false
     local is_known = false -- is key a valid option?
     local option
     for _, option in ipairs(C.known_options) do
@@ -71,6 +72,7 @@ function set_config_element(key, value, context)
             real_set_config(key, false)
         else
             config_warn(key, value, context)
+            parse_error = true
         end
     elseif string.find(key, '_level$') then
         -- integer
@@ -79,6 +81,7 @@ function set_config_element(key, value, context)
             real_set_config(key, val)
         else
             config_warn(key, value, context)
+            parse_error = true
         end
     else -- string
         real_set_config(key, value)
@@ -88,9 +91,11 @@ function set_config_element(key, value, context)
         dbg_print('version', C.fullname .. ' version ' .. C.version)
     end
     -- now tell what we have just done, for debugging
-    dbg_print('config',
-        'Setting "' .. key .. '=' .. value .. '" ' ..
-        context_to_string(context) .. '.')
+    if not parse_error then
+        dbg_print('config',
+            'Setting "' .. key .. '=' .. value .. '" ' ..
+            context_to_string(context) .. '.')
+    end
 end
 
 -- a helper function for warning messages in the above

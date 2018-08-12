@@ -614,8 +614,8 @@ end
 -- fuzzy search by using Levenshtein distance
 function fuzzy_search(pattern)
     local tmp_d
-    local min = 100
-    local result
+    local min = math.huge
+    local result = ''
 
     for p in pairs(tlp_doclist) do
         tmp_d = levenshtein(pattern, p)
@@ -624,11 +624,7 @@ function fuzzy_search(pattern)
         end
     end
 
-    if min <= config.fuzzy_level then
-        return result
-    else
-        return ''
-    end
+    return result, min
 end
 
 -- calculate Levenshtein distance by dynamic programming
@@ -666,12 +662,16 @@ function get_doclist(pattern, no_alias)
     -- 1. normal search with the input pattern
     doc_search(pattern, no_alias)
     -- 2. if no result, execute fuzzy search
-    if not s_doclist[1] then
-        local f_res = fuzzy_search(pattern)
-        if f_res ~= '' then
+    if not s_doclist[1] and config.fuzzy_level > 0 then
+        local f_res, f_lev = fuzzy_search(pattern)
+        if f_lev <= config.fuzzy_level then
             err_print('info', 'Fuzzy search result: ' .. f_res)
+            dbg_print('search', 'Levenshtein distance: ' .. f_lev)
             pattern = f_res
             doc_search(pattern, no_alias)
+        else
+            dbg_print('search', 'Fuzzy search result: ' .. f_res)
+            dbg_print('search', 'Levenshtein distance: ' .. f_lev)
         end
     end
     -- finally, sort results
