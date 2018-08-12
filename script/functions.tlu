@@ -16,7 +16,7 @@ else
     end
 end
 
--- remove the last direcory component of a path
+-- remove the last directory component of a path
 if os.type == 'windows' then
     function path_parent(path)
         return string.match(path, '^(.*)[\\/]')

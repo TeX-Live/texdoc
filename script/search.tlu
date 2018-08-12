@@ -6,7 +6,7 @@
 -- Warning: every single function here assumes init_databases() has been called.
 
 -- shared by all functions in this file
-local s_doclist -- the Doclist objet to be populated by various functions
+local s_doclist -- the Doclist object to be populated by various functions
 local s_meta -- {[normname] = meta, ...} (populated by init_tlp_database)
 local vanilla -- is this a vanilla TL or a re-package one without tlpdb?
 
@@ -63,7 +63,7 @@ end
 
 --[[
 docfile = {
-    -- name and tree are mendatory
+    -- name and tree are mandatory
     name      = filename (used for scoring only)
     tree      = code of the tree, see below
     -- at least one of the following fields should exist
@@ -100,7 +100,7 @@ function Docfile:__index(key)
     end
 end
 
--- create a new docfile objet using initilisation info
+-- create a new docfile object using initialisation info
 -- required fields: name, tree
 function Docfile:new(info)
     local df = {}
@@ -115,7 +115,7 @@ function Docfile:new(info)
     return df
 end
 
--- merge a second docfile objet in, assuming it represents the same file
+-- merge a second docfile object in, assuming it represents the same file
 function Docfile:mergein(df)
     for k, v in pairs(df) do
         if k == 'matches' then
@@ -330,7 +330,7 @@ function scan_db(patlist, code, lsr_db)
     end
 end
 
--- says if file has a known extenstion according to ext_list
+-- says if file has a known extension according to ext_list
 -- (or known basename according to basename_list)
 function check_ext(file)
     file = string.lower(file)
@@ -369,7 +369,7 @@ function matches(pattern, file)
     end
 end
 
--- return a docfile object if file "matches", nil ortherwise
+-- return a docfile object if file "matches", nil otherwise
 function process_file(patlist, file, pathfile, code)
     local docfile
     local pattern
@@ -611,7 +611,7 @@ function get_doclist_tlpdb(pattern)
     end
 end
 
--- fuzzy search by using levenshtein distance
+-- fuzzy search by using Levenshtein distance
 function fuzzy_search(pattern)
     local tmp_d
     local min = 100
@@ -631,7 +631,7 @@ function fuzzy_search(pattern)
     end
 end
 
--- calculate levenshtein distance by dynamic programming
+-- calculate Levenshtein distance by dynamic programming
 -- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
 function levenshtein(s, t)
     local s, t = tostring(s), tostring(t)

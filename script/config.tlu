@@ -119,7 +119,7 @@ function context_to_string(context)
     end
 end
 
--- set a whole list, also whithout overwriting
+-- set a whole list, also without overwriting
 function set_config_list(conf, context)
     for key, value in pairs(conf) do
         set_config_element(key, value, context)
@@ -422,7 +422,7 @@ function guess_viewer(cmds)
 end
 end
 
--- returns a viewer specific to a desktop environement if relevant
+-- returns a viewer specific to a desktop environment if relevant
 -- doesn't work on windows (uses io.popen)
 -- logic stolen from xdg-open (http://www.freedesktop.org/) and adapted
 function desktop_environment_viewer()

@@ -49,7 +49,7 @@ end
 
 -- set the score of a docfile
 function set_score(df, original_kw)
-    -- scoring is case-insenstitive (patterns are already lowercased)
+    -- scoring is case-insensitive (patterns are already lowercased)
     local name = string.lower(df.shortname)
     dbg_print('score', '----------')
     dbg_print('score', 'Start scoring ' .. df.realpath)
@@ -205,7 +205,7 @@ function is_subword(str, pat)
         and (j == #str or is_delim(str, j) or is_delim(str, j+1)))
 end
 
--- say if character i of str is a delimiter (ponctuation)
+-- say if character i of str is a delimiter (punctuation)
 function is_delim(str, i)
     return not not string.find(string.sub(str, i, i), '%p')
 end
