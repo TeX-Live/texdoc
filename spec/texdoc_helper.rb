@@ -37,9 +37,13 @@ module Helplers
     viewer_list.each { |v| ENV[v + "_texdoc"] = ":" }
   end
 
-  # generate debug line
+  # generate message lines
   def error_line(msg)
     return "texdoc error: #{msg}"
+  end
+
+  def info_line(msg)
+    return "texdoc info: #{msg}"
   end
 
   def debug_line(cat, msg="")
