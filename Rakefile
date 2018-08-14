@@ -110,6 +110,15 @@ task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do |task, args|
   end
 end
 
+desc "Run Texdoc without installing (for debug purpose)"
+task :run_texdoc => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do |task, args|
+  # use controlled environment
+  ENV["TEXMFHOME"] = PS_TEXMF.to_s
+
+  # run texdoc
+  sh "texlua #{TEXDOC_TLU} #{args.to_a.join(' ')}"
+end
+
 desc "Generate a pre-hashed cache file"
 task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   # use controlled environment
