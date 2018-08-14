@@ -20,24 +20,26 @@ EXPECTED
 
   before(:all) { set_default_env }
 
+  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
+
   context "with --version" do
     before(:each) { run_texdoc "--version" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout.gsub("\r", "")).to eq version_text }
+    it { expect(stdout).to eq version_text }
   end
 
   context "with -V" do
     before(:each) { run_texdoc "-V" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout.gsub("\r", "")).to eq version_text }
+    it { expect(stdout).to eq version_text }
   end
 
   context "with -V -l" do
     before(:each) { run_texdoc "-V -l" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout.gsub("\r", "")).to eq version_text }
+    it { expect(stdout).to eq version_text }
   end
 end

@@ -47,24 +47,26 @@ EXPECTED
 
   before(:all) { set_default_env }
 
+  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
+
   context "with --help" do
     before(:each) { run_texdoc "--help" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout.gsub("\r", "")).to eq help_text }
+    it { expect(stdout).to eq help_text }
   end
 
   context "with -h" do
     before(:each) { run_texdoc "-h" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout.gsub("\r", "")).to eq help_text }
+    it { expect(stdout).to eq help_text }
   end
 
   context "with -h -l" do
     before(:each) { run_texdoc "-h -l" }
     before(:each) { stop_all_commands }
     it { expect(last_command_started).to be_successfully_executed }
-    it { expect(last_command_started.stdout.gsub("\r", "")).to eq help_text }
+    it { expect(stdout).to eq help_text }
   end
 end
