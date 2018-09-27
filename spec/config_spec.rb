@@ -1,3 +1,4 @@
+require 'os'
 require 'spec_helper'
 require 'texdoc_helper'
 
@@ -30,16 +31,18 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     before(:each) { run_texdoc "-D", SAMPLE }
     before(:each) { stop_all_commands }
 
-    it "set from built-in defaults at the first place" do
+    it "configuration should set from built-in defaults at the first place" do
       DEFAULTS.each do |config|
         expect(stderr).to include(
           debug_line "config", "Setting \"#{config}\" from built-in defaults.")
       end
     end
 
-    it "set lang from the OS locale" do
-      expect(stderr).to include(
-        debug_line "config", "Setting \"lang=en\" from operating system locale.")
+    if not OS.windows?
+      it "set lang from the OS locale (except Windows)" do
+        expect(stderr).to include(
+          debug_line "config", "Setting \"lang=en\" from operating system locale.")
+      end
     end
   end
 end
