@@ -3,6 +3,7 @@
 
 require 'rake/clean'
 require 'pathname'
+require 'optparse'
 
 # basics
 TEXDOC_VERSION = "3.0"
@@ -92,31 +93,68 @@ task :uninstall do
   safe_unlink [TEXDOC_LINK, TEXDOC_CNF_LINK]
 end
 
-desc "Run tests (only listed specs, if specified)"
-task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do |task, args|
+desc "Run tests [options available]"
+task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+  # parse options
+  options = {}
+  if ARGV.delete("--")
+    OptionParser.new do |opts|
+      opts.banner = "Usage: rake test [-- OPTION...]"
+      opts.on("-o", "--opts=OPTS", "Pass OPTS to RSpec") do |args|
+        options[:args] = args
+      end
+      opts.on("-l", "--list=LIST", "Load only specified specs in LIST") do |args|
+        options[:list] = args
+      end
+    end.parse!(ARGV)
+  end
+
   # use controlled environment
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
   # check version
   sh "texlua #{TEXDOC_TLU} -f"
 
-  # run rspec
-  args = args.to_a
-  if args.size > 0
-    f_list = args.map{|f| "spec/#{f}_spec.rb"}.join(" ")
-    sh "bundle exec rspec #{f_list}"
+  # construct options
+  opt_args = if options[:args]
+    " " + options[:args].strip
   else
-    sh "bundle exec rspec"
+    ""
   end
+  opt_files = if options[:list]
+    " " + options[:list].split(",").map{|i|"spec/#{i.strip}_spec.rb"}.join(" ")
+  else
+    ""
+  end
+
+  # run rspec
+  sh "bundle exec rspec" + opt_args + opt_files
+
+  # make sure to end this process
+  exit 0
 end
 
-desc "Run Texdoc without installing (for debug purpose)"
-task :run_texdoc => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do |task, args|
+desc "Run Texdoc without installing [options available]"
+task :run_texdoc => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+  # parse options
+  options = {}
+  if ARGV.delete("--")
+    OptionParser.new do |opts|
+      opts.banner = "Usage: rake run_texdoc [-- OPTION...]"
+      opts.on("-a", "--args=ARGS", "Pass ARGS to Texdoc") do |args|
+        options[:args] = args
+      end
+    end.parse!(ARGV)
+  end
+
   # use controlled environment
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
   # run texdoc
-  sh "texlua #{TEXDOC_TLU} #{args.to_a.join(' ')}"
+  sh "texlua #{TEXDOC_TLU} #{options[:args]}"
+
+  # make sure to end this process
+  exit 0
 end
 
 desc "Generate a pre-hashed cache file"

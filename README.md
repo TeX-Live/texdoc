@@ -78,10 +78,10 @@ Following will run all tests in `spec/` directory.
 $ rake test
 ```
 
-Alternatively, you can give spec names as the arguments for this task. E.g., following will run only `help_spec.rb` and `version_spec.rb`:
+Alternatively, you can give spec names with the `--list` (`-l`) option for this task. E.g., following will run only `help_spec.rb` and `version_spec.rb`:
 
 ```
-$ rake "test[help,version]"
+$ rake test -- -l help,version
 ```
 
 ### Showing all available tasks
@@ -92,9 +92,15 @@ Following will show all available tasks with a short description.
 $ rake -T
 ```
 
+In addition to that, for options available tasks (e.g., `rake test` and `rake run_texdoc`) you can get options information with `-h` option for each task:
+
+```
+$ rake test -- -h
+```
+
 ## Further Information
 
-More specific information (e.g. TODO) can be found in the Wiki of our GitHub repository. Please visit:
+More specific information (e.g., TODO) can be found in the Wiki of our GitHub repository. Please visit:
 
 * <https://github.com/TeX-Live/texdoc/wiki>
 
