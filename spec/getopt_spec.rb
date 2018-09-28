@@ -5,19 +5,20 @@ RSpec.configure do |c|
   c.include Helplers
 end
 
-RSpec.describe "Running Texdoc", :type => :aruba do
+RSpec.describe "The command line option parser", :type => :aruba do
   def set_cmo_line(config, opt)
-    debug_line "config", "Setting \"#{config}\" from command line option \"#{opt}\"."
+    debug_line "config",
+      "Setting \"#{config}\" from command line option \"#{opt}\"."
   end
-
   def ignore_cmo_line(config, opt)
-    debug_line "config", "Ignoring \"#{config}\" from command line option \"#{opt}\"."
+    debug_line "config",
+      "Ignoring \"#{config}\" from command line option \"#{opt}\"."
   end
 
+  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
   let(:sample) { "texlive-en" }
 
   before(:all) { set_default_env }
-  let(:stderr) { last_command_started.stderr }
 
   context "with an argument" do
     before(:each) { run_texdoc sample }
@@ -26,51 +27,51 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     it { expect(last_command_started).to be_successfully_executed }
   end
 
-  context 'with option "-D"' do
+  context "with -D" do
     before(:each) { run_texdoc "-D", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it "should activate all debug items" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=all", "-D")
     end
   end
 
-  context 'with option "--debug"' do
+  context "with --debug" do
     before(:each) { run_texdoc "--debug", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it "should activate all debug items" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=all", "--debug")
     end
   end
 
-  context 'with option "-dconfig"' do
+  context "with -dconfig" do
     before(:each) { run_texdoc "-dconfig", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it 'should activate only debug item "config"' do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=config", "-d")
     end
   end
 
-  context 'with option "--debug=config"' do
+  context "with --debug=config" do
     before(:each) { run_texdoc "--debug=config", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it 'should activate only debug item "config"' do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=config", "--debug")
     end
   end
 
-  context 'with option "-dconfig -lIv"' do
+  context "with -dconfig -lIv" do
     before(:each) { run_texdoc "-dconfig", "-lIv", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it "all specified options should effective" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=config", "-d")
       expect(stderr).to include(set_cmo_line "mode=list", "-l")
@@ -79,11 +80,11 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     end
   end
 
-  context 'with option "-dconfig -wmls"' do
+  context "with -dconfig -wmls" do
     before(:each) { run_texdoc "-dconfig", "-wmls", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it "only -w should effective and others should not" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "mode=view", "-w")
       expect(stderr).to include(ignore_cmo_line "mode=mixed", "-m")
@@ -92,11 +93,11 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     end
   end
 
-  context 'with option "-D -Mdconfig"' do
+  context "with -D -Mdconfig" do
     before(:each) { run_texdoc "-D", "-Mdconfig", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it "-w and -M should effective, and -d should not" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=all", "-D")
       expect(stderr).to include(set_cmo_line "machine_switch=true", "-M")
@@ -104,11 +105,11 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     end
   end
 
-  context 'with option "-D -c fuzzy_level=0 -qv"' do
+  context "with -D -c fuzzy_level=0 -qv" do
     before(:each) { run_texdoc "-D", "-c fuzzy_level=0", "-qv", sample }
     before(:each) { stop_all_commands }
 
-    it do
+    it "-c and -q should effective, and -v should not" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "fuzzy_level=0", "-c")
       expect(stderr).to include(set_cmo_line "verbosity_level=0", "-q")

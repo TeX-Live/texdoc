@@ -5,7 +5,8 @@ RSpec.configure do |c|
   c.include Helplers
 end
 
-RSpec.describe "Showing version", :type => :aruba do
+RSpec.describe 'The "version" action', :type => :aruba do
+  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
   let(:version) { "3.0" }
   let(:version_text) do
     <<~EXPECTED
@@ -18,15 +19,14 @@ RSpec.describe "Showing version", :type => :aruba do
   end
 
   before(:all) { set_default_env }
-  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
 
   context "with --version" do
     before(:each) { run_texdoc "--version" }
     before(:each) { stop_all_commands }
 
     it do
-      expect(last_command_started).to be_successfully_executed
       expect(stdout).to eq version_text
+      expect(last_command_started).to be_successfully_executed
     end
   end
 
@@ -35,8 +35,8 @@ RSpec.describe "Showing version", :type => :aruba do
     before(:each) { stop_all_commands }
 
     it do
-      expect(last_command_started).to be_successfully_executed
       expect(stdout).to eq version_text
+      expect(last_command_started).to be_successfully_executed
     end
   end
 
@@ -45,8 +45,8 @@ RSpec.describe "Showing version", :type => :aruba do
     before(:each) { stop_all_commands }
 
     it do
-      expect(last_command_started).to be_successfully_executed
       expect(stdout).to eq version_text
+      expect(last_command_started).to be_successfully_executed
     end
   end
 end

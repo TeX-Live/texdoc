@@ -5,7 +5,8 @@ RSpec.configure do |c|
   c.include Helplers
 end
 
-RSpec.describe "Showing help", :type => :aruba do
+RSpec.describe 'The "help" action', :type => :aruba do
+  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
   let(:help_text) do
     <<~EXPECTED
       Usage: texdoc [OPTION...] NAME...
@@ -46,15 +47,14 @@ RSpec.describe "Showing help", :type => :aruba do
   end
 
   before(:all) { set_default_env }
-  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
 
   context "with --help" do
     before(:each) { run_texdoc "--help" }
     before(:each) { stop_all_commands }
 
     it do
-      expect(last_command_started).to be_successfully_executed
       expect(stdout).to eq help_text
+      expect(last_command_started).to be_successfully_executed
     end
   end
 
@@ -63,8 +63,8 @@ RSpec.describe "Showing help", :type => :aruba do
     before(:each) { stop_all_commands }
 
     it do
-      expect(last_command_started).to be_successfully_executed
       expect(stdout).to eq help_text
+      expect(last_command_started).to be_successfully_executed
     end
   end
 
@@ -73,8 +73,8 @@ RSpec.describe "Showing help", :type => :aruba do
     before(:each) { stop_all_commands }
 
     it do
-      expect(last_command_started).to be_successfully_executed
       expect(stdout).to eq help_text
+      expect(last_command_started).to be_successfully_executed
     end
   end
 end

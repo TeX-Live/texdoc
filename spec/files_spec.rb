@@ -5,7 +5,7 @@ RSpec.configure do |c|
   c.include Helplers
 end
 
-RSpec.describe "Showing files", :type => :aruba do
+RSpec.describe 'The "files" action', :type => :aruba do
   before(:all) { set_default_env }
 
   context "with --files" do

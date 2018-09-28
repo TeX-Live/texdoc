@@ -6,28 +6,34 @@ RSpec.configure do |c|
 end
 
 RSpec.describe "Fuzzy search", :type => :aruba do
+  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
   before(:all) { set_default_env }
-  let(:stderr) { last_command_started.stderr }
 
-  context "should not be performed if user input is right" do
+  context "if user input is right" do
     before(:each) { run_texdoc "-v", "texlive-en" }
     before(:each) { stop_all_commands }
 
-    it { expect(stderr).not_to include(info_line "Fuzzy search result: ") }
+    it "should not be performed" do
+      expect(stderr).not_to include(info_line "Fuzzy search result: ")
+    end
   end
 
-  context "should be performed if fuzzy_level > 0" do
+  context "if fuzzy_level > 0" do
     before(:each) { run_texdoc "-v -c fuzzy_level=1", "texlive-ex" }
     before(:each) { stop_all_commands }
 
-    it { expect(stderr).to include(info_line "Fuzzy search result: ") }
+    it "should be performed" do
+      expect(stderr).to include(info_line "Fuzzy search result: ")
+    end
   end
 
-  context "should not be performed if fuzzy_level = 0" do
+  context "if fuzzy_level = 0" do
     before(:each) { run_texdoc "-v -c fuzzy_level=0", "texlive-ex" }
     before(:each) { stop_all_commands }
 
-    it { expect(stderr).not_to include(info_line "Fuzzy search result: ") }
+    it "should not be performed" do
+      expect(stderr).not_to include(info_line "Fuzzy search result: ")
+    end
   end
 
   # TODO: check fuzzy search deliver the correct results

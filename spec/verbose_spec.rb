@@ -6,17 +6,20 @@ RSpec.configure do |c|
 end
 
 RSpec.describe "Verbose outputs", :type => :aruba do
-  before(:all) { set_default_env }
   let(:stderr) { last_command_started.stderr.gsub("\r", "") }
 
-  context 'ordinally show "view command" and "setting env"' do
-    before(:each) { run_texdoc "-v", "texdoc" }
+  before(:all) { set_default_env }
+
+  context "with normal input" do
+    before(:each) { run_texdoc "-v", "texlive-en" }
     before(:each) { stop_all_commands }
 
-    it do
+    it 'should include "view command" and "env" info' do
+      info_viewcmd = info_line "View command: .+"
+      info_env = info_line "Setting environment LC_CTYPE to: .+"
+      expect(stderr).to match(Regexp.new(
+        "^" + info_viewcmd + '\n' + info_env + '\Z'))
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to match(
-        /^texdoc info: View command: .+\ntexdoc info: Setting environment LC_CTYPE to: .+\Z/)
     end
   end
 end

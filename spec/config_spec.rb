@@ -6,7 +6,8 @@ RSpec.configure do |c|
   c.include Helplers
 end
 
-RSpec.describe "Running Texdoc", :type => :aruba do
+RSpec.describe "Configuration", :type => :aruba do
+  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
   let(:sample) { "texlive-en" }
   let(:defaults) do
     [
@@ -27,13 +28,12 @@ RSpec.describe "Running Texdoc", :type => :aruba do
   end
 
   before(:all) { set_default_env }
-  let(:stderr) { last_command_started.stderr }
 
-  context "the simplest case" do
+  context "the default behavior" do
     before(:each) { run_texdoc "-D", sample }
     before(:each) { stop_all_commands }
 
-    it "configuration should set from built-in defaults at the first place" do
+    it "most items should be set from built-in defaults" do
       defaults.each do |config|
         expect(stderr).to include(
           debug_line "config", "Setting \"#{config}\" from built-in defaults.")
@@ -41,7 +41,7 @@ RSpec.describe "Running Texdoc", :type => :aruba do
     end
 
     if not OS.windows?
-      it "set lang from the OS locale (except Windows)" do
+      it 'item "lang" should be set from the OS locale (except Windows)' do
         expect(stderr).to include(
           debug_line "config", "Setting \"lang=en\" from operating system locale.")
       end
