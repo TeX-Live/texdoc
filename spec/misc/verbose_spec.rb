@@ -6,6 +6,8 @@ RSpec.configure do |c|
 end
 
 RSpec.describe "Verbose outputs", :type => :aruba do
+  include_context "messages"
+
   let(:stderr) { last_command_started.stderr.gsub("\r", "") }
 
   before(:all) { set_default_env }

@@ -1,5 +1,6 @@
 require 'aruba/rspec'
 require 'pathname'
+require 'fileutils'
 
 module Helplers
   # constants
@@ -35,22 +36,5 @@ module Helplers
       "PAGER", "BROWSER", "DVIVIEWER", "PSVIEWER", "PDFVIEWER", "MDVIEWER"
     ]
     viewer_list.each { |v| ENV[v + "_texdoc"] = ":" }
-  end
-
-  # generate message lines
-  def error_line(msg)
-    return "texdoc error: #{msg}"
-  end
-
-  def info_line(msg)
-    return "texdoc info: #{msg}"
-  end
-
-  def debug_line(cat, msg="")
-    if msg.empty?
-      return "texdoc debug-#{cat}:"
-    else
-      return "texdoc debug-#{cat}: #{msg}"
-    end
   end
 end

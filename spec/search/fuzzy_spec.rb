@@ -6,7 +6,10 @@ RSpec.configure do |c|
 end
 
 RSpec.describe "Fuzzy search", :type => :aruba do
+  include_context "messages"
+
   let(:stderr) { last_command_started.stderr.gsub("\r", "") }
+
   before(:all) { set_default_env }
 
   context "if user input is right" do

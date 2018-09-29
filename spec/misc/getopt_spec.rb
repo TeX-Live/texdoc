@@ -6,6 +6,8 @@ RSpec.configure do |c|
 end
 
 RSpec.describe "The command line option parser", :type => :aruba do
+  include_context "messages"
+
   def set_cmo_line(config, opt)
     debug_line "config",
       "Setting \"#{config}\" from command line option \"#{opt}\"."
