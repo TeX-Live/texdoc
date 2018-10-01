@@ -1,0 +1,61 @@
+require 'spec_helper'
+require 'texdoc_helper'
+
+RSpec.configure do |c|
+  c.include Helplers
+end
+
+RSpec.describe 'The "list" mode', :type => :aruba do
+  include_context "messages"
+
+  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
+  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
+
+  before(:all) { set_default_env }
+
+  context "with -I" do
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+    before(:each) { stop_all_commands }
+
+    it "should show the result list without interaction" do
+      expect(stdout).to match(/^ 1 .+\n 2 .+$/)
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
+
+  context "when RET is typed" do
+    before(:each) { run_texdoc "-dconfig", "-vl", "texlive-en" }
+    before(:each) { type "" }
+    before(:each) { stop_all_commands }
+
+    it "should view the first item in the list" do
+      first_item = stdout[/^ 1 (.*)$/, 1]
+      expect(stderr).to include(info_line "View command: : \"#{first_item}\"")
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
+
+  context 'when "1" is typed' do
+    before(:each) { run_texdoc "-dconfig", "-vl", "texlive-en" }
+    before(:each) { type "1" }
+    before(:each) { stop_all_commands }
+
+    it "should view the first item in the list" do
+      first_item = stdout[/^ 1 (.*)$/, 1]
+      expect(stderr).to include(info_line "View command: : \"#{first_item}\"")
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
+
+  context 'when "2" is typed' do
+    before(:each) { run_texdoc "-dconfig", "-vl", "texlive-en" }
+    before(:each) { type "2" }
+    before(:each) { stop_all_commands }
+
+    it "should view the second item in the list" do
+      second_item = stdout[/^ 2 (.*)$/, 1]
+      expect(stderr).to include(info_line "View command: : \"#{second_item}\"")
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
+end
