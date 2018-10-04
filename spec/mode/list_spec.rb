@@ -14,7 +14,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
   before(:all) { set_default_env }
 
   context "with -I" do
-    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+    before(:each) { run_texdoc "-lI", "texlive-en" }
     before(:each) { stop_all_commands }
 
     it "should show the result list without interaction" do
@@ -23,8 +23,18 @@ RSpec.describe 'The "list" mode', :type => :aruba do
     end
   end
 
+  context "with -M" do
+    before(:each) { run_texdoc "-lM", "texlive-en" }
+    before(:each) { stop_all_commands }
+  
+    it "should show the machine-readable list without interaction" do
+      expect(stdout).to match(/^texlive-en\t\d(|\.\d)\t.+$/)
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
+
   context "when RET is typed" do
-    before(:each) { run_texdoc "-dconfig", "-vl", "texlive-en" }
+    before(:each) { run_texdoc "-vl", "texlive-en" }
     before(:each) { type "" }
     before(:each) { stop_all_commands }
 
@@ -36,7 +46,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
   end
 
   context 'when "1" is typed' do
-    before(:each) { run_texdoc "-dconfig", "-vl", "texlive-en" }
+    before(:each) { run_texdoc "-vl", "texlive-en" }
     before(:each) { type "1" }
     before(:each) { stop_all_commands }
 
@@ -48,7 +58,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
   end
 
   context 'when "2" is typed' do
-    before(:each) { run_texdoc "-dconfig", "-vl", "texlive-en" }
+    before(:each) { run_texdoc "-vl", "texlive-en" }
     before(:each) { type "2" }
     before(:each) { stop_all_commands }
 
