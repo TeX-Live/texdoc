@@ -6,7 +6,8 @@ RSpec.configure do |c|
 end
 
 RSpec.describe 'The "help" action', :type => :aruba do
-  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
+  include_context "messages"
+
   let(:help_text) do
     <<~EXPECTED
       Usage: texdoc [OPTION...] NAME...

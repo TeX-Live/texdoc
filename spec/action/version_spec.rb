@@ -6,7 +6,8 @@ RSpec.configure do |c|
 end
 
 RSpec.describe 'The "version" action', :type => :aruba do
-  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
+  include_context "messages"
+
   let(:version) { "3.0" }
   let(:version_text) do
     <<~EXPECTED

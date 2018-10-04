@@ -8,8 +8,6 @@ end
 RSpec.describe 'The "view" mode', :type => :aruba do
   include_context "messages"
 
-  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
-
   before(:all) { set_default_env }
 
   context "with normal input" do

@@ -8,7 +8,6 @@ end
 RSpec.describe "Errors", :type => :aruba do
   include_context "messages"
 
-  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
   let(:nonexist_pkg) { "never_never_existing_package_foooooooooo" }
   let(:msg_not_found) do
     <<~EXPECTED

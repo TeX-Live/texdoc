@@ -9,7 +9,6 @@ end
 RSpec.describe "General configuration", :type => :aruba do
   include_context "messages"
 
-  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
   let(:sample) { "texlive-en" }
   let(:defaults) do
     [

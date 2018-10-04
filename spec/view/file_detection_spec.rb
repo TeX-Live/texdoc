@@ -9,8 +9,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
   include_context "messages"
   include_context "sample_files"
 
-  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
-
   before(:all) { set_default_env }
 
   context "File *.html" do

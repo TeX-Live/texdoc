@@ -17,7 +17,6 @@ RSpec.describe "The command line option parser", :type => :aruba do
       "Ignoring \"#{config}\" from command line option \"#{opt}\"."
   end
 
-  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
   let(:sample) { "texlive-en" }
 
   before(:all) { set_default_env }

@@ -1,4 +1,9 @@
 shared_context "messages" do
+  # the aliases to access outputs
+  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
+  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
+
+  # functions for output line genaration
   def error_line msg
     return "texdoc error: #{msg}"
   end

@@ -8,9 +8,6 @@ end
 RSpec.describe 'The "list" mode', :type => :aruba do
   include_context "messages"
 
-  let(:stdout) { last_command_started.stdout.gsub("\r", "") }
-  let(:stderr) { last_command_started.stderr.gsub("\r", "") }
-
   before(:all) { set_default_env }
 
   context "with -I" do
