@@ -1,14 +1,7 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe "Fuzzy search", :type => :aruba do
   include_context "messages"
-
-  before(:all) { set_default_env }
 
   context "if user input is right" do
     before(:each) { run_texdoc "-v", "texlive-en" }

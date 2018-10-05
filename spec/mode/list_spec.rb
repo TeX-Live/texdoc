@@ -1,18 +1,10 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe 'The "list" mode', :type => :aruba do
   include_context "messages"
 
-  before(:all) { set_default_env }
-
   context "with -I" do
     before(:each) { run_texdoc "-lI", "texlive-en" }
-    before(:each) { stop_all_commands }
 
     it "should show the result list without interaction" do
       expect(stdout).to match(/^ 1 .+\n 2 .+$/)
@@ -22,7 +14,6 @@ RSpec.describe 'The "list" mode', :type => :aruba do
 
   context "with -M" do
     before(:each) { run_texdoc "-lM", "texlive-en" }
-    before(:each) { stop_all_commands }
   
     it "should show the machine-readable list without interaction" do
       expect(stdout).to match(/^texlive-en\t\d(|\.\d)\t.+$/)
@@ -31,7 +22,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
   end
 
   context "when RET is typed" do
-    before(:each) { run_texdoc "-vl", "texlive-en" }
+    before(:each) { run_texdoc "-vl", "texlive-en", interactive: true }
     before(:each) { type "" }
     before(:each) { stop_all_commands }
 
@@ -43,7 +34,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
   end
 
   context 'when "1" is typed' do
-    before(:each) { run_texdoc "-vl", "texlive-en" }
+    before(:each) { run_texdoc "-vl", "texlive-en", interactive: true }
     before(:each) { type "1" }
     before(:each) { stop_all_commands }
 
@@ -55,7 +46,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
   end
 
   context 'when "2" is typed' do
-    before(:each) { run_texdoc "-vl", "texlive-en" }
+    before(:each) { run_texdoc "-vl", "texlive-en", interactive: true }
     before(:each) { type "2" }
     before(:each) { stop_all_commands }
 

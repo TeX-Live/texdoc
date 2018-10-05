@@ -1,20 +1,12 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe 'The "view" mode', :type => :aruba do
   include_context "messages"
 
-  before(:all) { set_default_env }
-
   context "with normal input" do
-    it 'should open a file without interaction' do
-      run_texdoc "-dconfig", "-wv", "texlive-en"
-      stop_all_commands
+    before(:each) { run_texdoc "-dconfig", "-wv", "texlive-en" }
 
+    it 'should open a file without interaction' do
       expect(stderr).to include(info_line "View command: ")
       expect(last_command_started).to be_successfully_executed
     end

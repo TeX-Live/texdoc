@@ -1,9 +1,4 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe "The command line option parser", :type => :aruba do
   include_context "messages"
@@ -18,8 +13,6 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   let(:sample) { "texlive-en" }
-
-  before(:all) { set_default_env }
 
   context "with an argument" do
     before(:each) { run_texdoc sample }

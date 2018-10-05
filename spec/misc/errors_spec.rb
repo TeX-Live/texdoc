@@ -1,9 +1,4 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe "Errors", :type => :aruba do
   include_context "messages"
@@ -19,8 +14,6 @@ RSpec.describe "Errors", :type => :aruba do
   let(:msg_usage) do
     "Try `texdoc --help' for short help, `texdoc texdoc' for full manual."
   end
-
-  before(:all) { set_default_env }
 
   context "running without any option nor argument" do
     before(:each) { run_texdoc }

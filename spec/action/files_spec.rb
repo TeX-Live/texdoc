@@ -1,13 +1,6 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe 'The "files" action', :type => :aruba do
-  before(:all) { set_default_env }
-
   context "with --files" do
     before(:each) { run_texdoc "--files" }
     before(:each) { stop_all_commands }

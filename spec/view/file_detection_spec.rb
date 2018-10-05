@@ -1,21 +1,13 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe "File detection for viewing", :type => :aruba do
   include_context "messages"
   include_context "sample_files"
 
-  before(:all) { set_default_env }
-
   context "File *.html" do
     before(:each) do
       sample_html = cleate_sample_file "html"
       run_texdoc "-dview --just-view", sample_html
-      stop_all_commands
     end
 
     it "should be opened with the viewer_html" do
@@ -29,7 +21,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_htm = cleate_sample_file "htm"
       run_texdoc "-dview --just-view", sample_htm
-      stop_all_commands
     end
 
     it "should be opened with the viewer_html" do
@@ -43,7 +34,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_dvi = cleate_sample_file "dvi"
       run_texdoc "-dview --just-view", sample_dvi
-      stop_all_commands
     end
 
     it "should be opened with the viewer_dvi" do
@@ -57,7 +47,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_md = cleate_sample_file "md"
       run_texdoc "-dview --just-view", sample_md
-      stop_all_commands
     end
 
     it "should be opened with the viewer_md" do
@@ -71,7 +60,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_txt = cleate_sample_file "txt"
       run_texdoc "-dview --just-view", sample_txt
-      stop_all_commands
     end
 
     it "should be opened with the viewer_txt" do
@@ -85,7 +73,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_pdf = cleate_sample_file "pdf"
       run_texdoc "-dview --just-view", sample_pdf
-      stop_all_commands
     end
 
     it "should be opened with the viewer_pdf" do
@@ -99,7 +86,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_ps = cleate_sample_file "ps"
       run_texdoc "-dview --just-view", sample_ps
-      stop_all_commands
     end
 
     it "should be opened with the viewer_ps" do
@@ -113,7 +99,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     before(:each) do
       sample_tex = cleate_sample_file "tex"
       run_texdoc "-dview --just-view", sample_tex
-      stop_all_commands
     end
 
     it "should be opened with the viewer_txt (fallback)" do

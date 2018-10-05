@@ -1,9 +1,4 @@
 require 'spec_helper'
-require 'texdoc_helper'
-
-RSpec.configure do |c|
-  c.include Helplers
-end
 
 RSpec.describe 'The "help" action', :type => :aruba do
   include_context "messages"
@@ -46,8 +41,6 @@ RSpec.describe 'The "help" action', :type => :aruba do
       Please email bugs to <texdoc@tug.org>.
     EXPECTED
   end
-
-  before(:all) { set_default_env }
 
   context "with --help" do
     before(:each) { run_texdoc "--help" }
