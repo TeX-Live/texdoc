@@ -56,4 +56,15 @@ RSpec.describe 'The "list" mode', :type => :aruba do
       expect(last_command_started).to be_successfully_executed
     end
   end
+
+  context 'when "x" is typed' do
+    before(:each) { run_texdoc "-vl", "texlive-en", interactive: true }
+    before(:each) { type "x" }
+    before(:each) { stop_all_commands }
+
+    it "should exit without viewing" do
+      expect(stderr).not_to include(info_line "View command: ")
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
 end

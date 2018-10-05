@@ -4,7 +4,7 @@ RSpec.describe 'The "view" mode', :type => :aruba do
   include_context "messages"
 
   context "with normal input" do
-    before(:each) { run_texdoc "-dconfig", "-wv", "texlive-en" }
+    before(:each) { run_texdoc "-wv", "texlive-en" }
 
     it 'should open a file without interaction' do
       expect(stderr).to include(info_line "View command: ")
