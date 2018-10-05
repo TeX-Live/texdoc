@@ -78,10 +78,10 @@ Following will run all tests in `spec/` directory.
 $ rake test
 ```
 
-Alternatively, you can give spec names with the `--list` (`-l`) option for this task. E.g., following will run only `help_spec.rb` and `version_spec.rb`:
+Alternatively, you can give spec names with the `--list` (`-l`) option for this task. E.g., following will run only `spec/action/help_spec.rb` and `spec/mode/list_spec.rb`:
 
 ```
-$ rake test -- -l help,version
+$ rake test -- -l action/help,mode/list
 ```
 
 ### Showing all available tasks
