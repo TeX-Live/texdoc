@@ -6,9 +6,9 @@ RSpec.describe "Errors", :type => :aruba do
   let(:nonexist_pkg) { "never_never_existing_package_foooooooooo" }
   let(:msg_not_found) do
     <<~EXPECTED
-      Sorry, no documentation found for #{nonexist_pkg}.
-      If you are unsure about the name, try searching CTAN's TeX catalogue at
-      https://ctan.org/search.html#byDescription.
+      Sorry, no documentation found for "#{nonexist_pkg}".
+      If you are unsure about the name, try full-text searching on CTAN.
+      Search form: <https://www.ctan.org/search/>
     EXPECTED
   end
   let(:msg_usage) do

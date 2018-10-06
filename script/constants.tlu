@@ -63,7 +63,7 @@ Please email bugs to <texdoc@tug.org>.]]
 
 copyright_msg = [[
 Copyright 2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.]]
 
 actions_ph = 'Actions:\n'
@@ -94,9 +94,9 @@ error_msg = [[
 Try `texdoc --help' for short help, `texdoc texdoc' for full manual.]]
 
 notfound_msg = [[
-Sorry, no documentation found for PKGNAME.
-If you are unsure about the name, try searching CTAN's TeX catalogue at
-https://ctan.org/search.html#byDescription.]]
+Sorry, no documentation found for "PKGNAME".
+If you are unsure about the name, try full-text searching on CTAN.
+Search form: <https://www.ctan.org/search/>]]
 notfound_msg_ph = 'PKGNAME'
 
 -- exit codes
