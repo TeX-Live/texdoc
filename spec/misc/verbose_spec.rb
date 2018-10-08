@@ -5,7 +5,6 @@ RSpec.describe "Verbose outputs", :type => :aruba do
 
   context "with normal input" do
     before(:each) { run_texdoc "-v", "texlive-en" }
-    before(:each) { stop_all_commands }
 
     it 'should include "view command" and "env" info' do
       info_viewcmd = info_line "View command: .+"

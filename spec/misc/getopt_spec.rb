@@ -12,18 +12,14 @@ RSpec.describe "The command line option parser", :type => :aruba do
       "Ignoring \"#{config}\" from command line option \"#{opt}\"."
   end
 
-  let(:sample) { "texlive-en" }
-
   context "with an argument" do
-    before(:each) { run_texdoc sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "texlive-en" }
 
     it { expect(last_command_started).to be_successfully_executed }
   end
 
   context "with -D" do
-    before(:each) { run_texdoc "-D", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-D", "texlive-en" }
 
     it "should activate all debug items" do
       expect(last_command_started).to be_successfully_executed
@@ -32,8 +28,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with --debug" do
-    before(:each) { run_texdoc "--debug", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "--debug", "texlive-en" }
 
     it "should activate all debug items" do
       expect(last_command_started).to be_successfully_executed
@@ -42,8 +37,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with -dconfig" do
-    before(:each) { run_texdoc "-dconfig", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-dconfig", "texlive-en" }
 
     it 'should activate only debug item "config"' do
       expect(last_command_started).to be_successfully_executed
@@ -52,8 +46,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with --debug=config" do
-    before(:each) { run_texdoc "--debug=config", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "--debug=config", "texlive-en" }
 
     it 'should activate only debug item "config"' do
       expect(last_command_started).to be_successfully_executed
@@ -62,8 +55,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with -dconfig -lIv" do
-    before(:each) { run_texdoc "-dconfig", "-lIv", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-dconfig", "-lIv", "texlive-en" }
 
     it "all specified options should effective" do
       expect(last_command_started).to be_successfully_executed
@@ -75,8 +67,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with -dconfig -wmls" do
-    before(:each) { run_texdoc "-dconfig", "-wmls", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-dconfig", "-wmls", "texlive-en" }
 
     it "only -w should effective and others should not" do
       expect(last_command_started).to be_successfully_executed
@@ -88,8 +79,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with -D -Mdconfig" do
-    before(:each) { run_texdoc "-D", "-Mdconfig", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-D", "-Mdconfig", "texlive-en" }
 
     it "-w and -M should effective, and -d should not" do
       expect(last_command_started).to be_successfully_executed
@@ -100,8 +90,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   end
 
   context "with -D -c fuzzy_level=0 -qv" do
-    before(:each) { run_texdoc "-D", "-c fuzzy_level=0", "-qv", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-D", "-c fuzzy_level=0", "-qv", "texlive-en" }
 
     it "-c and -q should effective, and -v should not" do
       expect(last_command_started).to be_successfully_executed

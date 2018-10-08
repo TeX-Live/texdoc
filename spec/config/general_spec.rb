@@ -4,11 +4,8 @@ require 'spec_helper'
 RSpec.describe "General configuration", :type => :aruba do
   include_context "messages"
 
-  let(:sample) { "texlive-en" }
-
   context "the default behavior" do
-    before(:each) { run_texdoc "-D", sample }
-    before(:each) { stop_all_commands }
+    before(:each) { run_texdoc "-D", "texlive-en" }
 
     it "most items should be set from built-in defaults" do
       defaults = [

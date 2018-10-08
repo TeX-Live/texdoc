@@ -3,21 +3,14 @@ require 'spec_helper'
 RSpec.describe "Errors", :type => :aruba do
   include_context "messages"
 
-  let(:nonexist_pkg) { "never_never_existing_package_foooooooooo" }
-  let(:msg_not_found) do
+  let(:msg_usage) {
     <<~EXPECTED
-      Sorry, no documentation found for "#{nonexist_pkg}".
-      If you are unsure about the name, try full-text searching on CTAN.
-      Search form: <https://www.ctan.org/search/>
+      Try `texdoc --help' for short help, `texdoc texdoc' for full manual.
     EXPECTED
-  end
-  let(:msg_usage) do
-    "Try `texdoc --help' for short help, `texdoc texdoc' for full manual."
-  end
+  }
 
   context "running without any option nor argument" do
     before(:each) { run_texdoc }
-    before(:each) { stop_all_commands }
 
     it 'result in the "no action" error' do
       expect(last_command_started).to have_exit_status(2)
@@ -28,7 +21,6 @@ RSpec.describe "Errors", :type => :aruba do
 
   context 'execute action the "just view" without an argument' do
     before(:each) { run_texdoc "--just-view" }
-    before(:each) { stop_all_commands }
 
     it 'result in the "missing file operand" error' do
       expect(last_command_started).to have_exit_status(2)
@@ -38,11 +30,18 @@ RSpec.describe "Errors", :type => :aruba do
   end
 
   context "when any document for input cannot be found" do
+    let(:nonexist_pkg) { "never_never_existing_package_foooooooooo" }
+
     before(:each) { run_texdoc nonexist_pkg }
-    before(:each) { stop_all_commands }
 
     it 'result in the "not found" error' do
-      expect(stderr).to include(msg_not_found)
+      expect(stderr).to include(
+        <<~EXPECTED
+          Sorry, no documentation found for "#{nonexist_pkg}".
+          If you are unsure about the name, try full-text searching on CTAN.
+          Search form: <https://www.ctan.org/search/>
+        EXPECTED
+      )
       expect(last_command_started).to have_exit_status(3)
     end
   end
