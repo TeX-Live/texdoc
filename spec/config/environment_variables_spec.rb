@@ -155,4 +155,18 @@ RSpec.describe "Environment variable", :type => :aruba do
   # NOTE: We skip some examples on Windows because Aruba has a bug with
   #       the "delete_environment_variable" method on the platform.
   #       cf. https://github.com/cucumber/aruba/issues/349
+
+  context "TEXDOCS" do
+    before(:each) { set_environment_variable "TEXDOCS", "test1,!!test2//" }
+    before(:each) { run_texdoc "-dtexdocs", "texlive-en" }
+
+    it "should be effective" do
+      expect(stderr).to include(
+        debug_line "texdocs",
+          "texdocs[2] = test1 (index_mandatory=false, recursion_allowed=false)")
+      expect(stderr).to include(
+        debug_line "texdocs",
+          "texdocs[1] = test2 (index_mandatory=true, recursion_allowed=true)")
+    end
+  end
 end
