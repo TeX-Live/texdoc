@@ -169,4 +169,18 @@ RSpec.describe "Environment variable", :type => :aruba do
           "texdocs[1] = test2 (index_mandatory=true, recursion_allowed=true)")
     end
   end
+
+  if OS.windows?
+    # TODO: support locale on Windows
+  else
+    context "LC_ALL" do
+      before(:each) { set_environment_variable "LC_ALL", "ja_JP.UTF-8" }
+      before(:each) { run_texdoc "-dconfig", "texlive-en" }
+
+      it "should be effective" do
+        expect(stderr).to include(
+          debug_line "config", 'Setting "lang=ja" from operating system locale.')
+      end
+    end
+  end
 end
