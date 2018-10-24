@@ -193,6 +193,9 @@ adjscore(babel-german) ngermanb.pdf = +5
 # prioritize man page
 adjscore(findhyph) findhyph.man1 = +5
 
+# prioritize official latex-tools
+adjscore(layout) /tools/ = +1
+
 # Aliases
 # =======
 
