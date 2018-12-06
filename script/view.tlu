@@ -152,15 +152,14 @@ function print_menu(name, doclist, showall)
     local max_lines = tonumber(config.max_lines)
     if config.interact_switch and doclist[max_lines + 1] then
         -- there may be too many lines, count them
-        local n
-        if showall then
-            n = #doclist
-        else
-            n = 0
-            while doclist[n + 1] and doclist[n + 1].quality == 'good' do
+        local n = 0
+        for _, doc in pairs(doclist) do
+            if doc.quality == 'good' or
+                    (showall and doc.quality ~= 'killed') then
                 n = n + 1
             end
         end
+
         if n > max_lines then
             io.write(n, ' results. Display them all? (y/N) ')
             local ans = io.read('*line')
