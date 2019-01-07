@@ -387,6 +387,7 @@ alias afoot = arabtex-doc
 alias arabicfont = bezos
 alias bibtex = btxdoc
 alias changes = changes.english.pdf
+alias cm = cm/README
 alias(5) cmsuper = cm-super/FAQ
 alias cm-super = cm-super/README
 alias cmsuper = cm-super/README
