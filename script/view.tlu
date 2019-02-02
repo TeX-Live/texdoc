@@ -53,7 +53,9 @@ function view_file(filename)
             os.exit(C.exit_error)
         end
 
-        viewer_replacement = tmpfile .. '; ' .. config.rm_file .. ' ' ..
+        -- it is necessary to sleep a few secounds. Otherwise, the temporary
+        -- file could be removed before opening it.
+        viewer_replacement = tmpfile .. '; sleep 2; ' .. config.rm_file .. ' ' ..
             tmpfile .. '; ' .. config.rm_dir .. ' ' .. tmpdir
         filename = nozipname
     else

@@ -415,9 +415,7 @@ do local de_viewer
 function guess_viewer(cmds)
     -- try the freedesktop method
     if is_in_path('xdg-open') then
-        -- it is necessary to sleep a few secounds. Otherwise, the temporary
-        -- file could be removed before opening it.
-        return '(xdg-open %s) & ; sleep 2'
+        return '(xdg-open %s) &'
     end
     -- try desktop environment
     if not de_viewer then de_viewer = desktop_environment_viewer() end
