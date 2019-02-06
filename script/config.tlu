@@ -431,16 +431,18 @@ end
 -- doesn't work on windows (uses io.popen)
 -- logic stolen from xdg-open (http://www.freedesktop.org/) and adapted
 function desktop_environment_viewer()
-    if os.getenv('KDE_SESSION_VERSION') and is_in_path('kde-open') then
-        return '(kde-open %s) &'                    -- kde 4 (or greater)
+    local xdg_current_desktop = os.getenv('XDG_CURRENT_DESKTOP') or ''
+    if (os.getenv('KDE_SESSION_VERSION') or os.getenv('KDE_FULL_SESSION'))
+        or string.match(xdg_current_desktop, '.*KDE.*') then
+        if is_in_path('kde-open') then return '(kde-open %s) &' end
+        if is_in_path('kfmclient') then return '(kfmclient exec %s) &' end
     end
-    if os.getenv('KDE_FULL_SESSION') and is_in_path('kfmclient') then
-        return '(kfmclient exec %s) &'              -- kde < 4
-    end
-    if os.getenv('GNOME_DESKTOP_SESSION_ID') then   -- gnome
+    if os.getenv('GNOME_DESKTOP_SESSION_ID')
+        or string.match(xdg_current_desktop, '.*GNOME.*') then   -- gnome
         if is_in_path('gvfs-open') then return '(gvfs-open %s) &' end
         if is_in_path('gnome-open') then return '(gnome-open %s) &' end
     end
+
     if not is_in_path('xprop') then return end
     local xprop_fh = io.popen('xprop -root _DT_SAVE_MODE 2>/dev/null')
     local xprop_out = xprop_fh:read('*line')
