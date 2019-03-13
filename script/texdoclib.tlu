@@ -1,7 +1,7 @@
 -- texdoclib.tlu: the texdoc library
 
 --[[
-Copyright 2008-2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and
+Copyright 2008-2019 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and
 Norbert Preining.
 
 This program is free software: you can redistribute it and/or modify it under
@@ -22,89 +22,26 @@ Previous work in the public domain:
 - Original shell script by Thomas Esser, David Aspinall, and Simon Wilkinson.
 --]]
 
-------------------------   functions for submodules   ------------------------
-
--- texdoc is divided in submodules (files). Each module is loaded in a private
--- copy of a shared environment, and can export symbols to this environments
--- by returning a table to be merge with this environment.
-
--- return a simple (not deep) copy of a table
-local function simple_copy(t)
-    local c = {}
-    for sym, val in pairs(t) do
-        c[sym] = val
-    end
-    return c
-end
-
--- initialise the shared environment with a copy of the global environment
-local prv_env = simple_copy(_G)
-if setfenv then
-    setfenv(1, prv_env)
-else
-    _ENV = prv_env
-end
-
--- import symbols from a table to the share environment
-local function import_symbols(symbols, name)
-    for sym, val in pairs(symbols) do
-        assert(val ~= nil,
-            'Internal error: ' .. name .. ' exporting undefined symbol ' ..
-            sym .. '.')
-        assert(prv_env[sym] == nil,
-            'Internal error: ' .. name .. ' exporting existing symbol ' ..
-            sym .. '.')
-        prv_env[sym] = val
-    end
-end
-
--- load a submodule of texdoc
-local function texdoc_do(name)
-    local pathname = kpse.find_file('texdoc/' .. name, 'lua')
-    assert(pathname, 'Internal error: missing submodule: ' .. name)
-    local submod
-    if setfenv then
-        submod = assert(loadfile (pathname))
-        setfenv(submod, simple_copy(prv_env))
-    else
-        local f = assert(io.open(pathname))
-        local s = f:read('*a')
-        f:close()
-        submod = assert(load(s, pathname, 'bt', simple_copy(prv_env)))
-        -- submod = assert(loadfile(pathname, 'bt', simple_copy(prv_env)))
-    end
-    local symbols = submod()
-    if symbols then import_symbols(symbols, name) end
-end
-
-------------------------   initialisation & main code   ------------------------
-
 -- pre-declare variables in the shared environment
-C = {}      -- constants
-config = {} -- configuration settings
+texdoc = {}  -- Warning: this is global table
+texdoc.config = {}
 
--- actually load the submodules now
-texdoc_do('constants')
-texdoc_do('functions')
-texdoc_do('alias')
-texdoc_do('score')
-texdoc_do('config')
-texdoc_do('search')
-texdoc_do('view')
+-- loading submodules
+local function texdoc_require(module_name)
+    local basename = 'texdoclib-' .. module_name
+    local module = require(basename)
+    texdoc[module_name] = texdoc[module_name] or module
+end
 
-return {
-    setup_config_and_alias = setup_config_and_alias,
-    read_config_file = read_config_file,
-    init_databases = init_databases,
-    print_usage = print_usage,
-    get_doclist = get_doclist,
-    deliver_results = deliver_results,
-    aliased_names = aliased_names,
-    show_config_files = show_config_files,
-    config = config,
-    view_file = view_file,
-    err_print = err_print,
-    const = C,
-}
+texdoc_require('const')
+texdoc_require('util')
+texdoc_require('alias')
+texdoc_require('score')
+texdoc_require('confutil')
+texdoc_require('search')
+texdoc_require('view')
+texdoc_require('cli')
+
+return texdoc
 
 -- vim: ft=lua:

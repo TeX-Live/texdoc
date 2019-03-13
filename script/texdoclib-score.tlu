@@ -1,15 +1,19 @@
--- score.tlu: scoring functions for texdoc
+-- texdoclib-score.tlu: scoring functions for texdoc
 --
--- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
--- see texdoclib.tlu for details
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
+
+texdoc.score = {}
+
+local dbg_print = texdoc.util.dbg_print
 
 -- shared variables
 local global_adjscore, spec_adjscore = {}, {}
+local is_exact
 
 -------------------------   configuration directives   -------------------------
 
 -- interpret a confline as a score directive or return false
-function confline_to_score(line, file, pos)
+function texdoc.score.confline_to_score(line, file, pos)
     local keyw, pat, val
     -- try global adjscore
     pat, val = string.match(line, '^adjscore%s+([%w%p]+)%s*=%s*([%d+-.]+)')
@@ -141,7 +145,7 @@ function heuristic_score(file, pat)
     end
     -- try derivatives unless pat contains a slash
     if not slash then
-        for _, suffix in ipairs(config.suffix_list) do
+        for _, suffix in ipairs(texdoc.config.suffix_list) do
             local deriv = pat..suffix
             if is_exact(file, deriv) then
                 upscore(3, 'exact match for derived pattern: ' .. deriv)
@@ -151,8 +155,8 @@ function heuristic_score(file, pat)
         end
     end
     -- if extension is bad, score becomes an epsilon
-    local ext = config.ext_list[ext_pos(file)]
-    if ext and config.badext_list_inv[ext] and score > 0 then
+    local ext = texdoc.config.ext_list[texdoc.score.ext_pos(file)]
+    if ext and texdoc.config.badext_list_inv[ext] and score > 0 then
         upscore(0.1, 'bad extension', true)
     end
     -- if basename is bad, score becomes an epsilon
@@ -169,19 +173,20 @@ function heuristic_score(file, pat)
 end
 
 -- says if file is an exact match for pat
-function is_exact(file, pat)
-    file = parse_zip(file)
+function texdoc.score.is_exact(file, pat)
+    file = texdoc.util.parse_zip(file)
     local slashes = string.gsub(pat, '[^/]+', '[^/]+')
     basename = string.match(file, slashes .. '$')
     if not basename then return nil end
     if basename == pat then return true end
-    for _, ext in ipairs(config.ext_list) do
+    for _, ext in ipairs(texdoc.config.ext_list) do
         if ext ~= '' and ext ~= '*' and basename == pat .. '.' .. ext then
             return true
         end
     end
     return false
 end
+is_exact = texdoc.score.is_exact
 
 -- says if file is an exact match for pat and the current locale
 function is_exact_locale(file, pat)
@@ -189,7 +194,7 @@ function is_exact_locale(file, pat)
         -- don't match if the pattern appears to include a language code
         return false
     end
-    local lang = config.lang
+    local lang = texdoc.config.lang
     if lang then
         return is_exact(file, pat .. '-' .. lang)
             or is_exact(file, lang .. '-' .. pat)
@@ -197,7 +202,7 @@ function is_exact_locale(file, pat)
     return false
 end
 
--- say if pat is a "subword" of str
+-- says if pat is a "subword" of str
 function is_subword(str, pat)
     local i, j = string.find(str, pat, 1, true)
     return not not (i and j
@@ -205,15 +210,15 @@ function is_subword(str, pat)
         and (j == #str or is_delim(str, j) or is_delim(str, j+1)))
 end
 
--- say if character i of str is a delimiter (punctuation)
+-- says if character i of str is a delimiter (punctuation)
 function is_delim(str, i)
     return not not string.find(string.sub(str, i, i), '%p')
 end
 
--- say if a filename has a bad basename
+-- says if a filename has a bad basename
 function has_bad_basename(file)
     file = file:gsub('.*/', '')
-    for _, b in ipairs(config.badbasename_list) do
+    for _, b in ipairs(texdoc.config.badbasename_list) do
         if file:find('^' .. b .. '$') or file:find('^' .. b .. '%.') then
             return true
         end
@@ -227,7 +232,7 @@ end
 -- 3. then lexicographically by fullpath.
 -- 4. then by tree.
 -- return true if a is better than b
-function docfile_order (a, b)
+function docfile_order(a, b)
     if     a.score > b.score       then return true
     elseif a.score < b.score       then return false
     elseif a.ext_pos < b.ext_pos   then return true
@@ -241,13 +246,13 @@ end
 -----------------------------   public functions   -----------------------------
 
 -- returns the index of the most specific extension of file in ext_list,
--- or config.ext_list_max + 1
-function ext_pos(file)
+-- or texdoc.config.ext_list_max + 1
+function texdoc.score.ext_pos(file)
     -- remove zipext if applicable
-    file = parse_zip(file)
+    file = texdoc.util.parse_zip(file)
     -- now find the extension
     local p, e, pos, ext
-    for p, e in ipairs(config.ext_list) do
+    for p, e in ipairs(texdoc.config.ext_list) do
         if (e == '*') and (ext == nil) then
             pos, ext = p, e
         elseif (e == '') and not string.find(file, '.', 1, true) then
@@ -259,11 +264,11 @@ function ext_pos(file)
             end
         end
     end
-    return pos or (config.ext_list_max + 1)
+    return pos or (texdoc.config.ext_list_max + 1)
 end
 
 -- return the "quality" of docfile
-function docfile_quality(df)
+function texdoc.score.docfile_quality(df)
     if df.score > 0 then
         return 'good'
     elseif df.score > -100 then
@@ -274,18 +279,12 @@ function docfile_quality(df)
 end
 
 -- sort a doclist
-function sort_doclist(dl, original_kw)
+function texdoc.score.sort_doclist(dl, original_kw)
     dl:stop()
     set_list_scores(dl, original_kw)
     table.sort(dl, docfile_order)
 end
 
-return {
-    sort_doclist = sort_doclist,
-    docfile_quality = docfile_quality,
-    ext_pos = ext_pos,
-    is_exact = is_exact,
-    confline_to_score = confline_to_score,
-}
+return texdoc.score
 
 -- vim: ft=lua:

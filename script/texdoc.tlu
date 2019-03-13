@@ -1,11 +1,38 @@
 #!/usr/bin/env texlua
 
--- texdoc.tlu: small wrapper around main.tlu
--- (makes it easier to install a new version of texdoc in TEXMFHOME)
+-- texdoc.tlu: the main program of Texdoc
 --
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
+-- Note: we keep this file small as much as possible so that make it easier
+--       to install a new version of texdoc in TEXMFHOME
+
+-- setup the kpse library and load texdoclib
 kpse.set_program_name(arg[-1], 'texdoc')
-require('texdoc.main')
+require('texdoclib')
+
+local C = texdoc.const
+
+-- the main function
+function main()
+    -- setup config and determine the action
+    local action = texdoc.confutil.setup_config_and_alias(arg)
+    if not action then
+        os.exit(C.exit_usage)
+    end
+
+    -- special action
+    texdoc.cli.do_action(action)
+
+    -- view action
+    texdoc.cli.check_argument()
+    texdoc.cli.do_texdoc()
+
+    -- finalize
+    os.exit(C.exit_ok)
+end
+
+-- execute
+main()
 
 -- vim: ft=lua:

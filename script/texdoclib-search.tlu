@@ -1,9 +1,15 @@
--- search.tlu: file searching functions for texdoc.
+-- texdoclib-search.tlu: file searching functions for texdoc
 --
--- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
--- see texdoclib.tlu for details
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
--- Warning: every single function here assumes init_databases() has been called.
+-- Warning: every single function here assumes texdoc.search.init_databases()
+--          has been called.
+
+texdoc.search = {}
+
+local C = texdoc.const
+local err_print = texdoc.util.err_print
+local dbg_print = texdoc.util.dbg_print
 
 -- shared by all functions in this file
 local s_doclist -- the Doclist object to be populated by various functions
@@ -183,11 +189,11 @@ function Docfile:get_matches()
 end
 
 -- from score.tlu
-Docfile.get_quality = docfile_quality
+Docfile.get_quality = texdoc.score.docfile_quality
 
 -- from score.tlu
 function Docfile:get_ext_pos()
-    return ext_pos(self.basename)
+    return texdoc.score.ext_pos(self.basename)
 end
 
 ---------------------   manage TEXDOCS trees à la kpse   ----------------------
@@ -253,7 +259,7 @@ end
 end -- scope of doc_roots
 
 -- find a ls-R file in a parent directory and return it or nil
-function lsr_root (path)
+function lsr_root(path)
     if not lfs.isdir (path) then return end
     local root, shift = path, ''
     if string.sub(root, -1) == '/' then root = string.sub(root, 1, -2) end
@@ -335,9 +341,9 @@ end
 function check_ext(file)
     file = string.lower(file)
     -- remove zipext if applicable
-    file = parse_zip(file)
+    file = texdoc.util.parse_zip(file)
     -- then do the normal thing
-    for _, e in ipairs(config.ext_list) do
+    for _, e in ipairs(texdoc.config.ext_list) do
         if e == '*' then
             return true
         elseif (e == '') then
@@ -352,7 +358,7 @@ function check_ext(file)
         end
     end
     -- is the basename good?
-    for _, b in ipairs(config.basename_list) do
+    for _, b in ipairs(texdoc.config.basename_list) do
         if file:find('^' .. b .. '$') or file:find('^' .. b .. '%.') then
             return true
         end
@@ -360,12 +366,12 @@ function check_ext(file)
     return false
 end
 
--- say if a file (with its path) matches a pattern
+-- says if a file (with its path) matches a pattern
 function matches(pattern, file)
     if pattern.original then
         return string.find(file:lower(), pattern.name:lower(), 1, true)
     else
-        return is_exact(file, pattern.name)
+        return texdoc.score.is_exact(file, pattern.name)
     end
 end
 
@@ -429,7 +435,7 @@ end
 -- make sure a given directory exists, or return nil plus an error string
 function mkdir_p(dir)
     if lfs.isdir(dir) then return true end
-    local parent = path_parent(dir)
+    local parent = texdoc.util.path_parent(dir)
     if parent then
         local ok, msg = mkdir_p(parent)
         if not ok then return nil, msg end
@@ -451,7 +457,7 @@ function init_tlp_database()
             dbg_print('tlpdb', 'Getting data from tlpdb file ' .. texlive_tlpdb)
             get_tlpinfo_from_tlpdb(texlive_tlpdb)
             dbg_print('tlpdb', 'Writing data in cache file ' .. cache_file)
-            local ok, msg = mkdir_p(path_parent(cache_file))
+            local ok, msg = mkdir_p(texdoc.util.path_parent(cache_file))
             if not ok then
                 err_print('warning',
                     'Failed to create cache file in ' .. cache_file .. ':')
@@ -541,6 +547,7 @@ end
 function print_out_tlpinfo(filename)
     local fh = assert(io.open(filename, 'w'))
     local function printf(s, ...) fh:write(string.format(s, ...)) end
+
     -- s_meta
     printf('local s_meta = {\n')
     for k, v in pairs(s_meta) do
@@ -549,6 +556,7 @@ function print_out_tlpinfo(filename)
         printf('},\n')
     end
     printf('}\n')
+
     -- tlp_from_runfile
     printf('local tlp_from_runfile = {\n')
     for k, v in pairs(tlp_from_runfile) do
@@ -557,6 +565,7 @@ function print_out_tlpinfo(filename)
         printf('},\n')
     end
     printf('}\n')
+
     -- tlp_doclist
     printf('local tlp_doclist = {\n')
     for k, v in pairs(tlp_doclist) do
@@ -566,6 +575,7 @@ function print_out_tlpinfo(filename)
     end
     printf('}\n')
     printf('return s_meta, tlp_from_runfile, tlp_doclist\n')
+
     fh:close()
 end
 
@@ -613,6 +623,24 @@ end
 
 -- fuzzy search by using Levenshtein distance
 function fuzzy_search(pattern)
+    -- calculating Levenshtein distance by dynamic programming
+    -- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
+    local function levenshtein(s, t)
+        local s, t = tostring(s), tostring(t)
+        if type(s) == 'string' and type(t) == 'string' then
+            local m, n, d = #s, #t, {}
+            for i = 0, m do d[i] = { [0] = i } end
+            for j = 1, n do d[0][j] = j end
+            for i = 1, m do
+                for j = 1, n do
+                    local cost = s:sub(i,i) == t:sub(j,j) and 0 or 1
+                    d[i][j] = math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
+                end
+            end
+            return d[m][n]
+        end
+    end
+
     local tmp_d
     local min = math.huge
     local result = ''
@@ -627,44 +655,55 @@ function fuzzy_search(pattern)
     return result, min
 end
 
--- calculate Levenshtein distance by dynamic programming
--- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
-function levenshtein(s, t)
-    local s, t = tostring(s), tostring(t)
-    if type(s) == 'string' and type(t) == 'string' then
-        local m, n, d = #s, #t, {}
-        for i = 0, m do d[i] = { [0] = i } end
-        for j = 1, n do d[0][j] = j end
-        for i = 1, m do
-            for j = 1, n do
-                local cost = s:sub(i,i) == t:sub(j,j) and 0 or 1
-                d[i][j] = math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
-            end
-        end
-        return d[m][n]
-    end
-end
 
 end --scope of tlpinfo table
 
 ------------------------------   main function   -------------------------------
 
 -- initialise the various databases (must be called first)
-function init_databases()
+function texdoc.search.init_databases()
     init_texdocs_database()
     init_tlp_database()
 end
 
 -- find docfiles according to pattern
-function get_doclist(pattern, no_alias)
+function texdoc.search.get_doclist(pattern, no_alias)
+    -- separate sty patterns from the rest
+    local function normal_vs_sty(list)
+        local normal, sty = {}, {}
+        for _, p in ipairs(list) do
+            if string.match(string.lower(p.name), '%.([^/.]*)$') == 'sty' then
+                table.insert(sty, p)
+            else
+                table.insert(normal, p)
+            end
+        end
+        return normal, sty
+    end
+
+    local function doc_search(pattern, no_alias)
+        -- get patterns (inc. aliases)
+        local patterns = texdoc.alias.get_patterns(pattern, no_alias)
+        local normal, sty = normal_vs_sty(patterns)
+
+        -- get results; _texdocs search comes after _tlpdb search so that
+        -- files found by both will have the priority of the _texdocs tree.
+        -- (https://puszcza.gnu.org.ua/bugs/?369)
+        get_doclist_sty(sty)
+        get_doclist_tlpdb(pattern)
+        get_doclist_texdocs(normal)
+    end
+
     -- initialise result list
     s_doclist = Doclist:new()
+
     -- 1. normal search with the input pattern
     doc_search(pattern, no_alias)
+
     -- 2. if no result, execute fuzzy search
-    if not s_doclist[1] and config.fuzzy_level > 0 then
+    if not s_doclist[1] and texdoc.config.fuzzy_level > 0 then
         local f_res, f_lev = fuzzy_search(pattern)
-        if f_lev <= config.fuzzy_level then
+        if f_lev <= texdoc.config.fuzzy_level then
             err_print('info', 'Fuzzy search result: ' .. f_res)
             dbg_print('search', 'Levenshtein distance: ' .. f_lev)
             pattern = f_res
@@ -674,38 +713,12 @@ function get_doclist(pattern, no_alias)
             dbg_print('search', 'Levenshtein distance: ' .. f_lev)
         end
     end
+
     -- finally, sort results
-    sort_doclist(s_doclist, pattern)
+    texdoc.score.sort_doclist(s_doclist, pattern)
     return s_doclist
 end
 
-function doc_search(pattern, no_alias)
-    -- get patterns (inc. aliases)
-    local normal, sty = normal_vs_sty(get_patterns(pattern, no_alias))
-    -- get results; _texdocs search comes after _tlpdb search so that
-    -- files found by both will have the priority of the _texdocs tree.
-    -- (https://puszcza.gnu.org.ua/bugs/?369)
-    get_doclist_sty(sty)
-    get_doclist_tlpdb(pattern)
-    get_doclist_texdocs(normal)
-end
-
--- separate sty patterns from the rest
-function normal_vs_sty(list)
-    local normal, sty = {}, {}
-    for _, p in ipairs(list) do
-        if string.match(string.lower(p.name), '%.([^/.]*)$') == 'sty' then
-            table.insert(sty, p)
-        else
-            table.insert(normal, p)
-        end
-    end
-    return normal, sty
-end
-
-return {
-    init_databases = init_databases,
-    get_doclist = get_doclist,
-}
+return texdoc.search
 
 -- vim: ft=lua:

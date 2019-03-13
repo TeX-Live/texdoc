@@ -1,46 +1,50 @@
--- functions.tlu: general-use functions for texdoc
+-- texdoclib-util.tlu: utility functions for texdoc
 --
--- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
--- see texdoclib.tlu for details
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
+
+texdoc.util = {}
+
+local C = texdoc.const
 
 -- change '/' to '\' on windows
 -- Use: internal representation of files always use forward slashes.
 -- This function should be called only before displaying a file name.
 if os.type == 'windows' then
-    function w32_path(path)
+    function texdoc.util.w32_path(path)
         return (string.gsub(path, '/', '\\'))
     end
 else
-    function w32_path(path)
+    function texdoc.util.w32_path(path)
         return path
     end
 end
 
 -- remove the last directory component of a path
 if os.type == 'windows' then
-    function path_parent(path)
+    function texdoc.util.path_parent(path)
         return string.match(path, '^(.*)[\\/]')
     end
 else
-    function path_parent(path)
+    function texdoc.util.path_parent(path)
         return string.match(path, '^(.*)/')
     end
 end
 
 -- generic error display function (see the err_priority constant)
-function err_print(lvl, msg)
-    -- be careful: maybe config.verbosity_level is not set yet
-    local verbosity_level = config.verbosity_level or tonumber(C.def_verbosity)
+function texdoc.util.err_print(lvl, msg)
+    -- be careful: maybe texdoc.config.verbosity_level is not set yet
+    local verbosity_level = texdoc.config.verbosity_level or tonumber(C.def_verbosity)
     if C.err_priority[lvl] <= verbosity_level then
         io.stderr:write('texdoc ' .. lvl .. ': ' .. msg .. '\n')
     end
 end
+local err_print = texdoc.util.err_print
 
 do --scope of active_debugs
 local active_debugs
 
 -- generic debug function
-function dbg_print(cat, msg)
+function texdoc.util.dbg_print(cat, msg)
     -- make sure active_debugs is set
     if not active_debugs then set_active_debugs() end
     -- print message it belongs to an active category
@@ -51,28 +55,28 @@ end
 
 -- set active_debugs
 function set_active_debugs()
-    if not config.debug_list then return end
+    if not texdoc.config.debug_list then return end
     active_debugs = {}
     -- all debug options imply version info
-    if config.debug_list[1] then
+    if texdoc.config.debug_list[1] then
         active_debugs.version = true
     else
         return
     end
     -- if 'all' is the first keyword, just activate all categories
-    if config.debug_list[1] == 'all' then
-        for deb in pairs(C.known_debugs) do
-            active_debugs[deb] = true end
+    if texdoc.config.debug_list[1] == 'all' then
+        for dbg in pairs(C.known_debugs) do
+            active_debugs[dbg] = true end
         return
     end
     -- activate options from the list
-    for _, deb in ipairs(config.debug_list) do
-        local deps = C.known_debugs[deb]
+    for _, dbg in ipairs(texdoc.config.debug_list) do
+        local deps = C.known_debugs[dbg]
         if deps then
-            active_debugs[deb] = true
+            active_debugs[dbg] = true
             for _, d in ipairs(deps) do active_debugs[d] = true end
         else
-            err_print('warning', 'Unknown debug category "' .. deb .. '".')
+            err_print('warning', 'Unknown debug category "' .. dbg .. '".')
         end
     end
 end
@@ -81,9 +85,9 @@ end -- scope of active_debugs
 
 -- if file is base .. '.' .. zip with zip in zipext_list, return: base, zip
 -- otherwise, return: file, nil
-function parse_zip(file) 
+function texdoc.util.parse_zip(file) 
     local zip
-    for _, zip in ipairs(config.zipext_list) do
+    for _, zip in ipairs(texdoc.config.zipext_list) do
         local l = #zip + 1
         if string.sub(file, -l, -1) == '.' .. zip then
             return string.sub(file, 1, -l - 1), zip
@@ -93,17 +97,10 @@ function parse_zip(file)
 end
 
 -- print a usage message
-function print_usage()
+function texdoc.util.print_usage()
     print(C.usage_msg)
 end
 
-return {
-    err_print = err_print,
-    dbg_print = dbg_print,
-    w32_path = w32_path,
-    parse_zip = parse_zip,
-    path_parent = path_parent,
-    print_usage = print_usage,
-}
+return texdoc.util
 
 -- vim: ft=lua:

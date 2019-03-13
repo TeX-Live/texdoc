@@ -1,4 +1,4 @@
--- constants.tlu: global "constants" for texdoc.
+-- texdoclib-consts.tlu: global constants for texdoc
 --
 -- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
 -- see texdoclib.tlu for details
@@ -8,7 +8,8 @@ local constants = {}
 local kpse = kpse
 local setfenv = setfenv
 local texdoc_env
-if setfenv then
+
+if setfenv then -- Lua <5.2
     texdoc_env = getfenv()
     setfenv(1, constants)
 else
@@ -140,16 +141,17 @@ else
     _ENV = texdoc_env
 end
 
--- Make global C a read-only proxy to the local <constants>.
+-- Make table C a read-only proxy to the local <constants>.
 -- Note this is not deep read-only: C.known_debugs is read-only, but
 -- C.known_debugs.version isn't, for instance.
-assert(next(C) == nil,
-    'Internal error: table of constants should be empty at this point')
+local C = {}
 setmetatable(C, {
     __index = constants,
     __newindew = function()
         error('Internal error: attempt to modify a constant.')
     end
 })
+
+return C
 
 -- vim: ft=lua:

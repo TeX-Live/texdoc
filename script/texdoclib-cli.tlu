@@ -1,0 +1,59 @@
+-- texdoclib-cli.tlu: command line interfaces
+--
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
+
+texdoc.cli = {}
+
+local C = texdoc.const
+local err_print = texdoc.util.err_print
+
+-- handling actions
+function texdoc.cli.do_action(action)
+    if action == 'help' then
+        texdoc.util.print_usage()
+        os.exit(C.exit_ok)
+    elseif action == 'version' then
+        print(C.progname .. ' ' .. C.version)
+        print('\n' .. C.copyright_msg)
+        os.exit(C.exit_ok)
+    elseif action == 'files' then
+        print(C.fullname .. ' ' .. C.version)
+        texdoc.confutil.show_config_files(print, true)
+        os.exit(C.exit_ok)
+    elseif action == 'view' then
+        if not arg[1] then
+            err_print('error', 'Missing file operand to --just-view.')
+            err_print('error', C.error_msg)
+            os.exit(C.exit_usage)
+        end
+        texdoc.view.view_file(arg[1])
+        os.exit(C.exit_ok)
+    end
+end
+
+-- make sure we actually have argument(s)
+function texdoc.cli.check_argument()
+    if not arg[1] then
+        err_print('error', 'No action specified.')
+        err_print('error', texdoc.const.error_msg)
+        os.exit(C.exit_usage)
+    end
+end
+
+-- the main loop
+function texdoc.cli.do_texdoc()
+    texdoc.search.init_databases()
+
+    for _, docname in ipairs(arg) do
+        -- do we have more then one argument?
+        local multiarg = not not arg[2]
+        -- get results
+        local doclist = texdoc.search.get_doclist(docname)
+        -- deliver results to the user
+        texdoc.view.deliver_results(docname, doclist, multiarg)
+    end
+end
+
+return texdoc.cli
+
+-- vim: ft=lua:

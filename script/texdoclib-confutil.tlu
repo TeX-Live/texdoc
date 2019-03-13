@@ -1,7 +1,12 @@
--- config.tlu: configuration handling for texdoc
+-- texdoclib-confutil.tlu: configuration utility functions for texdoc
 --
--- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
--- see texdoclib.tlu for details
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
+
+texdoc.confutil = {}
+
+local C = texdoc.const
+local err_print = texdoc.util.err_print
+local dbg_print = texdoc.util.dbg_print
 
 --------------------------   hide the config table   --------------------------
 
@@ -18,8 +23,7 @@ function set_read_only(table, name)
     return function(k, v) real[k] = v end
 end
 
-real_set_config = set_read_only(config, 'config')
-
+local real_set_config = set_read_only(texdoc.config, 'config')
 
 -------------------------   general config functions   ------------------------
 
@@ -35,7 +39,7 @@ function set_config_element(key, value, context)
     -- warn and exit if key is not a known option
     if not is_known then config_warn(key, nil, context, true) return end
     -- exit if key is already set (/!\ must test for nil, not false)
-    if not (config[key] == nil) then
+    if not (texdoc.config[key] == nil) then
         if context.src ~= 'def' then
             dbg_print('config',
                 'Ignoring "' .. key .. '=' .. value .. '" ' ..
@@ -103,7 +107,8 @@ function config_warn(key, value, context, unknown)
     local begin = unknown
         and 'Unknown option "' .. key .. '"'
         or 'Illegal value "' .. tostring(value) .. '" for option "' .. key .. '"'
-    err_print('warning', begin .. ' ' .. context_to_string(context) .. '.  Skipping.')
+    err_print('warning',
+        begin .. ' ' .. context_to_string(context) .. '.  Skipping.')
 end
 
 -- interpreting 'context' for the previous functions
@@ -289,8 +294,8 @@ function read_config_file(configfile)
         line = string.gsub(line, '^%s*', '')    -- remove leading spaces
         -- try to interpret the line
         local ok = string.match(line, '^%s*$') 
-        or confline_to_alias(line, configfile, lineno)
-        or confline_to_score(line, configfile, lineno)
+        or texdoc.alias.confline_to_alias(line, configfile, lineno)
+        or texdoc.score.confline_to_score(line, configfile, lineno)
         or confline_to_config(line, configfile, lineno)
         -- complain if it failed
         if not ok then
@@ -345,7 +350,7 @@ local config_files = {}
 function setup_config_from_files()
     local file_list = get_config_files()
     for i, file in ipairs(file_list) do
-        local status = config.lastfile_switch and 'disabled' or 'active'
+        local status = texdoc.config.lastfile_switch and 'disabled' or 'active'
         config_files[i] = {
             path = file,
             status = status,
@@ -357,11 +362,11 @@ function setup_config_from_files()
 end
 
 -- now a special information function (see -f,--file option)
-function show_config_files(print_fun, verbose)
+function texdoc.confutil.show_config_files(print_fun, verbose)
     local pref = verbose and '    ' or ''
     print_fun('Configuration files are:')
     for i, file in ipairs(config_files) do
-        print_fun(pref .. file.status .. '\t' .. w32_path(file.path))
+        print_fun(pref .. file.status .. '\t' .. texdoc.util.w32_path(file.path))
     end
     if verbose then
         print_fun('Recommended file(s) for personal settings:')
@@ -453,7 +458,7 @@ function desktop_environment_viewer()
 end
 
 -- set viewers from defaults (done only if necessary)
-function get_default_viewers()
+function texdoc.confutil.get_default_viewers()
     local function set_config_ls(ls) set_config_list(ls, {src='def'}) end
     if (os.type == 'windows') then
         set_config_ls {
@@ -567,7 +572,7 @@ end
 --------------------------   set all configuration   ---------------------------
 
 -- populate the config and alias arrays
-function setup_config_and_alias(arg)
+function texdoc.confutil.setup_config_and_alias(arg)
     -- setup config from all sources
     local ret = setup_config_from_cl(arg)
     setup_config_from_env()
@@ -575,24 +580,19 @@ function setup_config_and_alias(arg)
     setup_config_from_locale()
     setup_config_from_defaults()
     -- machine mode implies no interaction
-    if config.machine_switch == true then
+    if texdoc.config.machine_switch == true then
         real_set_config('interact_switch', false)
     end
     -- debug implies verbose
-    if #config.debug_list > 0 then
+    if #texdoc.config.debug_list > 0 then
         real_set_config('verbosity_level', tonumber(C.max_verbosity))
     end
     -- we were waiting for config.debug_list to be known to do this
-    show_config_files(function(s) dbg_print('files', s) end)
+    texdoc.confutil.show_config_files(function(s) dbg_print('files', s) end)
     -- propagated return value of _from_cl()
     return ret
 end
 
-return {
-    setup_config_and_alias = setup_config_and_alias,
-    get_default_viewers = get_default_viewers,
-    show_config_files = show_config_files,
-    read_config_file = read_config_file,
-}
+return texdoc.confutil
 
 -- vim: ft=lua:

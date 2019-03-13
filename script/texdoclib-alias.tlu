@@ -1,7 +1,6 @@
--- alias.tlu: configuration handling for texdoc
+-- texdoclib-alias.tlu: alias handling for texdoc
 --
--- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
--- see texdoclib.tlu for details
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
 --[[ structure of the alias table
 
@@ -15,11 +14,13 @@ aliasentry = {
   name      = <string> pattern to be matched,
   score     = <number or nil> associated score,
   original  = <true or nil> is this the original keyword?,
-  locale    = <true or nil> is this entry found via config.lang?
+  locale    = <true or nil> is this entry found via texdoc.config.lang?
 }
 score == nil means to use the default score (defined in score.tlu)
 
 --]]
+
+texdoc.alias = {}
 
 -- alias is local to this file
 local alias = {}
@@ -53,7 +54,7 @@ function stop_alias(key)
 end
 
 -- get patterns for a name
-function get_patterns(name, no_alias)
+function texdoc.alias.get_patterns(name, no_alias)
     local n = string.lower(name)
     -- get normal aliases
     local res
@@ -63,7 +64,7 @@ function get_patterns(name, no_alias)
         res = { make_alias(name, false) }
     end
     -- check for language-specific aliases
-    local lang = config.lang and alias[n .. '-' .. config.lang]
+    local lang = texdoc.config.lang and alias[n .. '-' .. texdoc.config.lang]
     if lang then
         for _, entry in ipairs(lang) do
             if not entry.original then
@@ -79,7 +80,7 @@ function get_patterns(name, no_alias)
 end
 
 -- interpret a confline as an alias setting or return false
-function confline_to_alias(line, file, pos)
+function texdoc.alias.confline_to_alias(line, file, pos)
     -- alias directive without score
     local key, val = string.match(line, '^alias%s+([%w%p]+)%s*=%s*(.+)')
     if key and val then
@@ -104,16 +105,13 @@ function confline_to_alias(line, file, pos)
 end
 
 -- iterator over the list of keys in the alias table
-function aliased_names()
+-- Note: currently this function is not used (for debug)
+function texdoc.alias.aliased_names()
     return function(_, cur)
         return (next(alias, cur))
     end
 end
 
-return {
-    confline_to_alias = confline_to_alias,
-    get_patterns = get_patterns,
-    aliased_names = aliased_names,
-}
+return texdoc.alias
 
 -- vim: ft=lua:
