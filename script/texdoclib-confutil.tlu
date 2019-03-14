@@ -29,15 +29,18 @@ local real_set_config = set_read_only(texdoc.config, 'config')
 
 -- set a config parameter, but don't overwrite it if already set
 -- three special types: *_list (list), *_switch (boolean), *_level (number)
-function set_config_element(key, value, context)
+function texdoc.confutil.set_config_element(key, value, context)
     local parse_error = false
     local is_known = false -- is key a valid option?
     local option
+
     for _, option in ipairs(C.known_options) do
         if string.match(key, '^'..option..'$') then is_known = true break end
     end
+
     -- warn and exit if key is not a known option
     if not is_known then config_warn(key, nil, context, true) return end
+
     -- exit if key is already set (/!\ must test for nil, not false)
     if not (texdoc.config[key] == nil) then
         if context.src ~= 'def' then
@@ -47,8 +50,10 @@ function set_config_element(key, value, context)
         end
         return nil
     end
+
     -- record the source of the setting
     real_set_config(key .. '_src', context.src)
+
     -- detect the type of the key
     if string.match(key, '_list$') then
         -- coma-separated list
@@ -58,6 +63,7 @@ function set_config_element(key, value, context)
         else
             values = string.explode(value, ',')
         end
+
         local inverse = {}
         for i, j in ipairs(values) do -- sanitize values...
             j = string.gsub(j, '%s*$', '')
@@ -65,6 +71,7 @@ function set_config_element(key, value, context)
             values[i] = j
             inverse[j] = i -- ... and build inverse mapping on the way
         end
+
         real_set_config(key, values)
         real_set_config(key .. '_inv', inverse)
         real_set_config(key .. '_max', #values)
@@ -90,10 +97,12 @@ function set_config_element(key, value, context)
     else -- string
         real_set_config(key, value)
     end
+
     -- special case: if we just set debug_list, print version info now
     if key == 'debug_list' then
         dbg_print('version', C.fullname .. ' version ' .. C.version)
     end
+
     -- now tell what we have just done, for debugging
     if not parse_error then
         dbg_print('config',
@@ -101,6 +110,7 @@ function set_config_element(key, value, context)
             context_to_string(context) .. '.')
     end
 end
+local set_config_element = texdoc.confutil.set_config_element
 
 -- a helper function for warning messages in the above
 function config_warn(key, value, context, unknown)
@@ -136,121 +146,15 @@ function set_config_list(conf, context)
     end
 end
 
-------------------------   options from command line   ------------------------
+------------------------   config from command line   ------------------------
 
 -- set config from the command line
--- Please make sure to update C.usage_msg accordingly
--- and set a default value in setup_config_from_defaults() if relevant.
-function setup_config_from_cl(arg)
-    local curr_arg
-    local action = true
-    local function set_config_elt(key, val)
-        set_config_element(key, val, {src='cl', name=curr_arg})
+-- Note: Please make sure to set a default value in setup_config_from_defaults()
+--       if relevant.
+function setup_config_from_cl(cl_config)
+    for _, e in ipairs(cl_config) do
+        set_config_element(e[1], e[2], {src='cl', name=e[3]})
     end
-
-    -- modified Alternative Get Opt
-    -- cf. http://lua-users.org/wiki/AlternativeGetOpt
-    local function getopt(arg, options)
-        local tmp
-        local tab = {}
-        local saved_arg = { table.unpack(arg) }
-        for k, v in ipairs(saved_arg) do
-            if string.sub(v, 1, 2) == '--' then
-                table.remove(arg, 1)
-                local x = string.find(v, '=', 1, true)
-                if x then
-                    table.insert(tab, { string.sub(v, 3, x-1), string.sub(v, x+1) })
-                else
-                    table.insert(tab, { string.sub(v, 3), true })
-                end
-            elseif string.sub(v, 1, 1) == '-' then
-                table.remove(arg, 1)
-                local y = 2
-                local l = string.len(v)
-                local jopt
-                while (y <= l) do
-                    jopt = string.sub(v, y, y)
-                    if string.find(options, jopt, 1, true) then
-                        if y < l then
-                            tmp = string.sub(v, y+1)
-                            y = l
-                        else
-                            table.remove(arg, 1)
-                            tmp = saved_arg[k + 1]
-                        end
-                        if string.match(tmp, '^%-') then
-                            table.insert(tab, { jopt, false })
-                        else
-                            table.insert(tab, { jopt, tmp })
-                        end
-                    else
-                        table.insert(tab, { jopt, true })
-                    end
-                    y = y + 1
-                end
-            end
-        end
-        return tab
-    end
-
-    opts = getopt(arg, 'cd')
-    for _, tp in ipairs(opts) do
-        k, v = tp[1], tp[2]
-        if #k == 1 then
-            curr_arg = '-' .. k
-        else
-            curr_arg = '--' .. k
-        end
-
-        -- action
-        if (curr_arg == '-h') or (curr_arg == '--help') then
-            action = 'help'
-        elseif (curr_arg == '-V') or (curr_arg == '--version') then
-            action = 'version'
-        elseif (curr_arg == '-f') or (curr_arg == '--files') then
-            action = 'files'
-        elseif curr_arg == '--just-view' then
-            action = 'view'
-        -- mode
-        elseif (curr_arg == '-w') or (curr_arg == '--view') then
-            set_config_elt('mode', 'view')
-        elseif (curr_arg == '-m') or (curr_arg == '--mixed') then
-            set_config_elt('mode', 'mixed')
-        elseif (curr_arg == '-l') or (curr_arg == '--list') then
-            set_config_elt('mode', 'list')
-        elseif (curr_arg == '-s') or (curr_arg == '--showall') then
-            set_config_elt ('mode', 'showall')
-        -- interaction
-        elseif (curr_arg == '-I') or (curr_arg == '--nointeract') then
-            set_config_elt('interact_switch', 'false')
-        elseif (curr_arg == '-i') or (curr_arg == '--interact') then
-            set_config_elt('interact_switch', 'true')
-        -- output format
-        elseif (curr_arg == '-M') or (curr_arg == '--machine') then
-            set_config_elt('machine_switch', 'true')
-        -- config
-        elseif curr_arg == '-c' then
-            local item, value = string.match(v, '^([%a%d_]+)%s*=%s*(.+)')
-            set_config_elt(item, value)
-        -- debug
-        elseif (curr_arg == '-d') or (curr_arg == '--debug') then
-            if v == true then v = 'all' end
-            set_config_elt('debug_list', v)
-        elseif curr_arg == '-D' then
-            set_config_elt('debug_list', 'all')
-        -- verbosity
-        elseif (curr_arg == '-q') or (curr_arg == '--quiet') then
-            set_config_elt('verbosity_level', C.min_verbosity)
-        elseif (curr_arg == '-v') or (curr_arg == '--verbose') then
-            set_config_elt('verbosity_level', C.max_verbosity)
-        -- problem
-        else
-            err_print('error', 'unknown option: ' .. curr_arg)
-            err_print('error', C.error_msg)
-            return false
-        end
-    end
-    return action
 end
 
 -------------------------   config from environment   --------------------------
@@ -572,25 +476,26 @@ end
 --------------------------   set all configuration   ---------------------------
 
 -- populate the config and alias arrays
-function texdoc.confutil.setup_config_and_alias(arg)
+function texdoc.confutil.setup_config_and_alias(cl_config)
     -- setup config from all sources
-    local ret = setup_config_from_cl(arg)
+    setup_config_from_cl(cl_config)
     setup_config_from_env()
     setup_config_from_files()
     setup_config_from_locale()
     setup_config_from_defaults()
+
     -- machine mode implies no interaction
     if texdoc.config.machine_switch == true then
         real_set_config('interact_switch', false)
     end
+
     -- debug implies verbose
     if #texdoc.config.debug_list > 0 then
         real_set_config('verbosity_level', tonumber(C.max_verbosity))
     end
+
     -- we were waiting for config.debug_list to be known to do this
     texdoc.confutil.show_config_files(function(s) dbg_print('files', s) end)
-    -- propagated return value of _from_cl()
-    return ret
 end
 
 return texdoc.confutil
