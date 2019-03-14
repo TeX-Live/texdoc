@@ -62,7 +62,7 @@ OPT_DATE = "--date=\"#{Time.now.strftime('%F')}\""
 
 # cleaning
 CLEAN.include(["doc/*", "tmp"])
-CLEAN.exclude(["doc/*.md", "doc/*.tex", "doc/*.pdf"])
+CLEAN.exclude(["doc/*.md", "doc/*.tex", "doc/*.pdf", "doc/*.1"])
 CLOBBER.include(["doc/*.pdf", "script/*.lua", "*.zip"])
 
 desc "Install Texdoc to your system"
