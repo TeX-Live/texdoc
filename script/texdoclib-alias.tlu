@@ -97,7 +97,7 @@ function texdoc.alias.confline_to_alias(line, file, pos)
     end
     -- stopalias directive
     local key = string.match(line, '^stopalias%s+(.+)')
-    if key then 
+    if key then
         stop_alias(key)
         return true
     end

@@ -85,7 +85,7 @@ end -- scope of active_debugs
 
 -- if file is base .. '.' .. zip with zip in zipext_list, return: base, zip
 -- otherwise, return: file, nil
-function texdoc.util.parse_zip(file) 
+function texdoc.util.parse_zip(file)
     local zip
     for _, zip in ipairs(texdoc.config.zipext_list) do
         local l = #zip + 1

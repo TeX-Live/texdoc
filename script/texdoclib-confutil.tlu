@@ -293,7 +293,7 @@ function read_config_file(configfile)
         line = string.gsub(line, '%s*$', '')    -- remove trailing spaces
         line = string.gsub(line, '^%s*', '')    -- remove leading spaces
         -- try to interpret the line
-        local ok = string.match(line, '^%s*$') 
+        local ok = string.match(line, '^%s*$')
         or texdoc.alias.confline_to_alias(line, configfile, lineno)
         or texdoc.score.confline_to_score(line, configfile, lineno)
         or confline_to_config(line, configfile, lineno)

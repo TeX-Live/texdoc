@@ -17,13 +17,13 @@ function texdoc.score.confline_to_score(line, file, pos)
     local keyw, pat, val
     -- try global adjscore
     pat, val = string.match(line, '^adjscore%s+([%w%p]+)%s*=%s*([%d+-.]+)')
-    if pat and val then 
+    if pat and val then
         return set_score_table(global_adjscore, pat, val)
     end
     -- try keyword specific adjscore
     keyw, pat, val = string.match(line,
         '^adjscore%(([%w%p]+)%)%s+([%w%p]+)%s*=%s*([%d+-.]+)')
-    if keyw and pat and val then 
+    if keyw and pat and val then
         keyw = string.lower(keyw)
         spec_adjscore[keyw] = spec_adjscore[keyw] or {}
         return set_score_table(spec_adjscore[keyw], pat, val)

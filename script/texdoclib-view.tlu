@@ -227,7 +227,7 @@ function texdoc.view.deliver_results(name, doclist, many)
             or (doclist[2].quality ~= 'good' and not showall)) then
         view_doc(doclist[1])
     else
-        if many and not texdoc.config.machine_switch then 
+        if many and not texdoc.config.machine_switch then
             print('*** Results for: ' .. name .. ' ***')
         end
         print_menu(name, doclist, showall)

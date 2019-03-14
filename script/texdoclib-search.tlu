@@ -136,7 +136,7 @@ end
 
 -- return the full path to the file
 function Docfile:get_realpath()
-    if self.tree > 0 then 
+    if self.tree > 0 then
         return texdocs_tree_to_path(self.tree, self.name)
     elseif self.tree == 0 then
         if vanilla then
