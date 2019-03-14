@@ -22,6 +22,8 @@ Previous work in the public domain:
 - Original shell script by Thomas Esser, David Aspinall, and Simon Wilkinson.
 --]]
 
+local setenv = setenv
+
 -- pre-declare variables in the shared environment
 texdoc = {}  -- Warning: this is global table
 texdoc.config = {}

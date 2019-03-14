@@ -21,7 +21,7 @@ local vanilla -- is this a vanilla TL or a re-package one without tlpdb?
 --[[
 doclist = {
     [1] = docfile1, [2] = docfiles2, ...,
-    inv = { realpath1 = index1, ... }
+    inv = {realpath1 = index1, ...}
 }
 
 The inv subtable is such that for all i
@@ -34,7 +34,7 @@ Doclist.__index = Doclist
 
 -- create a new list of docfiles
 function Doclist:new()
-    local dl = { inv = {} }
+    local dl = {inv = {}}
     setmetatable(dl, self)
     return dl
 end
@@ -115,7 +115,7 @@ function Docfile:new(info)
     setmetatable(df, self)
     for k, v in pairs(info) do
         if k == 'pattern' then
-            df.matches = { info.pattern }
+            df.matches = {info.pattern}
         else
             df[k] = v
         end
@@ -206,7 +206,7 @@ local doc_roots
 --[[
 doc_roots[i] = {
     path    = initial path,
-    db      = { [file1] = basename1, [file2] = basename2, ... },
+    db      = {[file1] = basename1, [file2] = basename2, ...},
 }
 --]]
 
@@ -242,7 +242,7 @@ function init_texdocs_database()
             db = init_tree_db(path, recursion_allowed)
         end
         -- register this in docroots
-        doc_roots[i] = { path = path, db = db }
+        doc_roots[i] = {path=path, db=db}
     end
 end
 
@@ -475,8 +475,8 @@ function init_tlp_database()
 end
 
 do -- begin scope of tlpinfo tables
-local tlp_from_runfile -- { [runfile_basename] = {tlp1 = true, ...}, ... }
-local tlp_doclist -- { [tlp_name] = { relname1, relname2, ...}, ... }
+local tlp_from_runfile -- {[runfile_basename] = {tlp1 = true, ...}, ...}
+local tlp_doclist -- {[tlp_name] = {relname1, relname2, ...}, ...}
 
 -- populate tlpinfo tables using the given texlive.tlpdb
 function get_tlpinfo_from_tlpdb(filename)
@@ -631,7 +631,7 @@ function fuzzy_search(pattern)
         local s, t = tostring(s), tostring(t)
         if type(s) == 'string' and type(t) == 'string' then
             local m, n, d = #s, #t, {}
-            for i = 0, m do d[i] = { [0] = i } end
+            for i = 0, m do d[i] = {[0] = i} end
             for j = 1, n do d[0][j] = j end
             for i = 1, m do
                 for j = 1, n do

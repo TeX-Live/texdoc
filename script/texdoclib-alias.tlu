@@ -5,7 +5,7 @@
 --[[ structure of the alias table
 
 alias = {
-  name1 = { <true or nill> stop, <aliasentry> aliasentry1, ... },
+  name1 = {<true or nill> stop, <aliasentry> aliasentry1, ...},
   ...
 }
 stop == true means further alias directives should be ignored
@@ -41,7 +41,7 @@ end
 -- add an alias value for a key
 function add_alias(key, value, score)
     local k = string.lower(key)
-    alias[k] = alias[k] or { make_alias(key, false) }
+    alias[k] = alias[k] or {make_alias(key, false)}
     if alias[k].stop then return end
     table.insert(alias[k], make_alias(value, score))
 end
@@ -61,7 +61,7 @@ function texdoc.alias.get_patterns(name, no_alias)
     if alias[n] and not no_alias then
         res = alias[n]
     else
-        res = { make_alias(name, false) }
+        res = {make_alias(name, false)}
     end
     -- check for language-specific aliases
     local lang = texdoc.config.lang and alias[n .. '-' .. texdoc.config.lang]
