@@ -3,6 +3,7 @@
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
 texdoc.view = {}
+local M = texdoc.view
 
 local C = texdoc.const
 local err_print = texdoc.util.err_print
@@ -12,11 +13,11 @@ local dbg_print = texdoc.util.dbg_print
 
 -- view a document
 -- see texdoclib-search.tlu for the structure of the argument
-function view_doc(docfile)
-    texdoc.view.view_file(docfile.realpath)
+function M.__view_doc(docfile)
+    M.view_file(docfile.realpath)
 end
 
--- get viewer and viewer_replacement before calling try_viewing
+-- get viewer and viewer_replacement before calling M.__try_viewing
 -- returns false of failure, true on success viewer_replacement is either:
 --
 --     1. the filename, quoted with ""
@@ -24,7 +25,7 @@ end
 --
 -- The second case happens when the doc is zipped. In the case, this function
 -- unzips it in a tmpdir so that the viewer command can use the unzipped file.
-function texdoc.view.view_file(filename)
+function M.view_file(filename)
     local viewer, viewer_replacement
 
     -- check if the file is zipped
@@ -94,11 +95,11 @@ function texdoc.view.view_file(filename)
     assert(viewer, 'Internal error: no viewer found.')
     dbg_print('view', 'Using "viewer_' .. viewext .. '" to open the file.')
 
-    return try_viewing(viewer, viewer_replacement)
+    return M.__try_viewing(viewer, viewer_replacement)
 end
 
 -- view a file, if possible
-function try_viewing(view_command, viewer_replacement)
+function M.__try_viewing(view_command, viewer_replacement)
     if string.match (view_command, C.place_holder) then
         view_command = string.gsub(
             view_command, C.place_holder, viewer_replacement)
@@ -153,7 +154,7 @@ end
 
 -- print a list of docfile objects (see search.tlu) as a menu
 -- if showall is false, stop as soon as a bad result is encountered
-function print_menu(name, doclist, showall)
+function M.__print_menu(name, doclist, showall)
     local max_lines = tonumber(texdoc.config.max_lines)
     if texdoc.config.interact_switch and doclist[max_lines + 1] then
         -- there may be too many lines, count them
@@ -201,14 +202,14 @@ function print_menu(name, doclist, showall)
         -- Use Lua's faked ternary operator for fun and brevity:
         num = (num_str == '' and 1 or tonumber(num_str))
         if num and doclist[num] and num <= last_i then
-            view_doc(doclist[num])
+            M.__view_doc(doclist[num])
         end
     end
 end
 
 -----------------------   deliver results based on mode   ---------------------
 
-function texdoc.view.deliver_results(name, doclist, many)
+function M.deliver_results(name, doclist, many)
     -- ensure that results were found or apologize
     if not doclist[1] or doclist[1].quality == 'killed' then
         local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
@@ -225,15 +226,15 @@ function texdoc.view.deliver_results(name, doclist, many)
     if (texdoc.config.mode == 'view')
             or texdoc.config.mode == 'mixed' and (not doclist[2]
             or (doclist[2].quality ~= 'good' and not showall)) then
-        view_doc(doclist[1])
+        M.__view_doc(doclist[1])
     else
         if many and not texdoc.config.machine_switch then
             print('*** Results for: ' .. name .. ' ***')
         end
-        print_menu(name, doclist, showall)
+        M.__print_menu(name, doclist, showall)
     end
 end
 
-return texdoc.view
+return M
 
 -- vim: ft=lua:

@@ -3,15 +3,16 @@
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
 texdoc.cli = {}
+local M = texdoc.cli
 
 local C = texdoc.const
 local err_print = texdoc.util.err_print
 
 --------------------------   parsing options   --------------------------
 
--- modified Alternative Get Opt
+-- modified Alternative GetOpt
 -- cf. http://lua-users.org/wiki/AlternativeGetOpt
-function getopt(arg, options)
+function M.__getopt(arg, options)
     local tmp
     local tab = {}
     local saved_arg = {table.unpack(arg)}
@@ -56,7 +57,7 @@ function getopt(arg, options)
     return tab
 end
 
-function parse_options()
+function M.__parse_options()
     local curr_arg
     local action = true
     local cl_config = {}
@@ -66,7 +67,7 @@ function parse_options()
     end
 
     -- actual parsing
-    opts = getopt(arg, 'cd')
+    opts = M.__getopt(arg, 'cd')
 
     for _, tp in ipairs(opts) do
         local k, v = tp[1], tp[2]
@@ -138,7 +139,7 @@ end
 --------------------------   process execution   --------------------------
 
 -- handling actions
-function do_action(action)
+function M.__do_action(action)
     if action == 'help' then
         texdoc.util.print_usage()
         os.exit(C.exit_ok)
@@ -162,7 +163,7 @@ function do_action(action)
 end
 
 -- the main loop
-function do_texdoc()
+function M.__do_texdoc()
     texdoc.search.init_databases()
 
     for _, docname in ipairs(arg) do
@@ -177,9 +178,9 @@ end
 
 --------------------------   the main function   --------------------------
 
-function texdoc.cli.main()
+function M.main()
     -- parsing command line options
-    local action, cl_config = parse_options()
+    local action, cl_config = M.__parse_options()
 
     if not action then
         os.exit(C.exit_usage)
@@ -189,7 +190,7 @@ function texdoc.cli.main()
     texdoc.confutil.setup_config_and_alias(cl_config)
 
     -- special action
-    do_action(action)
+    M.__do_action(action)
 
     -- do we actually have arguments?
     if not arg[1] then
@@ -199,11 +200,11 @@ function texdoc.cli.main()
     end
 
     -- the main feature
-    do_texdoc()
+    M.__do_texdoc()
 
     os.exit(C.exit_ok)
 end
 
-return texdoc.cli
+return M
 
 -- vim: ft=lua:

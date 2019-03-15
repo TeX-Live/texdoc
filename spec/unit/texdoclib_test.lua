@@ -11,20 +11,26 @@ local function table_keys(tab)
     return res
 end
 
-function check_global_env(before_req, after_req)
+-- Table texdoc is only allowed to be global
+table.insert(tests, function()
     local ok = true
 
+    local before_req = table_keys(_ENV)
+    require('texdoclib')
+    local after_req = table_keys(_ENV)
+
     for k, _ in pairs(after_req) do
-        if not before_req[k] and not k == 'texdoc' then
+        if not before_req[k] and k ~= 'texdoc' then
             print('Added global variable: ' .. k)
             ok = false
         end
     end
 
     return ok
-end
+end)
 
-function check_sub_modules(texdoc)
+-- Are all submodules sucessfully loaded?
+table.insert(tests, function()
     local ok = true
 
     local names = {
@@ -40,27 +46,23 @@ function check_sub_modules(texdoc)
 
     for _, name in pairs(names) do
         if type(texdoc[name]) ~= 'table' then
-            print('Table "' .. name .. '" does not exist.')
+            print('Table "texdoc.' .. name .. '" does not exist.')
             ok = false
         end
     end
 
     return ok
-end
+end)
 
 -- execute the tests
-do
-    local before_req = table_keys(_ENV)
-    local texdoc = require('texdoclib')
-    local after_req = table_keys(_ENV)
+local ok = true
 
-    local ok = true
-    ok = check_global_env(before_req, after_req)
-    ok = check_sub_modules(texdoc)
-
-    if ok then
-        os.exit(0)
-    else
-        os.exit(1)
+for _, t in ipairs(tests) do
+    if not t() then
+        ok = false
     end
+end
+
+if not ok then
+    os.exit(1)
 end

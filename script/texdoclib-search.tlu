@@ -6,6 +6,7 @@
 --          has been called.
 
 texdoc.search = {}
+local M = texdoc.search
 
 local C = texdoc.const
 local err_print = texdoc.util.err_print
@@ -13,7 +14,7 @@ local dbg_print = texdoc.util.dbg_print
 
 -- shared by all functions in this file
 local s_doclist -- the Doclist object to be populated by various functions
-local s_meta -- {[normname] = meta, ...} (populated by init_tlp_database)
+local s_meta -- {[normname] = meta, ...} (populated by M.__init_tlp_database)
 local vanilla -- is this a vanilla TL or a re-package one without tlpdb?
 
 -----------------------   docfile and doclist objects   ------------------------
@@ -139,10 +140,10 @@ end
 -- return the full path to the file
 function Docfile:get_realpath()
     if self.tree > 0 then
-        return texdocs_tree_to_path(self.tree, self.name)
+        return M.__texdocs_tree_to_path(self.tree, self.name)
     elseif self.tree == 0 then
         if vanilla then
-            return get_tlroot() .. '/' .. self.name
+            return M.__get_tlroot() .. '/' .. self.name
         else
             return kpse.find_file(self.normname, 'TeX system documentation')
         end
@@ -152,13 +153,13 @@ function Docfile:get_realpath()
 end
 
 -- normalise a name from the tlpdb (use for s_meta indexes)
-function reloc_tlpdb_path(name)
+function M.__reloc_tlpdb_path(name)
     return string.gsub(name, '^texmf[^/]*/doc/', '', 1)
 end
 
 -- return normalised name
 function Docfile:get_normname()
-    return (self.tree == 0) and reloc_tlpdb_path(self.name) or self.name
+    return (self.tree == 0) and M.__reloc_tlpdb_path(self.name) or self.name
 end
 
 -- retrieve the lang from meta
@@ -211,7 +212,7 @@ doc_roots[i] = {
 --]]
 
 -- populate the doc_roots filename databases
-function init_texdocs_database()
+function M.__init_texdocs_database()
     doc_roots = {}
     local sep = (os.type == 'windows') and ';' or ':'
     local kpse_texdocs = kpse.expand_var("$TEXDOCS")
@@ -231,15 +232,15 @@ function init_texdocs_database()
             'texdocs[%d] = %s (index_mandatory=%s, recursion_allowed=%s)',
             i, path, tostring(index_mandatory), tostring(recursion_allowed)))
         -- decide if we should use a ls-R index, the filesystem, or do nothing
-        local root, shift = lsr_root(path)
+        local root, shift = M.__lsr_root(path)
         if root and shift and recursion_allowed then
             dbg_print('texdocs', string.format(
                 'texdocs[%d] using index: %s (shift=%s)', i, root, shift))
-            db = init_lsr_db(root, shift)
+            db = M.__init_lsr_db(root, shift)
         elseif not index_mandatory and lfs.isdir(path) then
             dbg_print('texdocs', string.format(
                 'texdocs[%d] using filesystem search', i))
-            db = init_tree_db(path, recursion_allowed)
+            db = M.__init_tree_db(path, recursion_allowed)
         end
         -- register this in docroots
         doc_roots[i] = {path=path, db=db}
@@ -247,21 +248,21 @@ function init_texdocs_database()
 end
 
 -- return the real path from a texdocs tree number + relative path
-function texdocs_tree_to_path(tree, rel)
+function M.__texdocs_tree_to_path(tree, rel)
     return doc_roots[tree].path .. '/' .. rel
 end
 
 -- find docfiles in texdocs directories
-function get_doclist_texdocs(patlist)
+function M.__get_doclist_texdocs(patlist)
     for code, dr in ipairs(doc_roots) do
-        if dr.db then scan_db(patlist, code, dr.db) end
+        if dr.db then M.__scan_db(patlist, code, dr.db) end
     end
 end
 
 end -- scope of doc_roots
 
 -- find a ls-R file in a parent directory and return it or nil
-function lsr_root(path)
+function M.__lsr_root(path)
     if not lfs.isdir (path) then return end
     local root, shift = path, ''
     if string.sub(root, -1) == '/' then root = string.sub(root, 1, -2) end
@@ -277,7 +278,7 @@ function lsr_root(path)
 end
 
 -- build a db from a ls-R file
-function init_lsr_db(root, shift)
+function M.__init_lsr_db(root, shift)
     -- open the file
     local lsr = assert(io.open(root .. '/ls-R', 'r'))
     local _ = lsr:read('*line') -- throw away first line (comment)
@@ -302,7 +303,7 @@ function init_lsr_db(root, shift)
             end
         elseif isdoc then
             local file = (current_dir == '') and line or current_dir .. '/' .. line
-            if check_ext(line) then db[file] = line end
+            if M.__check_ext(line) then db[file] = line end
         end
     end
     lsr:close()
@@ -310,7 +311,7 @@ function init_lsr_db(root, shift)
 end
 
 -- build a db for a tree without ls-R index
-function init_tree_db(base, recurse)
+function M.__init_tree_db(base, recurse)
     local db = {}
     local function init_tree_db_rec(dir)
         for file in lfs.dir(base .. '/' .. dir) do
@@ -319,7 +320,7 @@ function init_tree_db(base, recurse)
                 if lfs.isdir(base..'/'..f) then
                     if recurse then init_tree_db_rec(f) end
                 else
-                    if check_ext(file) then db[f] = file end
+                    if M.__check_ext(file) then db[f] = file end
                 end
             end
         end
@@ -331,16 +332,16 @@ end
 --------------------   select results from TEXDOCS trees   ---------------------
 
 -- scan a database
-function scan_db(patlist, code, lsr_db)
+function M.__scan_db(patlist, code, lsr_db)
     for file, basename in pairs(lsr_db) do
-        local df = process_file(patlist, basename, file, code)
+        local df = M.__process_file(patlist, basename, file, code)
         if df then s_doclist:add(df) end
     end
 end
 
 -- says if file has a known extension according to ext_list
 -- (or known basename according to basename_list)
-function check_ext(file)
+function M.__check_ext(file)
     file = string.lower(file)
     -- remove zipext if applicable
     file = texdoc.util.parse_zip(file)
@@ -369,7 +370,7 @@ function check_ext(file)
 end
 
 -- says if a file (with its path) matches a pattern
-function matches(pattern, file)
+function M.__matches(pattern, file)
     if pattern.original then
         return string.find(file:lower(), pattern.name:lower(), 1, true)
     else
@@ -378,11 +379,11 @@ function matches(pattern, file)
 end
 
 -- return a docfile object if file "matches", nil otherwise
-function process_file(patlist, file, pathfile, code)
+function M.__process_file(patlist, file, pathfile, code)
     local docfile
     local pattern
     for _, pattern in ipairs(patlist) do
-        if matches(pattern, pathfile) then
+        if M.__matches(pattern, pathfile) then
             local info = {
                 name = pathfile,
                 tree = code,
@@ -401,7 +402,7 @@ end
 ----------------------------   look for sty files   ----------------------------
 
 -- add doclist entries for sty files in patlist
-function get_doclist_sty(patlist)
+function M.__get_doclist_sty(patlist)
     for _, pat in ipairs(patlist) do
         local file = kpse.find_file(pat.name)
         if file then
@@ -420,14 +421,14 @@ end
 -- tlpdb mean TeX Live Package DataBase and tlp means TeX Live Package
 
 -- find the TeX Live root
-function get_tlroot()
+function M.__get_tlroot()
     local tlroot = kpse.var_value('TEXMFROOT')
-    get_tlroot = function() return tlroot end
+    M.__get_tlroot = function() return tlroot end
     return tlroot
 end
 
 -- return true if cache exists and is newer than original, false otherwise
-function good_cache(cache, ori)
+function M.__good_cache(cache, ori)
     local cache_date = lfs.attributes(cache, 'modification')
     if not cache_date then return false end
     local ori_date = assert(lfs.attributes(ori, 'modification'))
@@ -435,42 +436,42 @@ function good_cache(cache, ori)
 end
 
 -- make sure a given directory exists, or return nil plus an error string
-function mkdir_p(dir)
+function M.__mkdir_p(dir)
     if lfs.isdir(dir) then return true end
     local parent = texdoc.util.path_parent(dir)
     if parent then
-        local ok, msg = mkdir_p(parent)
+        local ok, msg = M.__mkdir_p(parent)
         if not ok then return nil, msg end
     end
     return lfs.mkdir(dir)
 end
 
 -- get tlpinfo tables initialised by whatever mean
-function init_tlp_database()
+function M.__init_tlp_database()
     local TEXMFVAR = kpse.var_value('TEXMFVAR')
     local cache_file = TEXMFVAR .. '/' .. C.cache_name
-    local texlive_tlpdb = get_tlroot() .. '/tlpkg/texlive.tlpdb'
+    local texlive_tlpdb = M.__get_tlroot() .. '/tlpkg/texlive.tlpdb'
     vanilla = lfs.isfile(texlive_tlpdb)
     if vanilla then
-        if good_cache(cache_file, texlive_tlpdb) then
+        if M.__good_cache(cache_file, texlive_tlpdb) then
             dbg_print('tlpdb', 'Using cached data from ' .. cache_file)
-            get_tlpinfo_from_cache(cache_file)
+            M.__get_tlpinfo_from_cache(cache_file)
         else
             dbg_print('tlpdb', 'Getting data from tlpdb file ' .. texlive_tlpdb)
-            get_tlpinfo_from_tlpdb(texlive_tlpdb)
+            M.__get_tlpinfo_from_tlpdb(texlive_tlpdb)
             dbg_print('tlpdb', 'Writing data in cache file ' .. cache_file)
-            local ok, msg = mkdir_p(texdoc.util.path_parent(cache_file))
+            local ok, msg = M.__mkdir_p(texdoc.util.path_parent(cache_file))
             if not ok then
                 err_print('warning',
                     'Failed to create cache file in ' .. cache_file .. ':')
                 err_print('warning', msg)
             else
-                print_out_tlpinfo(cache_file)
+                M.__print_out_tlpinfo(cache_file)
             end
         end
     else
         dbg_print('tlpdb', 'Using shipped tlpdb data.')
-        get_tlpinfo_from_dist()
+        M.__get_tlpinfo_from_dist()
     end
 end
 
@@ -479,7 +480,7 @@ local tlp_from_runfile -- {[runfile_basename] = {tlp1 = true, ...}, ...}
 local tlp_doclist -- {[tlp_name] = {relname1, relname2, ...}, ...}
 
 -- populate tlpinfo tables using the given texlive.tlpdb
-function get_tlpinfo_from_tlpdb(filename)
+function M.__get_tlpinfo_from_tlpdb(filename)
     s_meta, tlp_from_runfile, tlp_doclist = {}, {}, {}
     local curr_tlp
     local state = 'none'
@@ -495,13 +496,13 @@ function get_tlpinfo_from_tlpdb(filename)
                 local file = string.match(line, '^ ([^ ]*)')
                 local meta = string.match(line, '^ [^ ]* (.+)')
                 local basename = string.match(file, '([^/]*)$')
-                if check_ext(basename) then
+                if M.__check_ext(basename) then
                     -- we've got a docfile here, add it
                     table.insert(tlp_doclist[curr_tlp], file)
                     if meta then
                         local details = string.match(meta, 'details="([^"]+)"')
                         local lang = string.match(meta, 'language="([^"]+)"')
-                        s_meta[reloc_tlpdb_path(file)] = {
+                        s_meta[M.__reloc_tlpdb_path(file)] = {
                             details = details,
                             lang = lang,
                         }
@@ -528,11 +529,11 @@ function get_tlpinfo_from_tlpdb(filename)
             state = 'runfiles'
         end
     end
-    remove_useless_tlp()
+    M.__remove_useless_tlp()
 end
 
 -- remove entries for tlp without any docfile
-function remove_useless_tlp()
+function M.__remove_useless_tlp()
     for tlp, doclist in pairs(tlp_doclist) do
         if #doclist == 0 then tlp_doclist[tlp] = nil end
     end
@@ -546,7 +547,7 @@ function remove_useless_tlp()
 end
 
 -- print out data from tlpdb in dofile()-able form
-function print_out_tlpinfo(filename)
+function M.__print_out_tlpinfo(filename)
     local fh = assert(io.open(filename, 'w'))
     local function printf(s, ...) fh:write(string.format(s, ...)) end
 
@@ -582,12 +583,12 @@ function print_out_tlpinfo(filename)
 end
 
 -- get pre-hashed tlpdb info from a cache file
-function get_tlpinfo_from_cache(filename)
+function M.__get_tlpinfo_from_cache(filename)
     s_meta, tlp_from_runfile, tlp_doclist = dofile(filename)
 end
 
 -- get pre-hashed tlpdb info from a pseudo-cache file
-function get_tlpinfo_from_dist()
+function M.__get_tlpinfo_from_dist()
     local f = kpse.find_file(C.data_tlpdb_name, 'texmfscripts')
     if not f then
         err_print('error', 'No texlive.tlpdb nor shipped tlpdb data found')
@@ -598,7 +599,7 @@ function get_tlpinfo_from_dist()
 end
 
 -- get docfiles for pattern using specific tlpdb information
-function get_doclist_tlpdb(pattern)
+function M.__get_doclist_tlpdb(pattern)
     -- runfile to tlp to docfile
     if tlp_from_runfile[pattern] then
         for tlp in pairs(tlp_from_runfile[pattern]) do
@@ -624,7 +625,7 @@ function get_doclist_tlpdb(pattern)
 end
 
 -- fuzzy search by using Levenshtein distance
-function fuzzy_search(pattern)
+function M.__fuzzy_search(pattern)
     -- calculating Levenshtein distance by dynamic programming
     -- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
     local function levenshtein(s, t)
@@ -663,13 +664,13 @@ end --scope of tlpinfo table
 ------------------------------   main function   -------------------------------
 
 -- initialise the various databases (must be called first)
-function texdoc.search.init_databases()
-    init_texdocs_database()
-    init_tlp_database()
+function M.init_databases()
+    M.__init_texdocs_database()
+    M.__init_tlp_database()
 end
 
 -- find docfiles according to pattern
-function texdoc.search.get_doclist(pattern, no_alias)
+function M.get_doclist(pattern, no_alias)
     -- separate sty patterns from the rest
     local function normal_vs_sty(list)
         local normal, sty = {}, {}
@@ -691,9 +692,9 @@ function texdoc.search.get_doclist(pattern, no_alias)
         -- get results; _texdocs search comes after _tlpdb search so that
         -- files found by both will have the priority of the _texdocs tree.
         -- (https://puszcza.gnu.org.ua/bugs/?369)
-        get_doclist_sty(sty)
-        get_doclist_tlpdb(pattern)
-        get_doclist_texdocs(normal)
+        M.__get_doclist_sty(sty)
+        M.__get_doclist_tlpdb(pattern)
+        M.__get_doclist_texdocs(normal)
     end
 
     -- initialise result list
@@ -704,7 +705,7 @@ function texdoc.search.get_doclist(pattern, no_alias)
 
     -- 2. if no result, execute fuzzy search
     if not s_doclist[1] and texdoc.config.fuzzy_level > 0 then
-        local f_res, f_lev = fuzzy_search(pattern)
+        local f_res, f_lev = M.__fuzzy_search(pattern)
         if f_lev <= texdoc.config.fuzzy_level then
             err_print('info', 'Fuzzy search result: ' .. f_res)
             dbg_print('search', 'Levenshtein distance: ' .. f_lev)
@@ -721,6 +722,6 @@ function texdoc.search.get_doclist(pattern, no_alias)
     return s_doclist
 end
 
-return texdoc.search
+return M
 
 -- vim: ft=lua:

@@ -3,6 +3,7 @@
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
 texdoc.util = {}
+local M = texdoc.util
 
 local C = texdoc.const
 
@@ -10,43 +11,43 @@ local C = texdoc.const
 -- Use: internal representation of files always use forward slashes.
 -- This function should be called only before displaying a file name.
 if os.type == 'windows' then
-    function texdoc.util.w32_path(path)
+    function M.w32_path(path)
         return (string.gsub(path, '/', '\\'))
     end
 else
-    function texdoc.util.w32_path(path)
+    function M.w32_path(path)
         return path
     end
 end
 
 -- remove the last directory component of a path
 if os.type == 'windows' then
-    function texdoc.util.path_parent(path)
+    function M.path_parent(path)
         return string.match(path, '^(.*)[\\/]')
     end
 else
-    function texdoc.util.path_parent(path)
+    function M.path_parent(path)
         return string.match(path, '^(.*)/')
     end
 end
 
 -- generic error display function (see the err_priority constant)
-function texdoc.util.err_print(lvl, msg)
+function M.err_print(lvl, msg)
     -- be careful: maybe texdoc.config.verbosity_level is not set yet
     local verbosity_level = texdoc.config.verbosity_level or tonumber(C.def_verbosity)
     if C.err_priority[lvl] <= verbosity_level then
         io.stderr:write('texdoc ' .. lvl .. ': ' .. msg .. '\n')
     end
 end
-local err_print = texdoc.util.err_print
+local err_print = M.err_print
 
 do --scope of active_debugs
 local active_debugs
 
 -- generic debug function
-function texdoc.util.dbg_print(cat, msg)
+function M.dbg_print(cat, msg)
     -- make sure active_debugs is set
-    if not active_debugs then set_active_debugs() end
+    if not active_debugs then M.__set_active_debugs() end
     -- print message it belongs to an active category
     if active_debugs and active_debugs[cat] or cat == 'XXX' then
         io.stderr:write("texdoc debug-" .. cat .. ": " .. msg .. "\n")
@@ -54,7 +55,7 @@ function texdoc.util.dbg_print(cat, msg)
 end
 
 -- set active_debugs
-function set_active_debugs()
+function M.__set_active_debugs()
     if not texdoc.config.debug_list then return end
     active_debugs = {}
     -- all debug options imply version info
@@ -85,7 +86,7 @@ end -- scope of active_debugs
 
 -- if file is base .. '.' .. zip with zip in zipext_list, return: base, zip
 -- otherwise, return: file, nil
-function texdoc.util.parse_zip(file)
+function M.parse_zip(file)
     local zip
     for _, zip in ipairs(texdoc.config.zipext_list) do
         local l = #zip + 1
@@ -97,10 +98,10 @@ function texdoc.util.parse_zip(file)
 end
 
 -- print a usage message
-function texdoc.util.print_usage()
+function M.print_usage()
     print(C.usage_msg)
 end
 
-return texdoc.util
+return M
 
 -- vim: ft=lua:
