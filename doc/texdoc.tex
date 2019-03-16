@@ -1,14 +1,11 @@
+%#!xelatex
 % Texdoc user manual
-% Copyright 2018 Manuel Pégourié-Gonnard and Takuto Asakura
+% Copyright 2008-2019 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
-
-% +++
-% latex = "xelatex"
-% +++
 
 \setlength\overfullrule{5pt}
 
-\documentclass[a4paper, oneside]{scrartcl}
+\documentclass[a4paper,oneside]{scrartcl}
 \usepackage{fontspec}
 \usepackage{xunicode}
 
@@ -20,13 +17,13 @@
 \newcommand\mylangle{$\langle$}
 \newcommand\myrangle{$\rangle$}
 
-\usepackage{xargs, xspace, fancyvrb, xcolor, pifont, calc, ifmtarg, mathstyle}
+\usepackage{xargs,xspace,fancyvrb,xcolor,pifont,calc,ifmtarg,mathstyle}
 
-\usepackage[sf, bf]{titlesec}
+\usepackage[sf,bf]{titlesec}
 \titlelabel{\makebox[0pt][r]{\thetitle\kern1pc}}
-\titleformat{\subsubsection}[runin]{\itshape}{%
-  \makebox[0pt][r]{\thetitle\kern1pc}}{%
-  0pt}{}[\maybedot\space --- \kern0pt]
+\titleformat{\subsubsection}[runin]{\itshape}
+  {\makebox[0pt][r]{\thetitle\kern1pc}}
+  {0pt}{}[\maybedot\space --- \kern0pt]
 \titlespacing{\subsubsection}{0pt}{0.5\baselineskip}{0pt}
 
 \usepackage{enumitem}
@@ -41,7 +38,8 @@
   pdftitle={Texdoc: find and view documentation in TeX Live},
   pdfauthor={Manuel Pégourié-Gonnard, Takuto Asakura},
   pdfsubject={Texdoc's user manual},
-  pdfkeywords={Texdoc, TeX Live, manual, documentation}}
+  pdfkeywords={Texdoc, TeX Live, manual, documentation},
+}
 
 \usepackage[yyyymmdd]{datetime}
 \renewcommand{\dateseparator}{-}
@@ -69,15 +67,13 @@
   formatcom=\cofont,
   defineactive=\makeallfancy,
   codes=\fancyactives,
-  }
-\newcommand\fancyactives{%
-  \catcode`\«\active}
-\newcommand\makeallfancy{%
-  \makefancyog}
-{\catcode`\«\active
-\global\def\makefancyog{%
-  \def«##1»{\meta{##1}}}
 }
+\newcommand\fancyactives{\catcode`\«\active}
+\newcommand\makeallfancy{\makefancyog}
+\bgroup
+  \catcode`\«\active
+  \global\def\makefancyog{\def«##1»{\meta{##1}}}
+\egroup
 
 \newif\ifframed
 \newlength\dec
@@ -89,7 +85,7 @@
   \def\bmtext{#2}%
   \def\thelabel{#3}%
   \SaveVerbatim[samepage, gobble=2]{verbmat}%
-  }{%
+}{%
   \endSaveVerbatim
   \xdef\sectioncmd{\noexpand\nodotthistime
     \thecmd[\bmtext]{%
@@ -101,32 +97,31 @@
           \BUseVerbatim{verbmat}}%
       \fi
       \noexpand\label{\thelabel}}}%
-  \aftergroup\sectioncmd}
+  \aftergroup\sectioncmd
+}
 \makeatother
 
 \newcommand\maybedot{.}
-\newcommand\nodotthistime{%
-  \renewcommand\maybedot{%
-    \global\def\maybedot{.}}}
+\newcommand\nodotthistime{\renewcommand\maybedot{\global\def\maybedot{.}}}
 
-\newenvironment{cmdsubsec}[2]{%
-  \framedtrue \commandes\subsection{#1}{#2}%
-  }{%
-  \endcommandes}
+\newenvironment{cmdsubsec}[2]
+  {\framedtrue \commandes\subsection{#1}{#2}}
+  {\endcommandes}
 
-\newenvironment{cmdsubsub}[2]{%
-  \framedfalse \commandes\subsubsection{#1}{#2}%
-  }{%
-  \endcommandes}
+\newenvironment{cmdsubsub}[2]
+  {\framedfalse \commandes\subsubsection{#1}{#2}}
+  {\endcommandes}
 
 \makeatletter
-\newenvironment{htcode}{% % code en hors-texte
-  \SaveVerbatim[samepage, gobble=2]{verbmat}%
-  }{%
-  \endSaveVerbatim
-  \par\medskip\noindent\hspace*{\parindent}%
-  \BUseVerbatim{verbmat}%
-  \par\medskip\@endpetrue}
+% code in hors-text
+\newenvironment{htcode}
+  {\SaveVerbatim[samepage, gobble=2]{verbmat}}
+  {
+    \endSaveVerbatim
+    \par\medskip\noindent\hspace*{\parindent}%
+    \BUseVerbatim{verbmat}%
+    \par\medskip\@endpetrue
+  }
 \makeatother
 \DefineShortVerb{\|}
 
@@ -140,7 +135,7 @@
 \subtitle{Find \& view documentation in \texlive\\
   \href{https://tug.org/texdoc/}{https://tug.org/texdoc/}}
 \author{Manuel Pégourié-Gonnard\and Takuto Asakura}
-\date{v3.0 \today}
+\date{v3.0\quad \today}
 
 \begin{document}
 \VerbatimFootnotes
@@ -430,16 +425,17 @@ to suggest additions on the \tdml (with a real-life example).
 
 \subsection{Fuzzy search}\label{ss-fuzzy}
 
-When the normal search can't find any document in \texlive, Texdoc will execute
-fuzzy search without user-interactions. The results of fuzzy search are shown
-by as an informational message. (you can see that with option |-v|)
+When the normal search can't find any document in {\texlive}, Texdoc will
+execute fuzzy search without user-interactions. The fuzzy search finds a
+closest name of package in {\texlive}\footnote{Note that the feature searches
+only package names at this point. Other objects such as aliases cannot be found
+by the fuzzy search.} to the input |«keyword»|. The results of fuzzy search are
+shown by as an informational message (you can see that with option |-v|).
 
-The default allowance of Levenshtein distance is 5. You can change this
-default value by specifying |fuzzy_level| in your |texdoc.cnf| (see
-\ref{cf-fuzzy_level}).
-
-Note that a result of fuzzy search is irreproducible if multiple strings have
-the same Levenshtein distance.
+The default allowance of Levenshtein distance is 5. You can change this default
+value by specifying |fuzzy_level| in your |texdoc.cnf| (see
+\ref{cf-fuzzy_level}). Results of fuzzy search could be irreproducible if
+multiple strings have the same Levenshtein distance.
 
 \clearpage
 
