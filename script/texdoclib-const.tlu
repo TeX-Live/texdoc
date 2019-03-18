@@ -1,7 +1,6 @@
--- texdoclib-consts.tlu: global constants for texdoc
+-- texdoclib-const.tlu: global constants for texdoc
 --
--- Manuel Pégourié-Gonnard and the TeX Live team, GPLv3,
--- see texdoclib.tlu for details
+-- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
 -- use an empty environment that will become texdoc_env.C (see EOF)
 local constants = {}

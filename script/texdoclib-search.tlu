@@ -2,8 +2,7 @@
 --
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 
--- Warning: every single function here assumes texdoc.search.init_databases()
---          has been called.
+-- Warning: Some functions here assume that M.init_databases() has been called.
 
 texdoc.search = {}
 local M = texdoc.search
@@ -191,10 +190,10 @@ function Docfile:get_matches()
     return {}
 end
 
--- from score.tlu
+-- from texdoclib-score.tlu
 Docfile.get_quality = texdoc.score.docfile_quality
 
--- from score.tlu
+-- from texdoclib-score.tlu
 function Docfile:get_ext_pos()
     return texdoc.score.ext_pos(self.basename)
 end

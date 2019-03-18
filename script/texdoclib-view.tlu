@@ -152,7 +152,7 @@ end
 
 -----------------------------   display results   -----------------------------
 
--- print a list of docfile objects (see search.tlu) as a menu
+-- print a list of docfile objects (see texdoclib-search.tlu) as a menu
 -- if showall is false, stop as soon as a bad result is encountered
 function M.__print_menu(name, doclist, showall)
     local max_lines = tonumber(texdoc.config.max_lines)

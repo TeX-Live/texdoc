@@ -1,4 +1,4 @@
--- texdoclib-cli.tlu: command line interfaces
+-- texdoclib-cli.tlu: command line interfaces for texdoc
 --
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 

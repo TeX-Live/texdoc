@@ -225,7 +225,7 @@ function M.__has_bad_basename(file)
     return false
 end
 
--- compare two docfile's: (see search.tlu for structure)
+-- compare two docfile's: (see texdoclib-search.tlu for structure)
 -- 1. by score
 -- 2. then by extensions (ordered as in ext_list),
 -- 3. then lexicographically by fullpath.

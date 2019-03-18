@@ -1,6 +1,6 @@
 #!/usr/bin/env texlua
 
--- texdoc.tlu: the main program of Texdoc
+-- texdoc.tlu: the main program of texdoc
 --
 -- The TeX Live team, GPLv3, see texdoclib.tlu for details
 

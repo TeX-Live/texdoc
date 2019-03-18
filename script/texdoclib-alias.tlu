@@ -16,7 +16,7 @@ aliasentry = {
   original  = <true or nil> is this the original keyword?,
   locale    = <true or nil> is this entry found via texdoc.config.lang?
 }
-score == nil means to use the default score (defined in score.tlu)
+score == nil means to use the default score (defined in texdoclib-score.tlu)
 
 --]]
 
