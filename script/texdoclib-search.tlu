@@ -624,32 +624,34 @@ function M.__get_doclist_tlpdb(pattern)
     end
 end
 
+-- calculating Levenshtein distance by dynamic programming
+-- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
+function M.__levenshtein(s, t)
+    local s, t = tostring(s), tostring(t)
+    if type(s) == 'string' and type(t) == 'string' then
+        local m, n, d = #s, #t, {}
+        for i = 0, m do d[i] = {[0] = i} end
+        for j = 1, n do d[0][j] = j end
+        for i = 1, m do
+            for j = 1, n do
+                local cost = s:sub(i,i) == t:sub(j,j) and 0 or 1
+                d[i][j] = math.min(
+                    d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + cost
+                )
+            end
+        end
+        return d[m][n]
+    end
+end
+
 -- fuzzy search by using Levenshtein distance
 function M.__fuzzy_search(pattern)
-    -- calculating Levenshtein distance by dynamic programming
-    -- cf. http://lua-users.org/lists/lua-l/2008-01/msg00095.html
-    local function levenshtein(s, t)
-        local s, t = tostring(s), tostring(t)
-        if type(s) == 'string' and type(t) == 'string' then
-            local m, n, d = #s, #t, {}
-            for i = 0, m do d[i] = {[0] = i} end
-            for j = 1, n do d[0][j] = j end
-            for i = 1, m do
-                for j = 1, n do
-                    local cost = s:sub(i,i) == t:sub(j,j) and 0 or 1
-                    d[i][j] = math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
-                end
-            end
-            return d[m][n]
-        end
-    end
-
     local tmp_d
     local min = math.huge
     local result = ''
 
     for p in pairs(tlp_doclist) do
-        tmp_d = levenshtein(pattern, p)
+        tmp_d = M.__levenshtein(pattern, p)
         if tmp_d < min then
             min, result = tmp_d, p
         end
