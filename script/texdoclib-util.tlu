@@ -8,8 +8,8 @@ local M = texdoc.util
 local C = texdoc.const
 
 -- change '/' to '\' on windows
--- Use: internal representation of files always use forward slashes.
--- This function should be called only before displaying a file name.
+-- Note: Internal representation of files always use forward slashes.
+--       This function should be called only before displaying a path.
 if os.type == 'windows' then
     function M.w32_path(path)
         return (string.gsub(path, '/', '\\'))
@@ -66,18 +66,21 @@ end
 function M.__set_active_debugs()
     if not texdoc.config.debug_list then return end
     active_debugs = {}
+
     -- all debug options imply version info
     if texdoc.config.debug_list[1] then
         active_debugs.version = true
     else
         return
     end
+
     -- if 'all' is the first keyword, just activate all categories
     if texdoc.config.debug_list[1] == 'all' then
         for dbg in pairs(C.known_debugs) do
             active_debugs[dbg] = true end
         return
     end
+
     -- activate options from the list
     for _, dbg in ipairs(texdoc.config.debug_list) do
         local deps = C.known_debugs[dbg]
