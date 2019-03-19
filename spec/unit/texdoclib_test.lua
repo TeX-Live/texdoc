@@ -1,19 +1,24 @@
--- Test script for the texdoclib
+#!/usr/bin/env texlua
+
+-- texdoclib_test.lua: unit test for the entire behavior of texdoclib
+--
+-- This file public domain.
 
 kpse.set_program_name('luatex')
-local tests = {}
 
-local function table_keys(tab)
-    local res = {}
-    for k, _ in pairs(tab) do
-        res[k] = true
-    end
-    return res
-end
+-- testing setup
+local ok = true
+local function printf(fmt, ...) print(fmt:format(...)) end
 
 -- Table texdoc is only allowed to be global
-table.insert(tests, function()
-    local ok = true
+do
+    local function table_keys(tab)
+        local res = {}
+        for k, _ in pairs(tab) do
+            res[k] = true
+        end
+        return res
+    end
 
     local before_req = table_keys(_ENV)
     require('texdoclib')
@@ -25,14 +30,10 @@ table.insert(tests, function()
             ok = false
         end
     end
-
-    return ok
-end)
+end
 
 -- Are all submodules sucessfully loaded?
-table.insert(tests, function()
-    local ok = true
-
+do
     local names = {
         'const',
         'util',
@@ -46,20 +47,9 @@ table.insert(tests, function()
 
     for _, name in pairs(names) do
         if type(texdoc[name]) ~= 'table' then
-            print('Table "texdoc.' .. name .. '" does not exist.')
+            printf('Table "texdoc.%s" does not exist.', name)
             ok = false
         end
-    end
-
-    return ok
-end)
-
--- execute the tests
-local ok = true
-
-for _, t in ipairs(tests) do
-    if not t() then
-        ok = false
     end
 end
 
