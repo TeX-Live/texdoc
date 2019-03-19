@@ -47,7 +47,7 @@ function Doclist:add(df)
 
     -- check the existence of the file
     if not lfs.isfile(df.realpath) then
-        dbg_print('search', 'File ' .. df.realpath .. ' not found; skipping.')
+        dbg_print('search', 'File %s not found.  Skipping.', df.realpath)
         return
     end
 
@@ -56,7 +56,7 @@ function Doclist:add(df)
     if index then
         self[index]:mergein(df)
     else
-        dbg_print('search', 'File ' .. df.realpath .. ' found.')
+        dbg_print('search', 'File %s found.', df.realpath)
 
         local newindex = #self + 1
         self[newindex] = df
@@ -227,18 +227,18 @@ function M.__init_texdocs_database()
         local recursion_allowed = (n == 1)
         local path, n = string.gsub (dir, '^!!', '')
         local index_mandatory = (n == 1)
-        dbg_print('texdocs', string.format(
+        dbg_print('texdocs',
             'texdocs[%d] = %s (index_mandatory=%s, recursion_allowed=%s)',
-            i, path, tostring(index_mandatory), tostring(recursion_allowed)))
+            i, path, tostring(index_mandatory), tostring(recursion_allowed))
         -- decide if we should use a ls-R index, the filesystem, or do nothing
         local root, shift = M.__lsr_root(path)
         if root and shift and recursion_allowed then
-            dbg_print('texdocs', string.format(
-                'texdocs[%d] using index: %s (shift=%s)', i, root, shift))
+            dbg_print('texdocs',
+                'texdocs[%d] using index: %s (shift=%s)', i, root, shift)
             db = M.__init_lsr_db(root, shift)
         elseif not index_mandatory and lfs.isdir(path) then
-            dbg_print('texdocs', string.format(
-                'texdocs[%d] using filesystem search', i))
+            dbg_print('texdocs',
+                'texdocs[%d] using filesystem search', i)
             db = M.__init_tree_db(path, recursion_allowed)
         end
         -- register this in docroots
@@ -462,7 +462,7 @@ function M.__init_tlp_database()
             local ok, msg = M.__mkdir_p(texdoc.util.path_parent(cache_file))
             if not ok then
                 err_print('warning',
-                    'Failed to create cache file in ' .. cache_file .. ':')
+                    'Failed to create cache file in %s:', cache_file)
                 err_print('warning', msg)
             else
                 M.__print_out_tlpinfo(cache_file)

@@ -31,12 +31,19 @@ else
     end
 end
 
+-- generic log display function
+function M.__log(label, msg, ...)
+    io.stderr:write('texdoc ' .. label .. ': ' .. msg:format(...) .. '\n')
+end
+
 -- generic error display function (see the err_priority constant)
-function M.err_print(lvl, msg)
+function M.err_print(lvl, msg, ...)
     -- be careful: maybe texdoc.config.verbosity_level is not set yet
     local verbosity_level = texdoc.config.verbosity_level or tonumber(C.def_verbosity)
+
+    -- print if the priority is higher than current verbosity level
     if C.err_priority[lvl] <= verbosity_level then
-        io.stderr:write('texdoc ' .. lvl .. ': ' .. msg .. '\n')
+        M.__log(lvl, msg, ...)
     end
 end
 local err_print = M.err_print
@@ -45,12 +52,13 @@ do --scope of active_debugs
 local active_debugs
 
 -- generic debug function
-function M.dbg_print(cat, msg)
+function M.dbg_print(cat, msg, ...)
     -- make sure active_debugs is set
     if not active_debugs then M.__set_active_debugs() end
+
     -- print message it belongs to an active category
     if active_debugs and active_debugs[cat] or cat == 'XXX' then
-        io.stderr:write("texdoc debug-" .. cat .. ": " .. msg .. "\n")
+        M.__log('debug-' .. cat, msg, ...)
     end
 end
 

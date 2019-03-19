@@ -66,27 +66,27 @@ function M.__set_score(df, original_kw)
         if pat.original then
             s = df.tree > -1 and M.__heuristic_score(name, p) or 1
         elseif M.is_exact(name, p) then
-            local bonus, msg = 0, ''
+            local bonus, note = 0, ''
             if pat.locale then
-                bonus, msg = 5, ', (language-based)'
+                bonus, note = 5, ', (language-based)'
             end
             s = (pat.score or 10) + bonus -- default alias score is 10
-            dbg_print('score', string.format(
-                'Matching alias "%s", score: %g%s', pat.name, s, msg))
+            dbg_print('score',
+                'Matching alias "%s", score: %.1f%s', pat.name, s, note)
         end
         if s > score then score = s end
     end
-    dbg_print('score', 'Max pattern score: ' .. tostring(score))
+    dbg_print('score', 'Max pattern score: %.1f', score)
     -- get score from tlp associations
     if score == -10 and df.tlptodoc then
         score = -1
-        dbg_print('score', 'New score: ' .. tostring(score) ..
-            ' from package name association')
+        dbg_print('score',
+            'New score: %.1f from package name association', score)
     end
     if score == -10 and df.runtodoc then
         score = -5
-        dbg_print('score', 'New score: ' .. tostring(score) ..
-            ' from sty/cls association')
+        dbg_print('score',
+            'New score: %.1f from sty/cls association', score)
     end
     -- bonus for metadata
     if df.details then
@@ -103,8 +103,8 @@ function M.__set_score(df, original_kw)
         for pat, val in pairs(spec_adjscore[original_kw]) do
             if val and M.__is_subword('/' .. name, pat) then
                 score = score + val
-                dbg_print('score', string.format(
-                    'Adjust by %g from specific pattern "%s"', val, pat))
+                dbg_print('score',
+                    'Adjust by %.1f from specific pattern "%s"', val, pat)
             end
         end
     end
@@ -113,12 +113,12 @@ function M.__set_score(df, original_kw)
         for pat, val in pairs(global_adjscore) do
             if val and M.__is_subword('/' .. name, pat) then
                 if score > -10 or val < 0 then score = score + val end
-                dbg_print('score', string.format(
-                    'Adjust by %g from global pattern "%s"', val, pat))
+                dbg_print('score',
+                    'Adjust by %.1f from global pattern "%s"', val, pat)
             end
         end
     end
-    dbg_print('score', 'Final score: ' .. tostring(score))
+    dbg_print('score', 'Final score: %.1f', score)
     df.score = score
 end
 
@@ -130,8 +130,8 @@ function M.__heuristic_score(file, pat)
     local function upscore(s, reason, force)
         if s > score or force then
             score = s
-            dbg_print('score', 'New heuristic score: ' .. tostring(s) ..
-                '. Reason: ' .. reason)
+            dbg_print('score',
+                'New heuristic score: %.1f. Reason: %s', s, reason)
         end
     end
     local slash = not not string.find(pat, '/', 1, true)
@@ -168,7 +168,7 @@ function M.__heuristic_score(file, pat)
         upscore(score + 1.5, 'directory bonus')
     end
     -- done
-    dbg_print('score', 'Final heuristic score: ' .. tostring(score))
+    dbg_print('score', 'Final heuristic score: %.1f', score)
     return score
 end
 

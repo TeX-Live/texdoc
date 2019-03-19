@@ -44,9 +44,8 @@ function M.set_config_element(key, value, context)
     -- exit if key is already set (/!\ must test for nil, not false)
     if not (texdoc.config[key] == nil) then
         if context.src ~= 'def' then
-            dbg_print('config',
-                'Ignoring "' .. key .. '=' .. value .. '" ' ..
-                M.__context_to_string(context) .. '.')
+            dbg_print('config', 'Ignoring "%s=%s" %s.',
+                key, tostring(value), M.__context_to_string(context))
         end
         return nil
     end
@@ -105,9 +104,8 @@ function M.set_config_element(key, value, context)
 
     -- now tell what we have just done, for debugging
     if not parse_error then
-        dbg_print('config',
-            'Setting "' .. key .. '=' .. value .. '" ' ..
-            M.__context_to_string(context) .. '.')
+        dbg_print('config', 'Setting "%s=%s" %s.',
+            key, tostring(value), M.__context_to_string(context))
     end
 end
 local set_config_element = M.set_config_element
@@ -115,10 +113,11 @@ local set_config_element = M.set_config_element
 -- a helper function for warning messages in the above
 function M.__config_warn(key, value, context, unknown)
     local begin = unknown
-        and 'Unknown option "' .. key .. '"'
-        or 'Illegal value "' .. tostring(value) .. '" for option "' .. key .. '"'
-    err_print('warning',
-        begin .. ' ' .. M.__context_to_string(context) .. '.  Skipping.')
+        and string.format('Unknown option "%s"', key)
+        or string.format('Illegal value "%s" for option "%s"',
+            key, tostring(value))
+    err_print('warning', '%s %s.  Skipping.',
+        begin, M.__context_to_string(context))
 end
 
 -- interpreting 'context' for the previous functions
@@ -189,22 +188,26 @@ end
 function M.__read_config_file(configfile)
     local cnf = assert(io.open(configfile, 'r'))
     local lineno = 0
+
     while true do
         local line=cnf:read('*line')
         lineno = lineno + 1
+
         if line == nil then break end  -- EOF
         line = string.gsub(line, '%s*#.*$', '') -- comments begin with #
         line = string.gsub(line, '%s*$', '')    -- remove trailing spaces
         line = string.gsub(line, '^%s*', '')    -- remove leading spaces
+
         -- try to interpret the line
         local ok = string.match(line, '^%s*$')
-        or texdoc.alias.confline_to_alias(line, configfile, lineno)
-        or texdoc.score.confline_to_score(line, configfile, lineno)
-        or M.__confline_to_config(line, configfile, lineno)
+            or texdoc.alias.confline_to_alias(line, configfile, lineno)
+            or texdoc.score.confline_to_score(line, configfile, lineno)
+            or M.__confline_to_config(line, configfile, lineno)
+
         -- complain if it failed
         if not ok then
             err_print('warning',
-                'syntax error in ' .. configfile .. ' at line ' .. lineno .. '.')
+                'syntax error in %s at line %d.', configfile, lineno)
         end
     end
     cnf:close()

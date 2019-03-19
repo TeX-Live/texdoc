@@ -36,8 +36,7 @@ function M.view_file(filename)
         local unzip_cmd = texdoc.config['unzip_' .. zipext]
 
         if not unzip_cmd then
-            err_print('error',
-                'No unzip command for ".' .. zipext .. '" files.')
+            err_print('error', 'No unzip command for ".%s" files.', zipext)
             os.exit(C.exit_error)
         end
 
@@ -85,15 +84,15 @@ function M.view_file(filename)
     -- still no viewers? use txt as a fallback
     if not texdoc.config['viewer_' .. viewext] then
         err_print('warning',
-            'No viewer defined for ".' .. viewext ..
-            '" files, using "viewer_txt" instead.')
+            'No viewer defined for ".%s" files, using "viewer_txt" instead.',
+            viewext)
         viewext = 'txt'
     end
 
     -- finally, check validity of the viewer
     viewer = texdoc.config['viewer_' .. viewext]
     assert(viewer, 'Internal error: no viewer found.')
-    dbg_print('view', 'Using "viewer_' .. viewext .. '" to open the file.')
+    dbg_print('view', 'Using "viewer_%s" to open the file.', viewext )
 
     return M.__try_viewing(viewer, viewer_replacement)
 end
