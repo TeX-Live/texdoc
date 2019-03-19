@@ -128,7 +128,14 @@ task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   end
 
   # run rspec
-  sh "bundle exec rspec" + opt_args + opt_files
+  begin
+    sh "bundle exec rspec" + opt_args + opt_files
+  rescue
+    # show outputs if failed
+    log_file = TMP_DIR + "rspec.log"
+    sh "cat #{log_file}", verbose: false
+    fail
+  end
 
   # make sure to end this process
   exit 0

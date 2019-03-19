@@ -50,4 +50,27 @@ end
 RSpec.configure do |config|
   config.include SpecHelplers::Texdoc
   config.before(:each) { set_default_env }
+
+  # log
+  log_file = Pathname.pwd + "tmp/rspec.log"
+
+  config.before(:suite) do
+    now = Time.now.strftime("%F %T")
+    File.open(log_file, "w") do |log|
+      log.puts("Outputs of failed commands (#{now})")
+    end
+  end
+
+  config.after(:each) do |example|
+    if !example.exception.nil?
+      File.open(log_file, "a") do |log|
+        log.puts
+        log.puts last_command_started.commandline
+        log.puts "STDOUT"
+        log.puts last_command_started.stdout
+        log.puts "STDERR"
+        log.puts last_command_started.stderr
+      end
+    end
+  end
 end
