@@ -308,7 +308,7 @@ function M.show_config_files(print_fun, verbose)
         local sep = (os.type == 'windows') and ';' or ':'
         local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
         for _, home in ipairs(texmfhomes) do
-            print_fun(pref .. home .. '/texdoc/texdoc.cnf')
+            print_fun(pref .. w32_path(home .. '/texdoc/texdoc.cnf'))
         end
     end
 end
