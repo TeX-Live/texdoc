@@ -1,8 +1,7 @@
 -- texdoclib.tlu: the texdoc library
 
 --[[
-Copyright 2008-2019 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and
-Norbert Preining.
+Copyright 2008 Manuel Pégourié-Gonnard, Takuto Asakura, and the TeX Live Team.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -22,25 +21,16 @@ Previous work in the public domain:
 - Original shell script by Thomas Esser, David Aspinall, and Simon Wilkinson.
 --]]
 
--- pre-declare variables in the shared environment
-texdoc = {}  -- Warning: this is global table
-texdoc.config = {}
-
--- loading submodules
-local function texdoc_require(module_name)
-    local basename = 'texdoclib-' .. module_name
-    local module = require(basename)
-    texdoc[module_name] = texdoc[module_name] or module
-end
-
-texdoc_require('const')
-texdoc_require('util')
-texdoc_require('alias')
-texdoc_require('score')
-texdoc_require('confutil')
-texdoc_require('search')
-texdoc_require('view')
-texdoc_require('cli')
+local texdoc = {
+    const = require('texdoclib-const'),
+    util = require('texdoclib-util'),
+    alias = require('texdoclib-alias'),
+    score = require('texdoclib-score'),
+    config = require('texdoclib-config'),
+    search = require('texdoclib-search'),
+    view = require('texdoclib-view'),
+    cli = require('texdoclib-cli'),
+}
 
 return texdoc
 

@@ -1,10 +1,18 @@
 -- texdoclib-cli.tlu: command line interfaces for texdoc
 --
--- The TeX Live team, GPLv3, see texdoclib.tlu for details
+-- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
-texdoc.cli = {}
-local M = texdoc.cli
+-- dependencies
+local texdoc = {
+    const = require('texdoclib-const'),
+    util = require('texdoclib-util'),
+    config = require('texdoclib-config'),
+    search = require('texdoclib-search'),
+    view = require('texdoclib-view'),
+}
 
+-- shortcuts
+local M = {}
 local C = texdoc.const
 local err_print = texdoc.util.err_print
 
@@ -12,7 +20,7 @@ local err_print = texdoc.util.err_print
 
 -- modified Alternative GetOpt
 -- cf. http://lua-users.org/wiki/AlternativeGetOpt
-function M.__getopt(arg, options)
+local function getopt(arg, options)
     local tmp
     local tab = {}
     local saved_arg = {table.unpack(arg)}
@@ -57,7 +65,7 @@ function M.__getopt(arg, options)
     return tab
 end
 
-function M.__parse_options()
+local function parse_options()
     local curr_arg
     local action = true
     local cl_config = {}
@@ -67,7 +75,7 @@ function M.__parse_options()
     end
 
     -- actual parsing
-    opts = M.__getopt(arg, 'cd')
+    opts = getopt(arg, 'cd')
 
     for _, tp in ipairs(opts) do
         local k, v = tp[1], tp[2]
@@ -139,7 +147,7 @@ end
 --------------------------   process execution   --------------------------
 
 -- handling actions
-function M.__do_action(action)
+local function do_action(action)
     if action == 'help' then
         texdoc.util.print_usage()
         os.exit(C.exit_ok)
@@ -149,7 +157,7 @@ function M.__do_action(action)
         os.exit(C.exit_ok)
     elseif action == 'files' then
         print(C.fullname .. ' ' .. C.version)
-        texdoc.confutil.show_config_files(print, true)
+        texdoc.config.show_config_files(print, true)
         os.exit(C.exit_ok)
     elseif action == 'view' then
         if not arg[1] then
@@ -163,7 +171,7 @@ function M.__do_action(action)
 end
 
 -- the main loop
-function M.__do_texdoc()
+local function do_texdoc()
     texdoc.search.init_databases()
 
     for _, docname in ipairs(arg) do
@@ -178,19 +186,19 @@ end
 
 --------------------------   the main function   --------------------------
 
-function M.main()
+function M.exec()
     -- parsing command line options
-    local action, cl_config = M.__parse_options()
+    local action, cl_config = parse_options()
 
     if not action then
         os.exit(C.exit_usage)
     end
 
     -- setup config and alias
-    texdoc.confutil.setup_config_and_alias(cl_config)
+    texdoc.config.setup_config_and_alias(cl_config)
 
     -- special action
-    M.__do_action(action)
+    do_action(action)
 
     -- do we actually have arguments?
     if not arg[1] then
@@ -200,7 +208,7 @@ function M.main()
     end
 
     -- the main feature
-    M.__do_texdoc()
+    do_texdoc()
 
     os.exit(C.exit_ok)
 end

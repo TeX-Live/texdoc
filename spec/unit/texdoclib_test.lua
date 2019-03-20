@@ -21,16 +21,19 @@ do
     end
 
     local before_req = table_keys(_ENV)
-    require('texdoclib')
+    local texdoc = require('texdoclib')
     local after_req = table_keys(_ENV)
 
     for k, _ in pairs(after_req) do
-        if not before_req[k] and k ~= 'texdoc' then
+        if not before_req[k] then
             print('Added global variable: ' .. k)
             ok = false
         end
     end
 end
+
+-- load texdoclib for tests bellow
+local texdoc = require('texdoclib')
 
 -- Are all submodules sucessfully loaded?
 do
@@ -39,7 +42,7 @@ do
         'util',
         'alias',
         'score',
-        'confutil',
+        'config',
         'search',
         'view',
         'cli',

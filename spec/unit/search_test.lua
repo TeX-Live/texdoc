@@ -12,7 +12,7 @@ local M = texdoc.search
 local ok = true
 local function printf(fmt, ...) print(fmt:format(...)) end
 
--- M.__levenshtein
+-- M.levenshtein
 do
     local test_cases = {
         -- {<string1>, <string2>, <distance>}
@@ -23,7 +23,7 @@ do
     }
 
     for _, c in ipairs(test_cases) do
-        local res = M.__levenshtein(c[1], c[2])
+        local res = M.levenshtein(c[1], c[2])
 
         if res ~= c[3] then
             printf('Levenshtein(%q, %q) should be %d but got %d',

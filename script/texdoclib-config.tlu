@@ -1,18 +1,31 @@
--- texdoclib-confutil.tlu: configuration utility functions for texdoc
+-- texdoclib-config.tlu: handling config of texdoc
 --
--- The TeX Live team, GPLv3, see texdoclib.tlu for details
+-- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
-texdoc.confutil = {}
-local M = texdoc.confutil
+-- shortcuts
+local M = {}
+local C = require('texdoclib-const')
 
-local C = texdoc.const
-local err_print = texdoc.util.err_print
-local dbg_print = texdoc.util.dbg_print
+-- config is local to this file
+local config = {}
+
+--------------------------   handling dependencies   --------------------------
+
+-- in this file, dependencies should be required ondemand to prevent infinite
+-- recursion.
+
+local texdoc = {}
+
+-- import specified function from the submodule
+local function import_function(mod, func)
+    texdoc[mod] = texdoc[mod] or require('texdoclib-' .. mod)
+    return texdoc[mod][func]
+end
 
 --------------------------   hide the config table   --------------------------
 
 -- config is read-only (but not "deep" read-only)
-function M.__set_read_only(table, name)
+local function set_read_only(table, name)
     assert(next(table) == nil,
         'Internal error: ' .. name .. ' should be empty at this point.')
     local ro = 'Internal error: attempt to update read-only table '
@@ -23,29 +36,65 @@ function M.__set_read_only(table, name)
     })
     return function(k, v) real[k] = v end
 end
-local real_set_config = M.__set_read_only(texdoc.config, 'config')
+local real_set_config = set_read_only(config, 'config')
+
+-- the accessor
+function M.get_value(key) return config[key] end
 
 -------------------------   general config functions   ------------------------
+
+-- interpreting 'context' in this section
+local function context_to_string(context)
+    if not context then return '(no context)' end
+    if context.src == 'cl' then
+        return 'from command line option "' .. context.name .. '"'
+    elseif context.src == 'env' then
+        return 'from environment variable "' .. context.name .. '"'
+    elseif context.src == 'loc' then
+        return 'from operating system locale'
+    elseif context.src == 'file' then
+        return 'in file "' .. context.file .. '" on line ' .. context.line
+    elseif context.src == 'def' then
+        return 'from built-in defaults'
+    else
+        return 'from unkown source (should not happen, please report)'
+    end
+end
+
+-- a helper function for warning messages in this section
+local function config_warn(key, value, context, unknown)
+    local err_print = import_function('util', 'err_print')
+    local begin = unknown
+        and string.format('Unknown option "%s"', key)
+        or string.format('Illegal value "%s" for option "%s"',
+            key, tostring(value))
+    texdoc.util.err_print('warning',
+        '%s %s. Skipping.', begin, context_to_string(context))
+end
 
 -- set a config parameter, but don't overwrite it if already set
 -- three special types: *_list (list), *_switch (boolean), *_level (number)
 function M.set_config_element(key, value, context)
+    local dbg_print = import_function('util', 'dbg_print')
     local parse_error = false
+
     local is_known = false -- is key a valid option?
     local option
-
     for _, option in ipairs(C.known_options) do
-        if string.match(key, '^'..option..'$') then is_known = true break end
+        if string.match(key, '^' .. option .. '$') then
+            is_known = true
+            break
+        end
     end
 
     -- warn and exit if key is not a known option
-    if not is_known then M.__config_warn(key, nil, context, true) return end
+    if not is_known then config_warn(key, nil, context, true) return end
 
     -- exit if key is already set (/!\ must test for nil, not false)
-    if not (texdoc.config[key] == nil) then
+    if not (config[key] == nil) then
         if context.src ~= 'def' then
             dbg_print('config', 'Ignoring "%s=%s" %s.',
-                key, tostring(value), M.__context_to_string(context))
+                key, tostring(value), context_to_string(context))
         end
         return nil
     end
@@ -81,7 +130,7 @@ function M.set_config_element(key, value, context)
         elseif value == 'false' then
             real_set_config(key, false)
         else
-            M.__config_warn(key, value, context)
+            config_warn(key, value, context)
             parse_error = true
         end
     elseif string.find(key, '_level$') then
@@ -90,7 +139,7 @@ function M.set_config_element(key, value, context)
         if val then
             real_set_config(key, val)
         else
-            M.__config_warn(key, value, context)
+            config_warn(key, value, context)
             parse_error = true
         end
     else -- string
@@ -99,47 +148,19 @@ function M.set_config_element(key, value, context)
 
     -- special case: if we just set debug_list, print version info now
     if key == 'debug_list' then
-        dbg_print('version', C.fullname .. ' version ' .. C.version)
+        dbg_print('version', '%s v%s', C.fullname, C.version)
     end
 
     -- now tell what we have just done, for debugging
     if not parse_error then
         dbg_print('config', 'Setting "%s=%s" %s.',
-            key, tostring(value), M.__context_to_string(context))
+            key, tostring(value), context_to_string(context))
     end
 end
 local set_config_element = M.set_config_element
 
--- a helper function for warning messages in the above
-function M.__config_warn(key, value, context, unknown)
-    local begin = unknown
-        and string.format('Unknown option "%s"', key)
-        or string.format('Illegal value "%s" for option "%s"',
-            key, tostring(value))
-    err_print('warning', '%s %s.  Skipping.',
-        begin, M.__context_to_string(context))
-end
-
--- interpreting 'context' for the previous functions
-function M.__context_to_string(context)
-    if not context then return '(no context)' end
-    if context.src == 'cl' then
-        return 'from command line option "' .. context.name .. '"'
-    elseif context.src == 'env' then
-        return 'from environment variable "' .. context.name .. '"'
-    elseif context.src == 'loc' then
-        return 'from operating system locale'
-    elseif context.src == 'file' then
-        return 'in file "' .. context.file .. '" on line ' .. context.line
-    elseif context.src == 'def' then
-        return 'from built-in defaults'
-    else
-        return 'from unkown source (should not happen, please report)'
-    end
-end
-
 -- set a whole list, also without overwriting
-function M.__set_config_list(conf, context)
+local function set_config_list(conf, context)
     for key, value in pairs(conf) do
         set_config_element(key, value, context)
     end
@@ -148,9 +169,9 @@ end
 ------------------------   config from command line   ------------------------
 
 -- set config from the command line
--- Note: Make sure to set a default value in M.__setup_config_from_defaults()
+-- Note: Make sure to set a default value in setup_config_from_defaults()
 --       if relevant.
-function M.__setup_config_from_cl(cl_config)
+local function setup_config_from_cl(cl_config)
     for _, e in ipairs(cl_config) do
         set_config_element(e[1], e[2], {src='cl', name=e[3]})
     end
@@ -159,7 +180,7 @@ end
 -------------------------   config from environment   --------------------------
 
 -- set config from environment if available
-function M.__setup_config_from_env()
+local function setup_config_from_env()
     local function set_config_elt_from_vars(key, vars)
         for _, var in ipairs(vars) do
             local value = os.getenv(var)
@@ -184,11 +205,24 @@ end
 
 ----------------------   options and aliases from files   ----------------------
 
--- set config+aliases from a particular config file assumed to exist
-function M.__read_config_file(configfile)
+-- interpret a confline as a config setting or return false
+local function confline_to_config(line, file, pos)
+    local key, val = string.match(line, '^([%a%d_]+)%s*=%s*(.+)')
+    if key and val then
+        set_config_element(key, val, {src='file', file=file, line=pos})
+        return true
+    end
+    return false
+end
+
+-- set config and aliases from a particular config file assumed to exist
+local function read_config_file(configfile)
+    local err_print = import_function('util', 'err_print')
+    local confline_to_alias = import_function('alias', 'confline_to_alias')
+    local confline_to_score = import_function('score', 'confline_to_score')
+
     local cnf = assert(io.open(configfile, 'r'))
     local lineno = 0
-
     while true do
         local line=cnf:read('*line')
         lineno = lineno + 1
@@ -200,9 +234,9 @@ function M.__read_config_file(configfile)
 
         -- try to interpret the line
         local ok = string.match(line, '^%s*$')
-            or texdoc.alias.confline_to_alias(line, configfile, lineno)
-            or texdoc.score.confline_to_score(line, configfile, lineno)
-            or M.__confline_to_config(line, configfile, lineno)
+            or confline_to_alias(line, configfile, lineno)
+            or confline_to_score(line, configfile, lineno)
+            or confline_to_config(line, configfile, lineno)
 
         -- complain if it failed
         if not ok then
@@ -213,18 +247,8 @@ function M.__read_config_file(configfile)
     cnf:close()
 end
 
--- interpret a confline as a config setting or return false
-function M.__confline_to_config(line, file, pos)
-    local key, val = string.match(line, '^([%a%d_]+)%s*=%s*(.+)')
-    if key and val then
-        set_config_element(key, val, {src='file', file=file, line=pos})
-        return true
-    end
-    return false
-end
-
 -- return the list of configuration files
-function M.__get_config_files()
+local function get_config_files()
     -- get names
     local platform = string.match(kpse.var_value('SELFAUTOLOC'), '.*/(.*)$')
     local names = {
@@ -249,31 +273,35 @@ function M.__get_config_files()
     return ret
 end
 
--- the config_files table is shared by the next two functions
-do
+-- the config_files table is shared by the following two functions
+local setup_config_from_files
+
+do -- begin scope of config_files
 local config_files = {}
 
 -- set config/aliases from all config files
-function M.__setup_config_from_files()
-    local file_list = M.__get_config_files()
+setup_config_from_files = function()
+    local file_list = get_config_files()
     for i, file in ipairs(file_list) do
-        local status = texdoc.config.lastfile_switch and 'disabled' or 'active'
+        local status = config.lastfile_switch and 'disabled' or 'active'
         config_files[i] = {
             path = file,
             status = status,
         }
         if status == 'active' then
-            M.__read_config_file(file)
+            read_config_file(file)
         end
     end
 end
 
 -- now a special information function (see -f,--file option)
 function M.show_config_files(print_fun, verbose)
+    local w32_path = import_function('util', 'w32_path')
+
     local pref = verbose and '    ' or ''
     print_fun('Configuration files are:')
     for i, file in ipairs(config_files) do
-        print_fun(pref .. file.status .. '\t' .. texdoc.util.w32_path(file.path))
+        print_fun(pref .. file.status .. '\t' .. w32_path(file.path))
     end
     if verbose then
         print_fun('Recommended file(s) for personal settings:')
@@ -285,11 +313,11 @@ function M.show_config_files(print_fun, verbose)
     end
 end
 
-end -- scope of config_files
+end -- end scope of config_files
 
 ----------------------   config from locale settings   -------------------------
 
-function M.__setup_config_from_locale()
+local function setup_config_from_locale()
     local current = os.setlocale(nil, 'all')
     os.setlocale('', 'all')
     local native = os.setlocale(nil, 'time')
@@ -302,19 +330,44 @@ end
 
 ----------------------   options from built-in defaults   ----------------------
 
--- for default viewer on general Unix, we have a list; the following two
--- functions are used to check in the path which program is available
+-- for default viewer on general Unix, we have a list; the following function is
+-- used to check in the path which program is available
 
 -- check if "name" is the name of a file in the path
 -- Warning: to be used only on Unix! (separators, and PATH irrelevant on win32)
--- the value of PATH is cached
+--          the value of PATH is cached
+local is_in_path
 do local path_list = string.explode(os.getenv('PATH'), ':')
-function M.__is_in_path(name)
+is_in_path = function(name)
     for _, path in ipairs(path_list) do
         if lfs.isfile(path .. '/' .. name) then return true end
     end
     return false
 end
+end
+
+-- returns a viewer specific to a desktop environment if relevant
+-- doesn't work on windows (uses io.popen)
+-- logic stolen from xdg-open (http://www.freedesktop.org/) and adapted
+local function desktop_environment_viewer()
+    local xdg_current_desktop = os.getenv('XDG_CURRENT_DESKTOP') or ''
+    if (os.getenv('KDE_SESSION_VERSION') or os.getenv('KDE_FULL_SESSION'))
+        or string.match(xdg_current_desktop, '.*KDE.*') then
+        if is_in_path('kde-open') then return '(kde-open %s) &' end
+        if is_in_path('kfmclient') then return '(kfmclient exec %s) &' end
+    end
+    if os.getenv('GNOME_DESKTOP_SESSION_ID')
+        or string.match(xdg_current_desktop, '.*GNOME.*') then  -- gnome
+        if is_in_path('gvfs-open') then return '(gvfs-open %s) &' end
+        if is_in_path('gnome-open') then return '(gnome-open %s) &' end
+    end
+    if not is_in_path('xprop') then return end
+    local xprop_fh = io.popen('xprop -root _DT_SAVE_MODE 2>/dev/null')
+    local xprop_out = xprop_fh:read('*line')
+    xprop_fh:close()
+    if xprop_out and string.find(xprop_out, '= "xfce4"$') then  -- xfce
+        return '(exo-open %s) &'
+    end
 end
 
 -- guess a viewer from a list:
@@ -323,50 +376,26 @@ end
 -- - or return the first element of "list" whose name is found in path
 -- - or nil
 -- caches results of desktop environment detection
+local guess_viewer
 do local de_viewer
-function M.__guess_viewer(cmds)
+guess_viewer = function(cmds)
     -- try the freedesktop method
-    if M.__is_in_path('xdg-open') then
+    if is_in_path('xdg-open') then
         return '(xdg-open %s) &'
     end
     -- try desktop environment
-    if not de_viewer then de_viewer = M.__desktop_environment_viewer() end
+    if not de_viewer then de_viewer = desktop_environment_viewer() end
     if de_viewer then return de_viewer end
     -- or look along path
     for _, cmd in ipairs(cmds) do
-        if M.__is_in_path(cmd[1]) then return cmd[2] end
+        if is_in_path(cmd[1]) then return cmd[2] end
     end
 end
-end
-
--- returns a viewer specific to a desktop environment if relevant
--- doesn't work on windows (uses io.popen)
--- logic stolen from xdg-open (http://www.freedesktop.org/) and adapted
-function M.__desktop_environment_viewer()
-    local xdg_current_desktop = os.getenv('XDG_CURRENT_DESKTOP') or ''
-    if (os.getenv('KDE_SESSION_VERSION') or os.getenv('KDE_FULL_SESSION'))
-        or string.match(xdg_current_desktop, '.*KDE.*') then
-        if M.__is_in_path('kde-open') then return '(kde-open %s) &' end
-        if M.__is_in_path('kfmclient') then return '(kfmclient exec %s) &' end
-    end
-    if os.getenv('GNOME_DESKTOP_SESSION_ID')
-        or string.match(xdg_current_desktop, '.*GNOME.*') then   -- gnome
-        if M.__is_in_path('gvfs-open') then return '(gvfs-open %s) &' end
-        if M.__is_in_path('gnome-open') then return '(gnome-open %s) &' end
-    end
-
-    if not M.__is_in_path('xprop') then return end
-    local xprop_fh = io.popen('xprop -root _DT_SAVE_MODE 2>/dev/null')
-    local xprop_out = xprop_fh:read('*line')
-    xprop_fh:close()
-    if xprop_out and string.find(xprop_out, '= "xfce4"$') then     -- xfce
-        return '(exo-open %s) &'
-    end
 end
 
 -- set viewers from defaults (done only if necessary)
 function M.get_default_viewers()
-    local function set_config_ls(ls) M.__set_config_list(ls, {src='def'}) end
+    local function set_config_ls(ls) set_config_list(ls, {src='def'}) end
     if (os.type == 'windows') then
         set_config_ls {
             -- Use 'start' to get file associations.
@@ -396,7 +425,7 @@ function M.get_default_viewers()
         }
     else -- generic Unix
         set_config_ls {
-            viewer_dvi = M.__guess_viewer {
+            viewer_dvi = guess_viewer {
                 {'xdvi', '(xdvi %s) &'},
                 {'evince', '(evince %s) &'},
                 {'okular', '(okular %s) &'},
@@ -410,7 +439,7 @@ function M.get_default_viewers()
                 {'xdvik-ja', '(xdvik-ja %s) &'},
                 {'see', '(see %s) &'}
             },
-            viewer_html = M.__guess_viewer {
+            viewer_html = guess_viewer {
                 {'firefox', '(firefox %s) &'},
                 {'seamonkey', '(seamonkey %s) &'},
                 {'mozilla', '(mozilla %s) &'},
@@ -422,7 +451,7 @@ function M.get_default_viewers()
                 {'lynx', 'lynx'},
                 {'see', 'see'}
             },
-            viewer_pdf = M.__guess_viewer {
+            viewer_pdf = guess_viewer {
                 {'xpdf', '(xpdf %s) &'},
                 {'evince', '(evince %s) &'},
                 {'okular', '(okular %s) &'},
@@ -430,14 +459,14 @@ function M.get_default_viewers()
                 {'acroread', '(xpdf %s) &'},
                 {'see', '(see %s) &'}
             },
-            viewer_ps = M.__guess_viewer {
+            viewer_ps = guess_viewer {
                 {'gv', '(gv %s) &'},
                 {'evince', '(evince %s) &'},
                 {'okular', '(okular %s) &'},
                 {'kghostview', '(kghostview %s) &'},
                 {'see', '(see %s) &'}
             },
-            viewer_txt = M.__guess_viewer {
+            viewer_txt = guess_viewer {
                 {'most', 'most'},
                 {'less', 'less'},
                 {'more', 'more'}
@@ -448,8 +477,8 @@ function M.get_default_viewers()
 end
 
 -- set some fall-back default values if no previous value is set
-function M.__setup_config_from_defaults()
-    local function set_config_ls(ls) M.__set_config_list(ls, {src='def'}) end
+local function setup_config_from_defaults()
+    local function set_config_ls(ls) set_config_list(ls, {src='def'}) end
     local function set_config_elt(key, val)
         set_config_element(key, val, {src='def'})
     end
@@ -480,20 +509,22 @@ end
 
 -- populate the config and alias arrays
 function M.setup_config_and_alias(cl_config)
+    local dbg_print = import_function('util', 'dbg_print')
+
     -- setup config from all sources
-    M.__setup_config_from_cl(cl_config)
-    M.__setup_config_from_env()
-    M.__setup_config_from_files()
-    M.__setup_config_from_locale()
-    M.__setup_config_from_defaults()
+    setup_config_from_cl(cl_config)
+    setup_config_from_env()
+    setup_config_from_files()
+    setup_config_from_locale()
+    setup_config_from_defaults()
 
     -- machine mode implies no interaction
-    if texdoc.config.machine_switch == true then
+    if config.machine_switch == true then
         real_set_config('interact_switch', false)
     end
 
     -- debug implies verbose
-    if #texdoc.config.debug_list > 0 then
+    if #config.debug_list > 0 then
         real_set_config('verbosity_level', tonumber(C.max_verbosity))
     end
 

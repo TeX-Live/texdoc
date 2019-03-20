@@ -1,6 +1,6 @@
 -- texdoclib-alias.tlu: alias handling for texdoc
 --
--- The TeX Live team, GPLv3, see texdoclib.tlu for details
+-- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
 --[[ structure of the alias table
 
@@ -14,21 +14,26 @@ aliasentry = {
   name      = <string> pattern to be matched,
   score     = <number or nil> associated score,
   original  = <true or nil> is this the original keyword?,
-  locale    = <true or nil> is this entry found via texdoc.config.lang?
+  locale    = <true or nil> is this entry found via config.lang?
 }
 score == nil means to use the default score (defined in texdoclib-score.tlu)
 
 --]]
 
-texdoc.alias = {}
-local M = texdoc.alias
+-- dependencies
+local texdoc = {
+    config = require('texdoclib-config'),
+}
+
+-- shortcuts
+local M = {}
 
 -- alias is local to this file
 local alias = {}
 
 -- turn a name into a suitable alias entry
 -- if score is 'false', this is the original name
-function M.__make_alias(pat, score)
+local function make_alias(pat, score)
     local al = {}
     al.name = pat
     if score == false then
@@ -40,15 +45,15 @@ function M.__make_alias(pat, score)
 end
 
 -- add an alias value for a key
-function M.__add_alias(key, value, score)
+local function add_alias(key, value, score)
     local k = string.lower(key)
-    alias[k] = alias[k] or {M.__make_alias(key, false)}
+    alias[k] = alias[k] or {make_alias(key, false)}
     if alias[k].stop then return end
-    table.insert(alias[k], M.__make_alias(value, score))
+    table.insert(alias[k], make_alias(value, score))
 end
 
 -- prevent a key from being further aliased
-function M.__stop_alias(key)
+local function stop_alias(key)
     local k = string.lower(key)
     alias[k] = alias[k] or {}
     alias[k].stop = true
@@ -57,15 +62,18 @@ end
 -- get patterns for a name
 function M.get_patterns(name, no_alias)
     local n = string.lower(name)
+
     -- get normal aliases
     local res
     if alias[n] and not no_alias then
         res = alias[n]
     else
-        res = {M.__make_alias(name, false)}
+        res = {make_alias(name, false)}
     end
+
     -- check for language-specific aliases
-    local lang = texdoc.config.lang and alias[n .. '-' .. texdoc.config.lang]
+    local config_lang = texdoc.config.get_value('lang')
+    local lang = config_lang and alias[n .. '-' .. config_lang]
     if lang then
         for _, entry in ipairs(lang) do
             if not entry.original then
@@ -77,6 +85,7 @@ function M.get_patterns(name, no_alias)
             end
         end
     end
+
     return res
 end
 
@@ -85,7 +94,7 @@ function M.confline_to_alias(line, file, pos)
     -- alias directive without score
     local key, val = string.match(line, '^alias%s+([%w%p]+)%s*=%s*(.+)')
     if key and val then
-        M.__add_alias(key, val)
+        add_alias(key, val)
         return true
     end
     -- alias directive with score
@@ -93,13 +102,13 @@ function M.confline_to_alias(line, file, pos)
         '^alias%(([%d+-.]+)%)%s+([%w%p]+)%s*=%s*(.+)')
     if score then score = tonumber(score) end
     if key and val and score then
-        M.__add_alias(key, val, score)
+        add_alias(key, val, score)
         return true
     end
     -- stopalias directive
     local key = string.match(line, '^stopalias%s+(.+)')
     if key then
-        M.__stop_alias(key)
+        stop_alias(key)
         return true
     end
     return false
@@ -107,7 +116,7 @@ end
 
 -- iterator over the list of keys in the alias table
 -- Note: currently this function is not used (for debug)
-function M.__aliased_names()
+function M.aliased_names()
     return function(_, cur)
         return (next(alias, cur))
     end

@@ -56,26 +56,26 @@ do
 end
 
 -- M.parse_zip
-do
-    local test_cases = {
-        -- {<arg>, <result>}
-        {'foo.zip', 'foo'},
-        {'foo.txt', 'foo.txt'},
-    }
-
-    -- pseudo config
-    texdoc.config = {zipext_list = {'zip', 'gz'}}
-
-    for _, c in ipairs(test_cases) do
-        local res = M.parse_zip(c[1])
-
-        if res ~= c[2] then
-            printf('parse_zip(%q) should return %q but returns %q',
-                c[1], c[2], res)
-            ok = false
-        end
-    end
-end
+--do
+--    local test_cases = {
+--        -- {<arg>, <result>}
+--        {'foo.zip', 'foo'},
+--        {'foo.txt', 'foo.txt'},
+--    }
+--
+--    -- pseudo config
+--    texdoc.config = {zipext_list = {'zip', 'gz'}}
+--
+--    for _, c in ipairs(test_cases) do
+--        local res = M.parse_zip(c[1])
+--
+--        if res ~= c[2] then
+--            printf('parse_zip(%q) should return %q but returns %q',
+--                c[1], c[2], res)
+--            ok = false
+--        end
+--    end
+--end
 
 if not ok then
     os.exit(1)

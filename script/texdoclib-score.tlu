@@ -1,10 +1,15 @@
 -- texdoclib-score.tlu: scoring functions for texdoc
 --
--- The TeX Live team, GPLv3, see texdoclib.tlu for details
+-- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
-texdoc.score = {}
-local M = texdoc.score
+-- dependencies
+local texdoc = {
+    util = require('texdoclib-util'),
+    config = require('texdoclib-config'),
+}
 
+-- shortcuts
+local M = {}
 local dbg_print = texdoc.util.dbg_print
 
 -- shared variables
@@ -12,27 +17,8 @@ local global_adjscore, spec_adjscore = {}, {}
 
 -------------------------   configuration directives   -------------------------
 
--- interpret a confline as a score directive or return false
-function M.confline_to_score(line, file, pos)
-    local keyw, pat, val
-    -- try global adjscore
-    pat, val = string.match(line, '^adjscore%s+([%w%p]+)%s*=%s*([%d+-.]+)')
-    if pat and val then
-        return M.__set_score_table(global_adjscore, pat, val)
-    end
-    -- try keyword specific adjscore
-    keyw, pat, val = string.match(line,
-        '^adjscore%(([%w%p]+)%)%s+([%w%p]+)%s*=%s*([%d+-.]+)')
-    if keyw and pat and val then
-        keyw = string.lower(keyw)
-        spec_adjscore[keyw] = spec_adjscore[keyw] or {}
-        return M.__set_score_table(spec_adjscore[keyw], pat, val)
-    end
-    return false
-end
-
 -- set key in score table to val, without overriding
-function M.__set_score_table(tab, key, val)
+local function set_score_table(tab, key, val)
     local k = string.lower(key)
     local v = tonumber(val)
     if v then
@@ -42,17 +28,102 @@ function M.__set_score_table(tab, key, val)
     return false
 end
 
+-- interpret a confline as a score directive or return false
+function M.confline_to_score(line, file, pos)
+    local keyw, pat, val
+    -- try global adjscore
+    pat, val = string.match(line, '^adjscore%s+([%w%p]+)%s*=%s*([%d+-.]+)')
+    if pat and val then
+        return set_score_table(global_adjscore, pat, val)
+    end
+    -- try keyword specific adjscore
+    keyw, pat, val = string.match(line,
+        '^adjscore%(([%w%p]+)%)%s+([%w%p]+)%s*=%s*([%d+-.]+)')
+    if keyw and pat and val then
+        keyw = string.lower(keyw)
+        spec_adjscore[keyw] = spec_adjscore[keyw] or {}
+        return set_score_table(spec_adjscore[keyw], pat, val)
+    end
+    return false
+end
+
 ----------------------------   score computation   -----------------------------
 
--- set the scores for a doclist
-function M.__set_list_scores(list, original_kw)
-    for _, df in ipairs(list) do
-        M.__set_score(df, original_kw)
+-- says if pat is a "subword" of str
+local function is_subword(str, pat)
+    local function is_delim(str, i)
+        return not not string.find(string.sub(str, i, i), '%p')
     end
+
+    local i, j = string.find(str, pat, 1, true)
+    return not not (i and j
+        and (i == 1 or is_delim(str, i) or is_delim(str, i-1))
+        and (j == #str or is_delim(str, j) or is_delim(str, j+1)))
+end
+
+-- says if a filename has a bad basename
+local function has_bad_basename(file)
+    file = file:gsub('.*/', '')
+    for _, b in ipairs(texdoc.config.get_value('badbasename_list')) do
+        if file:find('^' .. b .. '$') or file:find('^' .. b .. '%.') then
+            return true
+        end
+    end
+    return false
+end
+
+-- compute a heuristic score -10 <= s < 10
+local function heuristic_score(file, pat)
+    dbg_print('score', 'Start heuristic scoring with pattern: ' .. pat)
+    -- score management
+    local score = -10
+    local function upscore(s, reason, force)
+        if s > score or force then
+            score = s
+            dbg_print('score',
+                'New heuristic score: %.1f. Reason: %s', s, reason)
+        end
+    end
+    local slash = not not string.find(pat, '/', 1, true)
+    -- look for exact or subword match
+    if M.is_exact_locale(file, pat) then
+        upscore(5, 'exact match with correct locale')
+    elseif M.is_exact(file, pat) then
+        upscore(4, 'exact match')
+    elseif is_subword(file, pat) then
+        upscore(1, 'subword match')
+    end
+    -- try derivatives unless pat contains a slash
+    if not slash then
+        for _, suffix in ipairs(texdoc.config.get_value('suffix_list')) do
+            local deriv = pat..suffix
+            if M.is_exact(file, deriv) then
+                upscore(3, 'exact match for derived pattern: ' .. deriv)
+            elseif is_subword(file, deriv) then
+                upscore(2, 'subword match for derived pattern: ' .. deriv)
+            end
+        end
+    end
+    -- if extension is bad, score becomes an epsilon
+    local ext = texdoc.config.get_value('ext_list')[M.ext_pos(file)]
+    if ext and texdoc.config.get_value('badext_list_inv')[ext] and score > 0 then
+        upscore(0.1, 'bad extension', true)
+    end
+    -- if basename is bad, score becomes an epsilon
+    if has_bad_basename(file) and score > 0 then
+        upscore(0.1, 'bad basename', true)
+    end
+    -- bonus for being in the right directory
+    if string.find('/' .. file, '/' .. pat .. '/', 1, true) and not slash then
+        upscore(score + 1.5, 'directory bonus')
+    end
+    -- done
+    dbg_print('score', 'Final heuristic score: %.1f', score)
+    return score
 end
 
 -- set the score of a docfile
-function M.__set_score(df, original_kw)
+local function set_score(df, original_kw)
     -- scoring is case-insensitive (patterns are already lowercased)
     local name = string.lower(df.shortname)
     dbg_print('score', '----------')
@@ -64,7 +135,7 @@ function M.__set_score(df, original_kw)
         local s = -10
         local p = string.lower(pat.name)
         if pat.original then
-            s = df.tree > -1 and M.__heuristic_score(name, p) or 1
+            s = df.tree > -1 and heuristic_score(name, p) or 1
         elseif M.is_exact(name, p) then
             local bonus, note = 0, ''
             if pat.locale then
@@ -101,7 +172,7 @@ function M.__set_score(df, original_kw)
     -- adjust from keyword-specific tables
     if df.tree > -1 and spec_adjscore[original_kw] then
         for pat, val in pairs(spec_adjscore[original_kw]) do
-            if val and M.__is_subword('/' .. name, pat) then
+            if val and is_subword('/' .. name, pat) then
                 score = score + val
                 dbg_print('score',
                     'Adjust by %.1f from specific pattern "%s"', val, pat)
@@ -111,7 +182,7 @@ function M.__set_score(df, original_kw)
     -- adjust from global tables
     if df.tree > -1 then
         for pat, val in pairs(global_adjscore) do
-            if val and M.__is_subword('/' .. name, pat) then
+            if val and is_subword('/' .. name, pat) then
                 if score > -10 or val < 0 then score = score + val end
                 dbg_print('score',
                     'Adjust by %.1f from global pattern "%s"', val, pat)
@@ -122,54 +193,11 @@ function M.__set_score(df, original_kw)
     df.score = score
 end
 
--- compute a heuristic score -10 <= s < 10
-function M.__heuristic_score(file, pat)
-    dbg_print('score', 'Start heuristic scoring with pattern: ' .. pat)
-    -- score management
-    local score = -10
-    local function upscore(s, reason, force)
-        if s > score or force then
-            score = s
-            dbg_print('score',
-                'New heuristic score: %.1f. Reason: %s', s, reason)
-        end
+-- set the scores for a doclist
+local function set_list_scores(list, original_kw)
+    for _, df in ipairs(list) do
+        set_score(df, original_kw)
     end
-    local slash = not not string.find(pat, '/', 1, true)
-    -- look for exact or subword match
-    if M.is_exact_locale(file, pat) then
-        upscore(5, 'exact match with correct locale')
-    elseif M.is_exact(file, pat) then
-        upscore(4, 'exact match')
-    elseif M.__is_subword(file, pat) then
-        upscore(1, 'subword match')
-    end
-    -- try derivatives unless pat contains a slash
-    if not slash then
-        for _, suffix in ipairs(texdoc.config.suffix_list) do
-            local deriv = pat..suffix
-            if M.is_exact(file, deriv) then
-                upscore(3, 'exact match for derived pattern: ' .. deriv)
-            elseif M.__is_subword(file, deriv) then
-                upscore(2, 'subword match for derived pattern: ' .. deriv)
-            end
-        end
-    end
-    -- if extension is bad, score becomes an epsilon
-    local ext = texdoc.config.ext_list[M.ext_pos(file)]
-    if ext and texdoc.config.badext_list_inv[ext] and score > 0 then
-        upscore(0.1, 'bad extension', true)
-    end
-    -- if basename is bad, score becomes an epsilon
-    if M.__has_bad_basename(file) and score > 0 then
-        upscore(0.1, 'bad basename', true)
-    end
-    -- bonus for being in the right directory
-    if string.find('/' .. file, '/' .. pat .. '/', 1, true) and not slash then
-        upscore(score + 1.5, 'directory bonus')
-    end
-    -- done
-    dbg_print('score', 'Final heuristic score: %.1f', score)
-    return score
 end
 
 -- says if file is an exact match for pat
@@ -179,7 +207,7 @@ function M.is_exact(file, pat)
     basename = string.match(file, slashes .. '$')
     if not basename then return nil end
     if basename == pat then return true end
-    for _, ext in ipairs(texdoc.config.ext_list) do
+    for _, ext in ipairs(texdoc.config.get_value('ext_list')) do
         if ext ~= '' and ext ~= '*' and basename == pat .. '.' .. ext then
             return true
         end
@@ -193,34 +221,10 @@ function M.is_exact_locale(file, pat)
         -- don't match if the pattern appears to include a language code
         return false
     end
-    local lang = texdoc.config.lang
+    local lang = texdoc.config.get_value('lang')
     if lang then
         return M.is_exact(file, pat .. '-' .. lang)
             or M.is_exact(file, lang .. '-' .. pat)
-    end
-    return false
-end
-
--- says if pat is a "subword" of str
-function M.__is_subword(str, pat)
-    local i, j = string.find(str, pat, 1, true)
-    return not not (i and j
-        and (i == 1 or M.__is_delim(str, i) or M.__is_delim(str, i-1))
-        and (j == #str or M.__is_delim(str, j) or M.__is_delim(str, j+1)))
-end
-
--- says if character i of str is a delimiter (punctuation)
-function M.__is_delim(str, i)
-    return not not string.find(string.sub(str, i, i), '%p')
-end
-
--- says if a filename has a bad basename
-function M.__has_bad_basename(file)
-    file = file:gsub('.*/', '')
-    for _, b in ipairs(texdoc.config.badbasename_list) do
-        if file:find('^' .. b .. '$') or file:find('^' .. b .. '%.') then
-            return true
-        end
     end
     return false
 end
@@ -231,7 +235,7 @@ end
 -- 3. then lexicographically by fullpath.
 -- 4. then by tree.
 -- return true if a is better than b
-function M.__docfile_order(a, b)
+local function docfile_order(a, b)
     if     a.score > b.score       then return true
     elseif a.score < b.score       then return false
     elseif a.ext_pos < b.ext_pos   then return true
@@ -245,13 +249,13 @@ end
 -----------------------------   public functions   -----------------------------
 
 -- returns the index of the most specific extension of file in ext_list,
--- or texdoc.config.ext_list_max + 1
+-- or config.ext_list_max + 1
 function M.ext_pos(file)
     -- remove zipext if applicable
     file = texdoc.util.parse_zip(file)
     -- now find the extension
     local p, e, pos, ext
-    for p, e in ipairs(texdoc.config.ext_list) do
+    for p, e in ipairs(texdoc.config.get_value('ext_list')) do
         if (e == '*') and (ext == nil) then
             pos, ext = p, e
         elseif (e == '') and not string.find(file, '.', 1, true) then
@@ -263,7 +267,7 @@ function M.ext_pos(file)
             end
         end
     end
-    return pos or (texdoc.config.ext_list_max + 1)
+    return pos or (texdoc.config.get_value('ext_list_max') + 1)
 end
 
 -- return the "quality" of docfile
@@ -280,8 +284,8 @@ end
 -- sort a doclist
 function M.sort_doclist(dl, original_kw)
     dl:stop()
-    M.__set_list_scores(dl, original_kw)
-    table.sort(dl, M.__docfile_order)
+    set_list_scores(dl, original_kw)
+    table.sort(dl, docfile_order)
 end
 
 return M

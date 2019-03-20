@@ -1,10 +1,15 @@
 -- texdoclib-util.tlu: utility functions for texdoc
 --
--- The TeX Live team, GPLv3, see texdoclib.tlu for details
+-- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
-texdoc.util = {}
-local M = texdoc.util
+-- dependencies
+local texdoc = {
+    const = require('texdoclib-const'),
+    config = require('texdoclib-config'),
+}
 
+-- shortcuts
+local M = {}
 local C = texdoc.const
 
 -- change '/' to '\' on windows
@@ -32,57 +37,49 @@ else
 end
 
 -- generic log display function
-function M.__log(label, msg, ...)
+local function log(label, msg, ...)
     io.stderr:write('texdoc ' .. label .. ': ' .. msg:format(...) .. '\n')
 end
 
 -- generic error display function (see the err_priority constant)
 function M.err_print(lvl, msg, ...)
-    -- be careful: maybe texdoc.config.verbosity_level is not set yet
-    local verbosity_level = texdoc.config.verbosity_level or tonumber(C.def_verbosity)
+    -- be careful: maybe config item "verbosity_level" has not set yet
+    local verbosity_level = texdoc.config.get_value('verbosity_level')
+        or tonumber(C.def_verbosity)
 
     -- print if the priority is higher than current verbosity level
     if C.err_priority[lvl] <= verbosity_level then
-        M.__log(lvl, msg, ...)
+        log(lvl, msg, ...)
     end
 end
 local err_print = M.err_print
 
-do --scope of active_debugs
+do -- begin scope of active_debugs
 local active_debugs
 
--- generic debug function
-function M.dbg_print(cat, msg, ...)
-    -- make sure active_debugs is set
-    if not active_debugs then M.__set_active_debugs() end
-
-    -- print message it belongs to an active category
-    if active_debugs and active_debugs[cat] or cat == 'XXX' then
-        M.__log('debug-' .. cat, msg, ...)
-    end
-end
-
 -- set active_debugs
-function M.__set_active_debugs()
-    if not texdoc.config.debug_list then return end
+local function set_active_debugs()
+    local debug_list = texdoc.config.get_value('debug_list')
+
+    if not debug_list then return end
     active_debugs = {}
 
     -- all debug options imply version info
-    if texdoc.config.debug_list[1] then
+    if debug_list[1] then
         active_debugs.version = true
     else
         return
     end
 
     -- if 'all' is the first keyword, just activate all categories
-    if texdoc.config.debug_list[1] == 'all' then
+    if debug_list[1] == 'all' then
         for dbg in pairs(C.known_debugs) do
             active_debugs[dbg] = true end
         return
     end
 
     -- activate options from the list
-    for _, dbg in ipairs(texdoc.config.debug_list) do
+    for _, dbg in ipairs(debug_list) do
         local deps = C.known_debugs[dbg]
         if deps then
             active_debugs[dbg] = true
@@ -93,18 +90,30 @@ function M.__set_active_debugs()
     end
 end
 
-end -- scope of active_debugs
+-- generic debug function
+function M.dbg_print(cat, msg, ...)
+    -- make sure active_debugs is set
+    if not active_debugs then set_active_debugs() end
+
+    -- print message it belongs to an active category
+    if active_debugs and active_debugs[cat] or cat == 'XXX' then
+        log('debug-' .. cat, msg, ...)
+    end
+end
+
+end -- end scope of active_debugs
 
 -- if file is base .. '.' .. zip with zip in zipext_list, return: base, zip
 -- otherwise, return: file, nil
 function M.parse_zip(file)
     local zip
-    for _, zip in ipairs(texdoc.config.zipext_list) do
+    for _, zip in ipairs(texdoc.config.get_value('zipext_list')) do
         local l = #zip + 1
         if string.sub(file, -l, -1) == '.' .. zip then
             return string.sub(file, 1, -l - 1), zip
         end
     end
+
     return file, nil
 end
 
