@@ -660,9 +660,28 @@ end -- end scope of tlpinfo table
 local function init_tlp_database()
     local TEXMFVAR = kpse.var_value('TEXMFVAR')
     local cache_file = TEXMFVAR .. '/' .. C.cache_name
+
+    -- set vanilla and detect texlive.tlpdb to use
     local texlive_tlpdb = get_tlroot() .. '/tlpkg/texlive.tlpdb'
     vanilla = lfs.isfile(texlive_tlpdb)
-    if vanilla then
+    local tlpdb_found = vanilla
+
+    local custom_texlive_tlpdb = texdoc.config.get_value('texlive_tlpdb')
+    if custom_texlive_tlpdb then
+        if lfs.isfile(custom_texlive_tlpdb) then
+            texlive_tlpdb = custom_texlive_tlpdb
+            tlpdb_found = true
+        else
+            err_print('warning',
+                'Specified texlive.tlpdb does not exist: ' ..
+                texdoc.util.w32_path(custom_texlive_tlpdb))
+            err_print('warning',
+                'Fallback to use the texlive.tlpdb in the distribution.')
+        end
+    end
+
+    -- get tlpinfo
+    if tlpdb_found then
         if good_cache(cache_file, texlive_tlpdb) then
             dbg_print('tlpdb', 'Using cached data from ' .. cache_file)
             get_tlpinfo_from_cache(cache_file)
