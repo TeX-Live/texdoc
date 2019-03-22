@@ -585,7 +585,7 @@ end
 get_tlpinfo_from_dist = function()
     local f = kpse.find_file(C.data_tlpdb_name, 'texmfscripts')
     if not f then
-        err_print('error', 'No texlive.tlpdb nor shipped tlpdb data found')
+        err_print('error', 'No texlive.tlpdb nor shipped tlpdb data found.')
         os.exit(C.exit_usage)
     end
     dbg_print('tlpdb', 'Getting data from shipped tlpdb data file ' .. f)
@@ -747,9 +747,10 @@ function M.get_doclist(pattern, no_alias)
     doc_search(pattern, no_alias)
 
     -- 2. if no result, execute fuzzy search
-    if not s_doclist[1] and texdoc.config.get_value('fuzzy_level') > 0 then
+    local fuzzy_level = texdoc.config.get_value('fuzzy_level')
+    if not s_doclist[1] and fuzzy_level > 0 then
         local f_res, f_lev = M.fuzzy_search(pattern)
-        if f_lev <= texdoc.config.get_value('fuzzy_level') then
+        if f_lev <= fuzzy_level then
             err_print('info', 'Fuzzy search result: ' .. f_res)
             dbg_print('search', 'Levenshtein distance: ' .. f_lev)
             pattern = f_res
