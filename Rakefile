@@ -164,16 +164,37 @@ task :run_texdoc => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   exit 0
 end
 
-desc "Generate a pre-hashed cache file"
+desc "Generate a pre-hashed cache file [options available]"
 task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+  # parse options
+  options = {}
+  if ARGV.delete("--")
+    OptionParser.new do |opts|
+      opts.banner = "Usage: rake gen_datafile [-- OPTION...]"
+      opts.on("--tlpdb=PATH", "Use texlive.tlpdb at PATH") do |args|
+        options[:tlpdb] = args
+      end
+    end.parse!(ARGV)
+  end
+
   # use controlled environment
   ENV["TEXMFHOME"] = PS_TEXMF.to_s
 
+  # determine command line option for texdoc
+  if options[:tlpdb]
+    clo = "-c 'texlive_tlpdb=#{options[:tlpdb]}' -lM texlive-en"
+  else
+    clo = "-lM texlive-en"
+  end
+
   # run Texdoc to generate a flesh cache file
-  sh "texlua #{TEXDOC_TLU} -lM texlive-en > #{File::NULL}"
+  sh "texlua #{TEXDOC_TLU} #{clo} > #{File::NULL}"
 
   # copy the cache file
   cp TEXMFVAR + "texdoc/cache-tlpdb.lua", TEXDOC_SCRIPT_DIR + "Data.tlpdb.lua"
+
+  # make sure to end this process
+  exit 0
 end
 
 desc "Generate all documentation"
