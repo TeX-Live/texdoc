@@ -256,18 +256,18 @@ local function get_config_files()
         'texdoc.cnf',
         'texdoc-dist.cnf',
     }
+
     -- get dirs
     local sep = (os.type == 'windows') and ';' or ':'
     local texmf_texdoc = kpse.expand_path('$TEXMF/texdoc')
     local dirs = texmf_texdoc:explode(sep)
+
     -- merge them
     local ret = {}
     for _, dir in ipairs(dirs) do
         for _, name in ipairs(names) do
             local pathname = dir .. '/' .. name
-            if lfs.isfile(pathname) then
-                table.insert(ret, pathname)
-            end
+            table.insert(ret, pathname)
         end
     end
     return ret
@@ -282,12 +282,23 @@ local config_files = {}
 -- set config/aliases from all config files
 setup_config_from_files = function()
     local file_list = get_config_files()
+
     for i, file in ipairs(file_list) do
-        local status = config.lastfile_switch and 'disabled' or 'active'
+        -- determine the status of the config file
+        local status
+        if lfs.isfile(file) then
+            status = config.lastfile_switch and 'disabled' or 'active'
+        else
+            status = 'not found'
+        end
+
+        -- register it
         config_files[i] = {
             path = file,
             status = status,
         }
+
+        -- read only if active
         if status == 'active' then
             read_config_file(file)
         end
@@ -295,20 +306,28 @@ setup_config_from_files = function()
 end
 
 -- now a special information function (see -f,--file option)
-function M.show_config_files(print_fun, verbose)
+function M.show_config_files(is_action)
     local w32_path = import_function('util', 'w32_path')
+    local dbg_print = import_function('util', 'dbg_print')
 
-    local pref = verbose and '    ' or ''
-    print_fun('Configuration files are:')
+    -- controled print_func
+    local indent = is_action and '    ' or ''
+    local print_func = is_action and print
+        or function(s) dbg_print('files', s) end
+
+    -- show the list of configuration files
+    print_func('Configuration files are:')
     for i, file in ipairs(config_files) do
-        print_fun(pref .. file.status .. '\t' .. w32_path(file.path))
+        print_func(indent .. file.status .. '\t' .. w32_path(file.path))
     end
-    if verbose then
-        print_fun('Recommended file(s) for personal settings:')
+
+    -- show the recommendation (only for the "files" action)
+    if is_action then
+        print_func('Recommended file(s) for personal settings:')
         local sep = (os.type == 'windows') and ';' or ':'
         local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
         for _, home in ipairs(texmfhomes) do
-            print_fun(pref .. w32_path(home .. '/texdoc/texdoc.cnf'))
+            print_func(indent .. w32_path(home .. '/texdoc/texdoc.cnf'))
         end
     end
 end
@@ -509,7 +528,6 @@ end
 
 -- populate the config and alias arrays
 function M.setup_config_and_alias(cl_config)
-    local dbg_print = import_function('util', 'dbg_print')
 
     -- setup config from all sources
     setup_config_from_cl(cl_config)
@@ -529,7 +547,7 @@ function M.setup_config_and_alias(cl_config)
     end
 
     -- we were waiting for config.debug_list to be known to do this
-    M.show_config_files(function(s) dbg_print('files', s) end)
+    M.show_config_files()
 end
 
 return M
