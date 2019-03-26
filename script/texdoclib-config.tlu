@@ -318,7 +318,11 @@ function M.show_config_files(is_action)
     -- show the list of configuration files
     print_func('Configuration files are:')
     for i, file in ipairs(config_files) do
-        print_func(indent .. file.status .. '\t' .. w32_path(file.path))
+        -- if not verbose, do not show "not found" files for -f
+        if file.status ~= "not found"
+                or (not is_action or config.verbosity_level == 3) then
+            print_func(indent .. file.status .. '\t' .. w32_path(file.path))
+        end
     end
 
     -- show the recommendation (only for the "files" action)
