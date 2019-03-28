@@ -6,7 +6,7 @@ RSpec.describe 'The "help" action', :type => :aruba do
   let(:help_text) do
     <<~EXPECTED
       Usage: texdoc [OPTION...] NAME...
-        or:  texdoc ACTION
+        or:  texdoc [OPTION...] ACTION
 
       Try to find appropriate TeX documentation for the specified NAME(s).
       Alternatively, perform the given ACTION and exit.

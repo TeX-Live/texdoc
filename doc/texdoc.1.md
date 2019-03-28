@@ -3,7 +3,7 @@
 ## SYNOPSIS
 
 `texdoc` [OPTION...] NAME...  
-`texdoc` ACTION
+`texdoc` [OPTION...] ACTION
 
 ## DESCRIPTION
 

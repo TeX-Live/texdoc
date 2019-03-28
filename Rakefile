@@ -6,7 +6,7 @@ require 'pathname'
 require 'optparse'
 
 # basics
-TEXDOC_VERSION = "3.0"
+TEXDOC_VERSION = "3.1"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 
 # woking/temporaly dirs

@@ -152,8 +152,9 @@ local function do_action(action)
         texdoc.util.print_usage()
         os.exit(C.exit_ok)
     elseif action == 'version' then
-        print(C.progname .. ' ' .. C.version)
-        print('\n' .. C.copyright_msg)
+        print(string.format(
+            '%s %s (%s)', C.progname, C.version, C.release_date) ..
+            '\n\n' .. C.copyright_msg)
         os.exit(C.exit_ok)
     elseif action == 'files' then
         print(C.fullname .. ' ' .. C.version)

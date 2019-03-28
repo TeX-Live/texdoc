@@ -2,6 +2,14 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 3.1 (TeX Live 2019)
+===========================
+- New option -c: changing configure temporally
+- New config item `texlive_tlpdb` to specify a path for texlive.tlpdb
+- Fixed an issue that texdoc fails to open gzipped file in GNOME/XFCE
+- Added prefixes to script files not to contaminate kpse search space
+- Many other small improvements and bug fixes
+
 Version 3.0 (TeX Live 2018)
 ===========================
 This version has two big features:

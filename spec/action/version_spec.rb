@@ -5,9 +5,9 @@ RSpec.describe 'The "version" action', :type => :aruba do
 
   let(:version_text) do
     <<~EXPECTED
-      Texdoc 3.0
+      Texdoc 3.1 (2019-03-28)
 
-      Copyright 2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining.
+      Copyright 2008 Manuel Pégourié-Gonnard, Takuto Asakura, and the TeX Live Team.
       License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
       This is free software: you are free to change and redistribute it.
     EXPECTED

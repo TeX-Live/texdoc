@@ -1,4 +1,4 @@
-# Texdoc (v3.0)
+# Texdoc v3.1 (2019-03-28)
 
 [![Build Status](https://travis-ci.org/TeX-Live/texdoc.svg?branch=master)](https://travis-ci.org/TeX-Live/texdoc)
 [![Build status](https://ci.appveyor.com/api/projects/status/uq28ms7eba7ns6d3/branch/master?svg=true)](https://ci.appveyor.com/project/wtsnjp/texdoc/branch/master)
@@ -106,7 +106,7 @@ More specific information (e.g., TODO) can be found in the Wiki of our GitHub re
 
 ## Copyright and License
 
-Copyright 2008-2018 Manuel Pégourié-Gonnard, Takuto Asakura, Karl Berry, and Norbert Preining. All rights reserved.
+Copyright 2008 Manuel Pégourié-Gonnard, Takuto Asakura, and the TeX Live Team.
 
 This package is distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either [version 3](./COPYING) of the License, or (at your option) any later version.
 
