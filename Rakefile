@@ -182,13 +182,13 @@ task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
 
   # determine command line option for texdoc
   if options[:tlpdb]
-    clo = "-c 'texlive_tlpdb=#{options[:tlpdb]}' -lM texlive-en"
+    clo = "-c 'texlive_tlpdb=#{options[:tlpdb]}' -lM"
   else
-    clo = "-lM texlive-en"
+    clo = "-lM"
   end
 
   # run Texdoc to generate a flesh cache file
-  sh "texlua #{TEXDOC_TLU} #{clo} > #{File::NULL}"
+  sh "texlua #{TEXDOC_TLU} #{clo} texlive-en > #{File::NULL}"
 
   # copy the cache file
   cp TEXMFVAR + "texdoc/cache-tlpdb.lua", TEXDOC_SCRIPT_DIR + "Data.tlpdb.lua"
