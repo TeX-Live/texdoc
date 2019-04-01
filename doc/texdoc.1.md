@@ -98,8 +98,7 @@ Source: <https://github.com/TeX-Live/texdoc>
 
 ## COPYRIGHT
 
-Copyright 2018 Manuel Pe'gourie'-Gonnard, Takuto Asakura, Karl Berry, and
-Norbert Preining.  
+Copyright 2008 Manuel Pe'gourie'-Gonnard, Takuto Asakura, and the TeX Live Team  
 License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.  
 This is free software: you are free to change and redistribute it.
 
