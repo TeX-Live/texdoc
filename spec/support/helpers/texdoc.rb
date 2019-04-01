@@ -20,9 +20,7 @@ module SpecHelplers
       arg_str = " " + args.join(" ") if args.size > 0
 
       # execute the command
-      # NOTE: the newest Aruba API should be run_command and
-      #       run_command_and_stop but it does not work for now.
-      run "texlua #{TEXDOC_TLU}" + arg_str
+      run_command "texlua #{TEXDOC_TLU}" + arg_str
 
       # stop the command automatically if not interactive execution
       stop_all_commands if !interactive

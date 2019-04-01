@@ -3,7 +3,7 @@ require 'pathname'
 
 RSpec.describe "Unit test", :type => :aruba do
   def run_unit_test name
-    run "texlua #{Pathname.pwd}/spec/unit/#{name}_test.lua"
+    run_command_and_stop "texlua #{Pathname.pwd}/spec/unit/#{name}_test.lua"
   end
 
   context 'texdoclib_test.lua' do
