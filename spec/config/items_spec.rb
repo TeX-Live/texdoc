@@ -1,16 +1,13 @@
 require 'os'
 require 'spec_helper'
-require 'pathname'
 require 'fileutils'
 
 RSpec.describe "Configuration item", :type => :aruba do
   include_context "messages"
+  include_context "texmf"
 
   context "texlive_tlpdb" do
     context "to set custom path" do
-      let(:tlpdb) { Pathname.pwd + "tmp/texlive.tlpdb" }
-      let(:texmf_var) { Pathname.pwd + "tmp/texmf-var" }
-
       before(:each) { set_environment_variable "TEXMFVAR", texmf_var.to_s }
       before(:each) {
         run_texdoc "-dtlpdb", "-c texlive_tlpdb=#{tlpdb.to_s}", "texlive-en"

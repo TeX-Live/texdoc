@@ -58,9 +58,23 @@ file PS_TEXDOC_CNF_LINK => PS_TEXMF_TEXDOC_DIR do
   ln_s TEXDOC_CNF, PS_TEXDOC_CNF_LINK
 end
 
+# link to texlive.tlpdb
 PS_TEXLIVE_TLPDB = TMP_DIR + "texlive.tlpdb"
 file PS_TEXLIVE_TLPDB do
   ln_s TEXMFROOT + "tlpkg/texlive.tlpdb", PS_TEXLIVE_TLPDB
+end
+
+# sample files
+SAMPLE_DOC_DIR = PS_TEXMF + "doc/sample"
+directory SAMPLE_DOC_DIR
+
+SAMPLE_FILES = []
+["html", "htm", "dvi", "md", "txt", "pdf", "ps", "tex"].each do |ext|
+  sample_file = SAMPLE_DOC_DIR + "sample.#{ext}"
+  file sample_file => SAMPLE_DOC_DIR do
+    touch sample_file
+  end
+  SAMPLE_FILES << sample_file
 end
 
 # options for ronn
@@ -102,7 +116,8 @@ task :uninstall do
 end
 
 desc "Run tests [options available]"
-task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, PS_TEXLIVE_TLPDB] do
+task :test =>
+    [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, PS_TEXLIVE_TLPDB] + SAMPLE_FILES do
   # parse options
   options = {}
   if ARGV.delete("--")

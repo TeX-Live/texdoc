@@ -2,11 +2,10 @@ require 'spec_helper'
 
 RSpec.describe "File detection for viewing", :type => :aruba do
   include_context "messages"
-  include_context "sample_files"
+  include_context "texmf"
 
   context "File *.html" do
     before(:each) do
-      sample_html = cleate_sample_file "html"
       run_texdoc "-dview --just-view", sample_html
     end
 
@@ -19,7 +18,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.htm" do
     before(:each) do
-      sample_htm = cleate_sample_file "htm"
       run_texdoc "-dview --just-view", sample_htm
     end
 
@@ -32,7 +30,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.dvi" do
     before(:each) do
-      sample_dvi = cleate_sample_file "dvi"
       run_texdoc "-dview --just-view", sample_dvi
     end
 
@@ -45,7 +42,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.md" do
     before(:each) do
-      sample_md = cleate_sample_file "md"
       run_texdoc "-dview --just-view", sample_md
     end
 
@@ -58,7 +54,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.txt" do
     before(:each) do
-      sample_txt = cleate_sample_file "txt"
       run_texdoc "-dview --just-view", sample_txt
     end
 
@@ -71,7 +66,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.pdf" do
     before(:each) do
-      sample_pdf = cleate_sample_file "pdf"
       run_texdoc "-dview --just-view", sample_pdf
     end
 
@@ -84,7 +78,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.ps" do
     before(:each) do
-      sample_ps = cleate_sample_file "ps"
       run_texdoc "-dview --just-view", sample_ps
     end
 
@@ -97,7 +90,6 @@ RSpec.describe "File detection for viewing", :type => :aruba do
 
   context "File *.tex" do
     before(:each) do
-      sample_tex = cleate_sample_file "tex"
       run_texdoc "-dview --just-view", sample_tex
     end
 
