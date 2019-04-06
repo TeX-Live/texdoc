@@ -20,13 +20,16 @@ TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
 
 # TEXMF
 if system("which kpsewhich > #{File::NULL} 2> #{File::NULL}")
+  texmf_root = `kpsewhich --var-value TEXMFROOT`.chomp
   texmf_home = `kpsewhich --var-value TEXMFHOME`.chomp
   texmf_var = `kpsewhich --var-value TEXMFVAR`.chomp
 else
   # from ENV or dummy
+  texmf_root = ENV["TEXMFROOT"] || "texmfroot"
   texmf_home = ENV["TEXMFHOME"] || "texmfhome"
   texmf_var = ENV["TEXMFVAR"] || "texmfvar"
 end
+TEXMFROOT = Pathname(texmf_root)
 TEXMFHOME = Pathname(texmf_home)
 TEXMFVAR = Pathname(texmf_var)
 
@@ -53,6 +56,11 @@ file PS_TEXDOC_LINK => PS_TEXMF_SCRIPTS_DIR do
 end
 file PS_TEXDOC_CNF_LINK => PS_TEXMF_TEXDOC_DIR do
   ln_s TEXDOC_CNF, PS_TEXDOC_CNF_LINK
+end
+
+PS_TEXLIVE_TLPDB = TMP_DIR + "texlive.tlpdb"
+file PS_TEXLIVE_TLPDB do
+  ln_s TEXMFROOT + "tlpkg/texlive.tlpdb", PS_TEXLIVE_TLPDB
 end
 
 # options for ronn
@@ -94,7 +102,7 @@ task :uninstall do
 end
 
 desc "Run tests [options available]"
-task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+task :test => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, PS_TEXLIVE_TLPDB] do
   # parse options
   options = {}
   if ARGV.delete("--")
