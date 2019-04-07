@@ -2,6 +2,7 @@ require 'pathname'
 
 shared_context "texmf" do
   # pseudo TEXMF trees
+  let(:texmf_dist) { Pathname.pwd + "tmp/texmf-dist" }
   let(:texmf_home) { Pathname.pwd + "tmp/texmf" }
   let(:texmf_var) { Pathname.pwd + "tmp/texmf-var" }
 

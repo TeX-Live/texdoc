@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe 'The "version" action', :type => :aruba do
+  include_context "version"
   include_context "messages"
 
   let(:version_text) do
     <<~EXPECTED
-      Texdoc 3.1 (2019-03-28)
+      Texdoc #{version} (#{release_date})
 
       Copyright 2008 Manuel Pégourié-Gonnard, Takuto Asakura, and the TeX Live Team.
       License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.

@@ -1,6 +1,5 @@
 # Rakefile for Texdoc.
 # Public domain.
-
 require 'rake/clean'
 require 'pathname'
 require 'optparse'
@@ -77,6 +76,18 @@ SAMPLE_FILES = []
   SAMPLE_FILES << sample_file
 end
 
+# dummy texdoc.cnf
+PS_TEXMFDIST = TMP_DIR + "texmf-dist"
+PS_TEXMFDIST_TEXDOC_DIR = PS_TEXMFDIST + "texdoc"
+directory PS_TEXMFDIST_TEXDOC_DIR
+
+DUMMY_TEXDOC_CNFS = []
+[PS_TEXMF_TEXDOC_DIR, PS_TEXMFDIST_TEXDOC_DIR].each do |texmf|
+  texdoc_cnf = texmf + "texdoc.cnf"
+  file texdoc_cnf => texmf do touch texdoc_cnf end
+  DUMMY_TEXDOC_CNFS << texdoc_cnf
+end
+
 # options for ronn
 OPT_MAN = "--manual=\"Texdoc manual\""
 OPT_ORG = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
@@ -117,7 +128,8 @@ end
 
 desc "Run tests [options available]"
 task :test =>
-    [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, PS_TEXLIVE_TLPDB] + SAMPLE_FILES do
+    [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, PS_TEXLIVE_TLPDB] +
+    SAMPLE_FILES + DUMMY_TEXDOC_CNFS do
   # parse options
   options = {}
   if ARGV.delete("--")
