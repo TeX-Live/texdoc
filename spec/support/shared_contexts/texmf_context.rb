@@ -1,3 +1,4 @@
+require 'os'
 require 'pathname'
 
 shared_context "texmf" do
@@ -14,5 +15,14 @@ shared_context "texmf" do
     let("sample_#{ext}".to_sym) {
       Pathname.pwd + "tmp/texmf/doc/sample/sample.#{ext}"
     }
+  end
+
+  # path utility
+  def normalize_path path
+    if OS.windows?
+      return `kpsewhich -expand-path #{path}`.chomp.gsub("\\", "/")
+    else
+      return `kpsewhich -expand-path #{path}`.chomp
+    end
   end
 end
