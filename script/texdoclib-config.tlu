@@ -316,7 +316,7 @@ function M.show_config_files(is_action)
         or function(s) dbg_print('files', s) end
 
     -- show the list of configuration files
-    print_func('Configuration files are:')
+    print_func('Configuration file(s):')
     for i, file in ipairs(config_files) do
         -- if not verbose, do not show "not found" files for -f
         if file.status ~= "not found"
@@ -329,7 +329,7 @@ function M.show_config_files(is_action)
     if is_action then
         print_func('Recommended file(s) for personal settings:')
         local sep = (os.type == 'windows') and ';' or ':'
-        local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
+        local texmfhomes = string.explode(kpse.expand_path('$TEXMFHOME'), sep)
         for _, home in ipairs(texmfhomes) do
             print_func(indent .. w32_path(home .. '/texdoc/texdoc.cnf'))
         end

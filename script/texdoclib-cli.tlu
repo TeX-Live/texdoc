@@ -157,7 +157,7 @@ local function do_action(action)
             '\n\n' .. C.copyright_msg)
         os.exit(C.exit_ok)
     elseif action == 'files' then
-        print(C.fullname .. ' ' .. C.version)
+        print(texdoc.util.w32_path(C.fullname) .. ' ' .. C.version)
         texdoc.config.show_config_files(true)
         os.exit(C.exit_ok)
     elseif action == 'view' then
