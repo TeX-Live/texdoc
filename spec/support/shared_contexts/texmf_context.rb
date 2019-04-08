@@ -19,10 +19,13 @@ shared_context "texmf" do
 
   # path utility
   def normalize_path path
+    pathname = path.to_s
+
     if OS.windows?
-      return `kpsewhich -expand-path #{path}`.chomp.gsub("\\", "/")
+      pathname[0] = pathname[0].downcase
+      return pathname.gsub("/", "\\")
     else
-      return `kpsewhich -expand-path #{path}`.chomp
+      return pathname
     end
   end
 end

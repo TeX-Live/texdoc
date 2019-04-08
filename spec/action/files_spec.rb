@@ -36,12 +36,12 @@ RSpec.describe 'The "files" action', :type => :aruba do
     let(:home_texdoc_cnf) { texmf_home + "texdoc/texdoc.cnf" }
 
     # message
-    let(:version_info) { "#{texdoclib} #{version}" }
+    let(:version_info) { "#{normalize_path(texdoclib)} #{version}" }
     let(:configuration_files) { "Configuration file(s):" }
     let(:recommended_files) do
       <<~EXPECTED
         Recommended file(s) for personal settings:
-            #{home_texdoc_cnf}
+            #{normalize_path(home_texdoc_cnf)}
       EXPECTED
     end
 
