@@ -12,6 +12,7 @@ kpse.set_program_name(arg[-1], 'texdoc')
 local texdoc = require('texdoclib')
 
 -- execute
+assert(texdoc.cli, 'Internal error: Texdoc is not installed properly.')
 texdoc.cli.exec()
 
 -- vim: ft=lua:
