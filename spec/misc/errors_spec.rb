@@ -29,6 +29,24 @@ RSpec.describe "Errors", :type => :aruba do
     end
   end
 
+  context "missing arguments for Option -d" do
+    before(:each) { run_texdoc "-d" }
+
+    it 'result in a getopt parser error' do
+      expect(last_command_started).to have_exit_status(1)
+      expect(stderr).to include(error_line "Option -d requires an argument.")
+    end
+  end
+
+  context "missing arguments for Option -c" do
+    before(:each) { run_texdoc "-c" }
+
+    it 'result in a getopt parser error' do
+      expect(last_command_started).to have_exit_status(1)
+      expect(stderr).to include(error_line "Option -c requires an argument.")
+    end
+  end
+
   context "when any document for input cannot be found" do
     let(:nonexist_pkg) { "never_never_existing_package_foooooooooo" }
 

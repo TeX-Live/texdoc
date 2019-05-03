@@ -34,13 +34,16 @@ local function getopt(arg, options)
             else
                 table.insert(tab, {string.sub(v, 3), true})
             end
+
         elseif string.sub(v, 1, 1) == '-' then
             table.remove(arg, 1)
             local y = 2
             local l = string.len(v)
             local jopt
+
             while (y <= l) do
                 jopt = string.sub(v, y, y)
+
                 if string.find(options, jopt, 1, true) then
                     if y < l then
                         tmp = string.sub(v, y+1)
@@ -49,6 +52,14 @@ local function getopt(arg, options)
                         table.remove(arg, 1)
                         tmp = saved_arg[k + 1]
                     end
+
+                    -- check the existence of an argument
+                    if not tmp then
+                        err_print('error',
+                            'Option -%s requires an argument.', jopt)
+                        os.exit(C.exit_error)
+                    end
+
                     if string.match(tmp, '^%-') then
                         table.insert(tab, {jopt, false})
                     else
