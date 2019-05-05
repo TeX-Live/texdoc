@@ -128,8 +128,7 @@ local function parse_options()
 
         -- config
         elseif curr_arg == '-c' then
-            local item, value = string.match(v, '^([%a%d_]+)%s*=%s*(.+)')
-            insert_cl_config(item, value, curr_arg)
+            insert_cl_config(v, nil, curr_arg)
 
         -- debug
         elseif (curr_arg == '-d') or (curr_arg == '--debug') then
