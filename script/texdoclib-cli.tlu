@@ -21,7 +21,7 @@ local err_print = texdoc.util.err_print
 -- modified Alternative GetOpt
 -- cf. http://lua-users.org/wiki/AlternativeGetOpt
 local function getopt(arg, options)
-    local tmp
+    local tmp = nil
     local tab = {}
     local saved_arg = {table.unpack(arg)}
 
@@ -30,7 +30,7 @@ local function getopt(arg, options)
             table.remove(arg, 1)
             local x = string.find(v, '=', 1, true)
             if x then
-                table.insert(tab, {string.sub(v, 3, x-1), string.sub(v, x+1)})
+                table.insert(tab, {string.sub(v, 3, x - 1), string.sub(v, x+1)})
             else
                 table.insert(tab, {string.sub(v, 3), true})
             end
@@ -46,7 +46,7 @@ local function getopt(arg, options)
 
                 if string.find(options, jopt, 1, true) then
                     if y < l then
-                        tmp = string.sub(v, y+1)
+                        tmp = string.sub(v, y + 1)
                         y = l
                     else
                         table.remove(arg, 1)
@@ -70,6 +70,9 @@ local function getopt(arg, options)
                 end
                 y = y + 1
             end
+
+        else
+            if tmp then tmp = nil else break end
         end
     end
 

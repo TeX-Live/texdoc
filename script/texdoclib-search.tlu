@@ -714,6 +714,8 @@ end
 
 -- find docfiles according to pattern
 function M.get_doclist(pattern, no_alias)
+    dbg_print('search', 'Searching documents for pattern "%s"', pattern)
+
     -- separate sty patterns from the rest
     local function normal_vs_sty(list)
         local normal, sty = {}, {}
