@@ -13,7 +13,7 @@ module SpecHelplers
     TEXMFHOME = ENV["TEXMFHOME"]
     LC_ALL = "C"
 
-    MOCK_VIEWER = ":"
+    MOCK_VIEWER = "true"
 
     # running the target texdoc
     def run_texdoc(*args, interactive: false)

@@ -196,6 +196,7 @@ local function setup_config_from_env()
     local function set_config_elt_from_vars(key, vars)
         for _, var in ipairs(vars) do
             local value = os.getenv(var)
+            value = value and string.gmatch(value, '([^:]+)')()
             if value then
                 set_config_element(key, value, {src='env', name=var})
             end
