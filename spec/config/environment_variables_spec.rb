@@ -185,4 +185,15 @@ RSpec.describe "Environment variable", :type => :aruba do
       end
     end
   end
+
+  # check if texdoc works when an environment variable contains colon
+  # https://github.com/TeX-Live/texdoc/issues/48
+  context "FIRST_OCCURRENCE_IN_COMMA_SEPARATED_VARIABLE" do
+    before(:each) { set_environment_variable "BROWSER_texdoc", "#{mock_viewer}:should-be-truncated" }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+
+    it "should be picked" do
+      expect(stderr).to include(set_env_line "viewer_html=#{mock_viewer}", "BROWSER_texdoc")
+    end
+  end
 end
