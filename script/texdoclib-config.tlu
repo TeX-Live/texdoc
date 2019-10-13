@@ -393,6 +393,7 @@ local function desktop_environment_viewer()
     end
     if os.getenv('GNOME_DESKTOP_SESSION_ID')
         or string.match(xdg_current_desktop, '.*GNOME.*') then  -- gnome
+        if is_in_path('gio') then return '(gio open %s) &' end
         if is_in_path('gvfs-open') then return '(gvfs-open %s) &' end
         if is_in_path('gnome-open') then return '(gnome-open %s) &' end
     end
