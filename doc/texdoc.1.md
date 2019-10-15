@@ -54,6 +54,8 @@ Alternatively, perform the given ACTION and exit.
 
 ## ENVIRONMENT
 
+The following environment variables can be split by colon and used to set viewers:
+
 * `BROWSER`, `BROWSER_texdoc`:
   Set the command to be used for HTML documents.
 * `DVIVIEWER`, `DVIVIEWER_texdoc`:
@@ -66,6 +68,9 @@ Alternatively, perform the given ACTION and exit.
   Set the command to be used for PDF documents.
 * `PSVIEWER`, `PSVIEWER_texdoc`:
   Set the command to be used for PS documents.
+
+The following environment variables are also used:
+
 * `LANG`, `LC_ALL` and so on:
   Set the locale (which will influence on the search results).
 * `TEXDOCS`:

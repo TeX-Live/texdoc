@@ -13,6 +13,8 @@ module SpecHelplers
     TEXMFHOME = ENV["TEXMFHOME"]
     LC_ALL = "C"
 
+    MOCK_VIEWER = "true"
+
     # running the target texdoc
     def run_texdoc(*args, interactive: false)
       # constract the arguments
@@ -40,7 +42,7 @@ module SpecHelplers
       viewer_list = [
         "PAGER", "BROWSER", "DVIVIEWER", "PSVIEWER", "PDFVIEWER", "MDVIEWER"
       ]
-      viewer_list.each { |v| ENV[v + "_texdoc"] = ":" }
+      viewer_list.each { |v| ENV[v + "_texdoc"] = MOCK_VIEWER }
     end
   end
 end

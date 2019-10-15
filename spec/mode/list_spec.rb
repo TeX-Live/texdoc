@@ -3,6 +3,8 @@ require 'spec_helper'
 RSpec.describe 'The "list" mode', :type => :aruba do
   include_context "messages"
 
+  let(:mock_viewer) { SpecHelplers::Texdoc::MOCK_VIEWER }
+
   context "with -I" do
     before(:each) { run_texdoc "-lI", "texlive-en" }
 
@@ -28,7 +30,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
 
     it "should view the first item in the list" do
       first_item = stdout[/^ 1 (.*)$/, 1]
-      expect(stderr).to include(info_line "View command: : \"#{first_item}\"")
+      expect(stderr).to include(info_line "View command: #{mock_viewer} \"#{first_item}\"")
       expect(last_command_started).to be_successfully_executed
     end
   end
@@ -40,7 +42,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
 
     it "should view the first item in the list" do
       first_item = stdout[/^ 1 (.*)$/, 1]
-      expect(stderr).to include(info_line "View command: : \"#{first_item}\"")
+      expect(stderr).to include(info_line "View command: #{mock_viewer} \"#{first_item}\"")
       expect(last_command_started).to be_successfully_executed
     end
   end
@@ -52,7 +54,7 @@ RSpec.describe 'The "list" mode', :type => :aruba do
 
     it "should view the second item in the list" do
       second_item = stdout[/^ 2 (.*)$/, 1]
-      expect(stderr).to include(info_line "View command: : \"#{second_item}\"")
+      expect(stderr).to include(info_line "View command: #{mock_viewer} \"#{second_item}\"")
       expect(last_command_started).to be_successfully_executed
     end
   end

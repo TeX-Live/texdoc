@@ -561,7 +561,8 @@ to~\ref{cf-viewer_*} for details.\footnote{Old names of environment variables,
 namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
 |TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You can
 append |_texdoc| to every name in the first column: this wins over every other
-name.
+name. These variables can be split by colon |:| and the first non-nil occurrence
+is used. If a viewer command contains colon, please specify it by |viewer_«ext»|.
 
 \begin{center}
 \begin{tabular}{ll}
