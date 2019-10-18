@@ -375,6 +375,7 @@ alias l3prop = interface3
 alias l3box = interface3
 alias l3coffins = interface3
 alias l3color-base = interface3
+alias l3regex = interface3
 alias l3msg = interface3
 alias l3keys = interface3
 alias l3file = interface3
