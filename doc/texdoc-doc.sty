@@ -1,0 +1,179 @@
+% Document style for Texdoc user manual
+% Copyright 2008 Manuel Pégourié-Gonnard and Takuto Asakura
+% distributed under the terms of GPL v3 or later
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{texdoc-doc}
+  [2019/12/10 Document style for Texdoc user manual]
+
+% package options
+\DeclareOption{draft}{\setlength\overfullrule{5pt}}
+\ProcessOptions\relax
+
+% basic dependency
+\RequirePackage[british]{babel}
+\RequirePackage{xunicode}
+\RequirePackage{fancyvrb}
+\RequirePackage{calc}
+
+% font settings
+\RequirePackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{DejaVuSerif}
+\setsansfont{DejaVuSans}
+\setmonofont{DejaVuSansMono}
+\renewcommand{\familydefault}{\sfdefault}
+
+\setkomafont{title}{}
+\setkomafont{subtitle}{\Large}
+\deffootnote[1.5em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}\thinspace}
+
+% colors
+\RequirePackage{xcolor}
+\definecolor{links}{named}{violet}
+\definecolor{special}{rgb}{0,0.5,0}
+\definecolor{code}{rgb}{0,0,0.6}
+
+% list environments
+\RequirePackage{enumitem}
+\newlength\lssep \setlength\lssep{\smallskipamount}
+\setlist{noitemsep, topsep=\lssep, partopsep=\lssep}
+
+% hyperref and bookmark
+\RequirePackage[
+  colorlinks=true, linkcolor=links, urlcolor=links, citecolor=links,
+  bookmarks=true, bookmarksnumbered=true, bookmarksopen=true,
+  bookmarksopenlevel=2]{hyperref}
+\RequirePackage{bookmark}
+
+% for metadata
+\AtBeginDocument{%
+  \bgroup
+  \def\and{, }%
+  \hypersetup{%
+    pdftitle={\@title: \@subtitle},
+    pdfauthor={\@author},
+    pdfsubject={Texdoc's user manual},
+    pdfkeywords={Texdoc, TeX Live, manual, documentation}}
+  \egroup}
+\RequirePackage[yyyymmdd]{datetime}
+\renewcommand{\dateseparator}{-}
+
+% title (overwrite \@maketitle from scrartcl)
+\newcommand*{\pkgurl}[1]{\gdef\@pkgurl{\url{#1}}}
+\renewcommand*{\@maketitle}{%
+  \global\@topnum=\z@
+  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+  \ifx\@titlehead\@empty \else
+    \begin{minipage}[t]{\textwidth}
+      \usekomafont{titlehead}{\@titlehead\par}%
+    \end{minipage}\par
+  \fi
+  \null
+  \vskip 2em%
+  \begin{center}%
+    \ifx\@subject\@empty \else
+      {\usekomafont{subject}{\@subject \par}}%
+      \vskip 1.5em
+    \fi
+    {\usekomafont{title}{\huge \@title \par}}%
+    \vskip .5em
+    {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
+    \vskip .1em
+    {\ifx\@pkgurl\@empty\else\usekomafont{subtitle}\@pkgurl\par\fi}%
+    \vskip 1em
+    {%
+      \usekomafont{author}{%
+        \lineskip .5em%
+        \begin{tabular}[t]{c}
+          \@author
+        \end{tabular}\par
+      }%
+    }%
+    \vskip 1em%
+    {\usekomafont{date}{\@date \par}}%
+    \vskip \z@ \@plus 1em
+    {\usekomafont{publishers}{\@publishers \par}}%
+    \ifx\@dedication\@empty \else
+      \vskip 2em
+      {\usekomafont{dedication}{\@dedication \par}}%
+    \fi
+  \end{center}%
+  \par
+  \vskip 2em
+}
+
+% shortcuts
+\DeclareRobustCommand{\TL}{\texorpdfstring{\TeX\,\,Live}{TeX Live}}
+\DeclareRobustCommand{\TexdocML}
+  {\href{http://lists.tug.org/texdoc}{texdoc mailing list}}
+
+% Low layer settings
+\lastlinefit=500 % e-TeX powered
+\catcode`\ 10\relax % take care of non-breakable spaces
+
+% macros
+\newcommand{\meta}[1]{% meta elements
+  {\normalfont\color{special}$\langle$\textit{#1}$\rangle$}}
+
+% verbatim
+\def\code@font{% code
+  \color{code}\normalfont\ttfamily}
+\fvset{%
+  formatcom=\code@font,
+  defineactive=\makeallfancy,
+  codes=\fancyactives}
+\newcommand{\fancyactives}{\catcode`\«\active}
+\newcommand{\makeallfancy}{\makefancyog}
+\bgroup
+  \catcode`\«\active
+  \gdef\makefancyog{\def«##1»{\meta{##1}}}
+\egroup
+
+\newif\if@framed
+\newlength\@dec
+\setlength\@dec{\heightof{\code@font{texdoc \meta{name}}}}
+
+\def\@maybedot{.}
+\def\@nodotthistime{\def\@maybedot{\gdef\@maybedot{.}}}
+
+\newenvironment{commandes}[3]{%
+  \def\thecmd{\noexpand#1}%
+  \def\bmtext{#2}%
+  \def\thelabel{#3}%
+  \SaveVerbatim[samepage, gobble=2]{verbmat}%
+}{%
+  \endSaveVerbatim
+  \xdef\sectioncmd{\noexpand\@nodotthistime
+    \thecmd[\bmtext]{%
+      \if@framed
+        \unexpanded{\normalsize\normalfont
+          \fbox{\raisebox{\@dec}{\BUseVerbatim[baseline=t]{verbmat}}}}%
+      \else
+        \unexpanded{\normalsize\normalfont
+          \BUseVerbatim{verbmat}}%
+      \fi
+      \noexpand\label{\thelabel}}}%
+  \aftergroup\sectioncmd
+}
+
+\newenvironment{cmdsubsec}[2]
+  {\@framedtrue \commandes\subsection{#1}{#2}}
+  {\endcommandes}
+
+\newenvironment{cmdsubsub}[2]
+  {\@framedfalse \commandes\subsubsection{#1}{#2}}
+  {\endcommandes}
+
+% code in hors-text
+\newenvironment{htcode}
+  {\SaveVerbatim[samepage, gobble=2]{verbmat}}
+  {
+    \endSaveVerbatim
+    \par\medskip\noindent\hspace*{\parindent}%
+    \BUseVerbatim{verbmat}%
+    \par\medskip\@endpetrue
+  }
+
+\DefineShortVerb{\|}
+% EOF

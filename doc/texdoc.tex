@@ -2,142 +2,17 @@
 % Texdoc user manual
 % Copyright 2008 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
-
-\setlength\overfullrule{5pt}
-
 \documentclass[a4paper,oneside]{scrartcl}
-\usepackage{fontspec}
-\usepackage{xunicode}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{DejaVuSerif}
-\setsansfont{DejaVuSans}
-\setmonofont{DejaVuSansMono}
-\renewcommand\familydefault{\sfdefault} \normalfont
-\newcommand\mylangle{$\langle$}
-\newcommand\myrangle{$\rangle$}
-
-\usepackage{xargs,xspace,fancyvrb,xcolor,pifont,calc,ifmtarg,mathstyle}
-
-\usepackage[sf,bf]{titlesec}
-\titlelabel{\makebox[0pt][r]{\thetitle\kern1pc}}
-\titleformat{\subsubsection}[runin]{\itshape}
-  {\makebox[0pt][r]{\thetitle\kern1pc}}
-  {0pt}{}[\maybedot\space --- \kern0pt]
-\titlespacing{\subsubsection}{0pt}{0.5\baselineskip}{0pt}
-
-\usepackage{enumitem}
-\newlength\lssep \setlength\lssep{\smallskipamount}
-\setlist{noitemsep,topsep=\lssep,partopsep=\lssep}
-
-\usepackage[british]{babel}
-\usepackage[bookmarks=true]{hyperref}
-\usepackage{bookmark}
-\hypersetup{%
-  bookmarksnumbered=true, bookmarksopen=true, bookmarksopenlevel=2,
-  pdftitle={Texdoc: find and view documentation in TeX Live},
-  pdfauthor={Manuel Pégourié-Gonnard, Takuto Asakura},
-  pdfsubject={Texdoc's user manual},
-  pdfkeywords={Texdoc, TeX Live, manual, documentation},
-}
-
-\usepackage[yyyymmdd]{datetime}
-\renewcommand{\dateseparator}{-}
-
-\newcommand\texlive{\TeX~Live\xspace}
-
-\setlength\parindent{\baselineskip}
-
-\lastlinefit=500 % e-TeX powered
-
-\definecolor{links}{named}{violet}
-\definecolor{special}{rgb}{0,0.5,0}
-\definecolor{code}{rgb}{0,0,0.6}
-\hypersetup{colorlinks=true, linkcolor=links, urlcolor=links, citecolor=links}
-
-\newcommand\cofont{% code
-  \color{code}\normalfont\ttfamily}
-\newcommand\meta[1]{% meta elements
-  {\normalfont\color{special}\mylangle\textit{#1}\myrangle}}
-
-% take care of non-breakable spaces
-\catcode`\ 10\relax
-
-\fvset{%
-  formatcom=\cofont,
-  defineactive=\makeallfancy,
-  codes=\fancyactives,
-}
-\newcommand\fancyactives{\catcode`\«\active}
-\newcommand\makeallfancy{\makefancyog}
-\bgroup
-  \catcode`\«\active
-  \global\def\makefancyog{\def«##1»{\meta{##1}}}
-\egroup
-
-\newif\ifframed
-\newlength\dec
-\setlength\dec{\heightof{\cofont{texdoc \meta{name}}}}
-
-\makeatletter
-\newenvironment{commandes}[3]{%
-  \def\thecmd{\noexpand#1}%
-  \def\bmtext{#2}%
-  \def\thelabel{#3}%
-  \SaveVerbatim[samepage, gobble=2]{verbmat}%
-}{%
-  \endSaveVerbatim
-  \xdef\sectioncmd{\noexpand\nodotthistime
-    \thecmd[\bmtext]{%
-      \ifframed
-        \unexpanded{\normalsize\normalfont
-          \fbox{\raisebox{\dec}{\BUseVerbatim[baseline=t]{verbmat}}}}%
-      \else
-        \unexpanded{\normalsize\normalfont
-          \BUseVerbatim{verbmat}}%
-      \fi
-      \noexpand\label{\thelabel}}}%
-  \aftergroup\sectioncmd
-}
-\makeatother
-
-\newcommand\maybedot{.}
-\newcommand\nodotthistime{\renewcommand\maybedot{\global\def\maybedot{.}}}
-
-\newenvironment{cmdsubsec}[2]
-  {\framedtrue \commandes\subsection{#1}{#2}}
-  {\endcommandes}
-
-\newenvironment{cmdsubsub}[2]
-  {\framedfalse \commandes\subsubsection{#1}{#2}}
-  {\endcommandes}
-
-\makeatletter
-% code in hors-text
-\newenvironment{htcode}
-  {\SaveVerbatim[samepage, gobble=2]{verbmat}}
-  {
-    \endSaveVerbatim
-    \par\medskip\noindent\hspace*{\parindent}%
-    \BUseVerbatim{verbmat}%
-    \par\medskip\@endpetrue
-  }
-\makeatother
-\DefineShortVerb{\|}
-
-\setkomafont{title}{}
-\setkomafont{subtitle}{\Large}
-\deffootnote[1.5em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}\thinspace}
-
-\newcommand\tdml{\href{http://lists.tug.org/texdoc}{texdoc mailing list}\xspace}
+\usepackage[draft]{texdoc-doc}
 
 \title{Texdoc}
-\subtitle{Find \& view documentation in \texlive\\
-  \href{https://tug.org/texdoc/}{https://tug.org/texdoc/}}
+\subtitle{Find \& view documentation in \TL}
+\pkgurl{https://tug.org/texdoc/}
 \author{Manuel Pégourié-Gonnard\and Takuto Asakura}
 \date{v3.1\quad \today}
 
 \begin{document}
+
 \VerbatimFootnotes
 
 \maketitle
@@ -146,7 +21,7 @@
 
 \subsection{Basics}
 
-Texdoc is a command line tool which find and view documentation in \texlive.
+Texdoc is a command line tool which find and view documentation in {\TL}.
 If you type
 %
 \begin{quote}
@@ -242,7 +117,7 @@ sources:
     \href{https://www.tug.org/kpathsea/} {kpathsea} variable |TEXDOCS|), it
     selects all files containing |«keyword»| in their name (including the
     directory name);
-  \item In the \texlive Database, it looks for packages named
+  \item In the {\TL} Database, it looks for packages named
     |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may be
     |sty| or |cls|, and selects all the documentation files from this package.
 \end{enumerate}
@@ -261,7 +136,7 @@ Score may also be adjusted base on file extensions or known names (or
 subwords): for example, by default, |Makefile|s get a very bad score since
 they are almost never documentation.\footnote{They often end up in the doc
   tree, since the source of documentation is often in the same directory as
-  the documentation itself in \texlive. Other source files are discriminated
+  the documentation itself in {\TL}. Other source files are discriminated
   by extension.}
 
 Finally, depending on the mode, the file with the highest score is opened in a
@@ -276,7 +151,7 @@ not perfect: Texdoc may sometimes need a hint, either to find a relevant file
 or, more likely, to recognize which of the files found is the most relevant.
 
 For example, assume you are looking for the documentation of the shortvrb
-{\LaTeX} package. Texdoc will find |shortvrb.sty| in the |latex| \texlive
+{\LaTeX} package. Texdoc will find |shortvrb.sty| in the |latex| {\TL}
 package, but since this package contains a lot of documentation files, none of
 which contains the string |shortvrb|, it will sort them basically at random.
 
@@ -295,7 +170,7 @@ case-insensitive):
   \item The keyword is a substring of the file name.
   \item The keyword is a ``subword'' of the file name; words are defined as
     sequences of alphanumeric characters delimited by punctuation characters
-    (there is no space in file names in \texlive) and a subword is a
+    (there is no space in file names in {\TL}) and a subword is a
     substring both ends of which are a word boundary.
   \item The keyword matches ``exactly'' the file name: that is, the file
     name is the keyword, possibly plus an extension.
@@ -334,7 +209,8 @@ configured, see the |lang| option) are also used for |«keyword»| and get a
 
 You can have a look at the configuration file provided (the last shown by
 |texdoc -f|) for examples. If you feel one of the aliases you defined locally
-should be added to the default configuration, please share it on the \tdml.
+should be added to the default configuration, please share it on the
+{\TexdocML}.
 
 Aliases are additive: if you define your own aliases for a keyword in your
 configuration file, and there are also aliases for the same keyword in the
@@ -421,13 +297,13 @@ the configuration setting |suffix_list|.
 To customise this list, add a line with |suffix_list = «your, list»| in a
 configuration file. Be warned, it will replace the default list, no expand
 it. You'll find the default list in the shipped configuration file; feel free
-to suggest additions on the \tdml (with a real-life example).
+to suggest additions on the {\TexdocML} (with a real-life example).
 
 \subsection{Fuzzy search}\label{ss-fuzzy}
 
-When the normal search can't find any document in {\texlive}, Texdoc will
+When the normal search can't find any document in {\TL}, Texdoc will
 execute fuzzy search without user-interactions. The fuzzy search finds the
-closest name of package in {\texlive}\footnote{Note that the feature searches
+closest name of package in {\TL}\footnote{Note that the feature searches
 only package names at this point. Other objects such as aliases cannot be found
 by the fuzzy search.} to the input |«keyword»|. The results of fuzzy search are
 shown by as an informational message (you can see that with option |-v|).
@@ -458,7 +334,7 @@ The configuration files are found in the directories |TEXMF/texdoc|, where
 each directory, three files are recognized, in this order:
 \begin{enumerate}
   \item |texdoc-«platform».cnf| where |«platform»| is the name of the current
-    platform (defined as the name of the directories where the \texlive
+    platform (defined as the name of the directories where the {\TL}
     binaries are located, for example |x86-64-linux|). This may be useful when
     an installation is shared across machines with different architectures
     needing different settings, for example for viewers. Their use is not
@@ -765,7 +641,7 @@ will be 1). In the future, more tab-separated fields may be added at the end
 of the line, but the first 3 fields will remain unchanged.
 
 Currently, there are two additional fields: a two-letter language code, and an
-unstructured description, both taken from the CTAN catalogue (via the \texlive
+unstructured description, both taken from the CTAN catalogue (via the {\TL}
 database). These fields may be empty, and they are not guaranteed to keep the
 same meaning in future versions of Texdoc.
 
@@ -784,8 +660,8 @@ sure that you also set a corresponding |unzip=«ext»| value for each |«ext»| 
 the list. At the same time, make sure you are using blocking (i.e., not
 returning immediately) viewers.
 
-\textit{Remark.} \texlive doesn't ship compressed documentation files, so
-this option is mainly useful with re-packaged version of \texlive that do,
+\textit{Remark.} {\TL} doesn't ship compressed documentation files, so
+this option is mainly useful with re-packaged version of {\TL} that do,
 for example in Linux distributions.
 
 \begin{cmdsubsub}{unzip_*}{cf-unzip_star}
@@ -835,7 +711,7 @@ The current exit codes are:
 \section{Licence}\label{s-licence}
 
 The current version of Texdoc program and its documentation are copyright 2008
-Manuel Pégourié-Gonnard, Takuto Asakura, and the {\texlive} Team.
+Manuel Pégourié-Gonnard, Takuto Asakura, and the {\TL} Team.
 
 They are free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
