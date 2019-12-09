@@ -168,7 +168,7 @@
 % code in hors-text
 \newenvironment{htcode}
   {\SaveVerbatim[samepage, gobble=2]{verbmat}}
-  {
+  {%
     \endSaveVerbatim
     \par\medskip\noindent\hspace*{\parindent}%
     \BUseVerbatim{verbmat}%

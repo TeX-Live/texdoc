@@ -698,6 +698,16 @@ so).
 Set the allowance of Levenshtein distance to |«n»| for the fuzzy search
 (default: 5). At level 0, the fuzzy search feature is disabled.
 
+\begin{cmdsubsub}{texlive_tlpdb}{cf-texlive_tlpdb}
+  texlive_tlpdb = «path»
+\end{cmdsubsub}
+
+This enables you to specify the |«path»| for the database |texlive.tlpdb| which
+Texdoc uses for searching documents. By default, Texdoc uses
+\path{TEXMFROOT/tlpkg/texlive.tlpdb}. Usually, you don't have to (or should
+not) set this configuration item. This is only useful when you want to use
+Texdoc within a {\TL}-based distribution which does not ship |texlive.tlpdb|.
+
 \subsection{Exit codes}\label{ss-exit}
 
 The current exit codes are:
@@ -742,4 +752,4 @@ Previous work (Texdoc program) in the public domain:
 \end{center}
 
 \end{document}
-% vim: ambiwidth=single spell:
+% vim: set ambiwidth=single spell:
