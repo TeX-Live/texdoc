@@ -19,89 +19,92 @@
 
 \section{Quick Guide}
 
-Texdoc is a command line tool which find and view documentation in {\TL}.
-If you type
+Texdoc is a command-line tool to find and view documents in {\TL}. Typing
 %
-\begin{quote}
-|texdoc «name»|
-\end{quote}
+\begin{htcode}
+texdoc «name»
+\end{htcode}
 %
-in your command line, the documentation of the |«name»| package will pop up. Of
-course, you have to replace |«name»| with the actual name of the package. To
-look up the documentation of more than one package at once, just use multiple
+in your command line, a document of the |«name»| package will pop up. To look
+up the documentation of more than one package at once, just give multiple
 |«name»|s as arguments.
 
 \subsection{Modes}
 \label{sec:modes}
 
-Texdoc has different modes that determine how results will be handled. In the
-default, ``view'' mode, it opens the first (supposedly the best) result with a
-suitable viewer. It is rather handy when you know what you want to read, and
-want to access it quickly. On the other hand, there may be other relevant
-documents for the given |«name»|, which are ignored in view mode.
+Texdoc has several modes that determine how results will be returned. The
+default is \emph{view} mode, which opens the first, that is supposedly the
+best, result with a suitable viewer. It is rather handy when you know what you
+want to read. On the other hand, there may be other relevant documents for the
+given |«name»|, which are ignored in the view mode.
 
-The so-called ``list mode'' makes Texdoc list all relevant documentation and
-ask you which one you want to view. It is useful when there another interesting
-sources of information besides the package's main documentation.
+In the \emph{list} mode, Texdoc lists all relevant documentation and ask you
+which one you want to view. This mode is useful when there are other
+interesting sources of information in addition to the main documentation of a
+package.
 
-There is also a ``mixed'' mode, intended to combine the best of view mode and
-list mode: if there is only one relevant result, then Texdoc opens it in a
-viewer, else it offers you a menu.
+There is also a \emph{mixed} mode, intended to get the best of the view mode
+and list mode: if there is only one good result, then Texdoc opens it in a
+viewer, like in the view mode. Otherwise, it offers you a menu, like in the
+list mode.
 
-By default, Texdoc hides the results it considers less relevant (unless it
-finds no relevant result at all). In ``showall'' mode, it always shows all
-results.
+By default, Texdoc hides some results, which expected to be less relevant,
+unless it cannot find any relevant result. In the \emph{showall} mode, Texdoc
+always shows all results, including bad ones.
 
-To select the mode on the command-line, use |texdoc «option» «name»| with one
-of the following options: |-w| or |--view| for view mode, |-m| or |--mixed|
-for mixed mode, |-l| or |--list| for list mode, |-s| or |--showall| for
-showall mode.
+A couple of command-line options are available for selecting the mode to
+execute: \sopt{w} (\lopt{view}) for the view mode, \sopt{m} (\lopt{mixed}) for
+the mixed mode, \sopt{l} (\lopt{list}) for the list mode, and \sopt{s}
+(\lopt{showall}) for the showall mode.
 
-If you always (or mostly) use the same mode, you don't want to keep typing the
-same option. The next section describes how to customize Texdoc using
-configurations files.
+If you have your favorite mode and always use it, you may not want to keep
+typing the same option. The next section describes how to customize Texdoc
+using its configurations files.
 
 \subsection{Configuration files}
 \label{sec:quick-file}
 
-Use |texdoc --files| to know where to put your personal configuration file;
-you'll need to create this file (a possibly some directories) the first time.
-(If you want to know the full list of possible configuration files,
-see Section~\ref{sec:prec}.)
+The configuration file enables you to tweak Texdoc in many ways. You can use
+the \lopt{files} option to know where to put your personal configuration file;
+you may need to create this file, possibly with some parent directories. If you
+want to know the full list of possible configuration files, see
+Section~\ref{sec:prec}.
 
-To set your favorite mode, just insert a line |mode = «mode»| in this file,
-where |«mode»| is one of |view|, |mixed|, |list| or |showall|. To set your
-preferred language, use |lang = «2-letter code»|, but it is usually detected
-automatically.
+To set your favorite mode, just insert a line |\ci{mode} = «mode»| in your
+personal configuration file, where |«mode»| is one of |view|, |mixed|, |list|,
+and |showall|. Though your preferred language is usually detected automatically
+by getting the system locale, you can set it explicitly with a line
+|\ci{lang} = «2-letter code»| in the configuration file.
 
-The configuration file can be used to tweak Texdoc in many ways, the most
-useful of which is probably the selection of the viewers for various types of
-documents, explained in the next section.
+%The configuration file enables you to tweak Texdoc in many ways. The most
+%important usage of the file may be the selection of the viewers for various
+%types of documents, explained in the next section.
 
 \subsection{Viewers}
 \label{sec:viewer}
 
-Texdoc's mechanism for choosing a viewer varies according to your platform.
-On Windows, macOS, or Unix with KDE, GNOME, or XFCE, it uses your file
+The way of Texdoc for choosing a viewer varies according to your platform. On
+Windows, macOS, or Unix with KDE, GNOME, or XFCE, it uses your file
 associations like when you double-click files in the Explorer, the Finder or
 your default file manager (except for the text viewer, which is always a
 pager). Otherwise, it tries to find a viewer in the path from a list of
 ``known'' viewers.
 
-You may want to select a different viewer for some kind of file. This is
-achieved by setting the various |viewer_«ext»| configuration options, where
-|«ext»| is the extension corresponding to the file type. For example, if you
-want to set xpdf as your default PDF viewer, and run it in the background,
-insert the line |viewer_pdf = xpdf %s &| in your configuration file. Here,
-|%s| stands for the name of the file to view.
+You may want to use a different viewer for some types of documents. This can be
+achieved by setting the various \ci{viewer\_\meta{ext}} configuration items,
+where |«ext»| is an extension corresponding to a file type. For example, if
+you want to set \code{xpdf} as your default PDF viewer, and run it in the
+background, insert the line |viewer_pdf = xpdf %s &| in your configuration
+file. Herein, |%s| is a place holder for the name of the file to view.
 
 \subsection{You can stop reading now}
 
-Following parts explain Texdoc's mechanisms for finding the best results and
-how to customize them. We have been trying hard to optimize the default
-configuration values so that you normally don't need to fiddle with that, but
-you may be curious or have special needs. The final part is a full reference
-including a few points omitted in the present and next parts.
+The following parts explain the mechanisms of Texdoc for finding the best
+results and how to customize them. We have been trying hard to optimize the
+default configuration values so that normal users do not need to fiddle with
+it. Thus, the following parts are useful only when you are curious or have
+special needs. The final part of this document is a full reference including a
+few points omitted in the other parts.
 
 \clearpage
 
@@ -609,11 +612,11 @@ Turn on or off machine-readable output. With this option active, the value of
 |interact_switch| is forced to |false|, and each line of output is
 %
 \begin{htcode}
-  «argument»\t«score»\t«filename»
+«argument»\metatab«score»\metatab«filename»
 \end{htcode}
 %
 where |«argument»| is the name of the argument to which the results correspond
-(mainly useful if there were many arguments), |\t| is the tab (ASCII \#9)
+(mainly useful if there were many arguments), {\metatab} is the tab (ASCII \#9)
 character, and the other entries are pretty self-explanatory. Nothing else is
 printed on stdout, except if an internal error occurs (in which case exit code
 will be 1). In the future, more tab-separated fields may be added at the end

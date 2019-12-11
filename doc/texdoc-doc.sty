@@ -29,6 +29,18 @@
 \setkomafont{subtitle}{\Large}
 \deffootnote[1.5em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}\thinspace}
 
+% headers
+\RedeclareSectionCommand[
+  runin=false,
+  afterindent=false,
+  beforeskip=\baselineskip,
+  afterskip=.5\baselineskip]{section}
+\RedeclareSectionCommand[
+  runin=false,
+  afterindent=false,
+  beforeskip=\baselineskip,
+  afterskip=.3\baselineskip]{subsection}
+
 % colors
 \RequirePackage{xcolor}
 \definecolor{links}{named}{violet}
@@ -46,7 +58,10 @@
   bookmarks=true, bookmarksnumbered=true, bookmarksopen=true,
   bookmarksopenlevel=2]{hyperref}
 \RequirePackage{bookmark}
+
+% text styles
 \DeclareUrlCommand\path{\urlstyle{tt}\color{links}}
+\DeclareTextFontCommand{\emph}{\color{code}}
 
 % for metadata
 \AtBeginDocument{%
@@ -118,6 +133,7 @@
 \newcommand*{\hyph}{-}
 \newcommand*{\meta}[1]{\bgroup
   \normalfont\color{special}$\langle$\textit{#1}$\rangle$\egroup}
+\newcommand*{\metatab}{\code{\char`\\t}}
 \newcommand*{\choice}[1]{\bgroup
   \def\@delim{\def\@delim{\space\char`\|\space}}%
   \normalfont\color{special}%
@@ -139,6 +155,7 @@
 \fvset{%
   formatcom=\code@font,
   defineactive=\makeallfancy,
+  commandchars=\\\{\},
   codes=\fancyactives}
 \newcommand{\fancyactives}{\catcode`\«\active}
 \newcommand{\makeallfancy}{\makefancyog}
@@ -158,7 +175,7 @@
 
 \NewDocumentEnvironment{clopt}{ m }
   {%
-    \par\vskip 3.25ex\@plus -1ex \@minus -.2ex\relax
+    \par\vskip\baselineskip
     \bgroup
     \def\sopt##1{\hypertarget{cl:##1}{\code{\hyph##1}}}%
     \def\lopt##1{\hypertarget{cl:##1}{\code{\hyph{}\hyph##1}}}%
@@ -169,7 +186,7 @@
 
 \NewDocumentEnvironment{confitem}{ m m o }
   {%
-    \par\vskip 3.25ex\@plus -1ex \@minus -.2ex\relax
+    \par\vskip\baselineskip
     \bgroup
     \def\_{-}\def\meta##1{##1}%
     \edef\x{\noexpand\def\noexpand\@tmp@hyname{cf:#1}}%
@@ -186,7 +203,7 @@
   {\SaveVerbatim[samepage]{verbmat}}
   {%
     \endSaveVerbatim
-    \par\medskip\noindent\hspace*{\parindent}%
+    \par\medskip\noindent\hspace*{2em}%
     \BUseVerbatim{verbmat}%
     \par\medskip\@endpetrue
   }
