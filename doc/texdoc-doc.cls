@@ -1,16 +1,16 @@
 % Document style for Texdoc user manual
 % Copyright 2008 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
-
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{texdoc-doc}
-  [2019/12/10 Document style for Texdoc user manual]
+\ProvidesClass{texdoc-doc}
+  [2019/12/10 Document class for Texdoc user manual]
 
 % package options
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \ProcessOptions\relax
 
 % basic dependency
+\LoadClass[a4paper,oneside,parskip=half-]{scrartcl}
 \RequirePackage[british]{babel}
 \RequirePackage{needspace}
 \RequirePackage{xunicode}
