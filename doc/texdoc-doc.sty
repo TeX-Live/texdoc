@@ -12,9 +12,10 @@
 
 % basic dependency
 \RequirePackage[british]{babel}
+\RequirePackage{needspace}
 \RequirePackage{xunicode}
 \RequirePackage{fancyvrb}
-\RequirePackage{calc}
+\RequirePackage{xparse}
 
 % font settings
 \RequirePackage{fontspec}
@@ -45,6 +46,7 @@
   bookmarks=true, bookmarksnumbered=true, bookmarksopen=true,
   bookmarksopenlevel=2]{hyperref}
 \RequirePackage{bookmark}
+\DeclareUrlCommand\path{\urlstyle{tt}\color{links}}
 
 % for metadata
 \AtBeginDocument{%
@@ -113,8 +115,23 @@
 \catcode`\ 10\relax % take care of non-breakable spaces
 
 % macros
-\newcommand{\meta}[1]{% meta elements
-  {\normalfont\color{special}$\langle$\textit{#1}$\rangle$}}
+\newcommand*{\hyph}{-}
+\newcommand*{\meta}[1]{\bgroup
+  \normalfont\color{special}$\langle$\textit{#1}$\rangle$\egroup}
+\newcommand*{\choice}[1]{\bgroup
+  \def\@delim{\def\@delim{\space\char`\|\space}}%
+  \normalfont\color{special}%
+  \@for\@item:=#1\do{\@delim\@item}%
+  \egroup}
+\newcommand*{\code}[1]{\bgroup
+  \chardef\_=`\_\code@font #1\egroup}
+\newcommand*{\sopt}[1]{\hyperlink{cl:#1}{\code{\hyph#1}}}
+\newcommand*{\lopt}[1]{\hyperlink{cl:#1}{\code{\hyph{}\hyph#1}}}
+\newcommand*{\ci}[1]{\bgroup
+  \def\_{-}\def\meta##1{##1}%
+  \edef\x{\noexpand\def\noexpand\@tmp@hyname{cf:#1}}%
+  \expandafter\egroup\x
+  \hyperlink{\@tmp@hyname}{\code{#1}}}
 
 % verbatim
 \def\code@font{% code
@@ -130,44 +147,43 @@
   \gdef\makefancyog{\def«##1»{\meta{##1}}}
 \egroup
 
-\newif\if@framed
-\newlength\@dec
-\setlength\@dec{\heightof{\code@font{texdoc \meta{name}}}}
+% manual entries
+\newenvironment{manual@entry}{\begin{list}{}{%
+  \setlength{\leftmargin}{2em}%
+  \setlength{\itemindent}{0pt}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\rightmargin}{0em}%
+  }\item}{\end{list}}
 
-\def\@maybedot{.}
-\def\@nodotthistime{\def\@maybedot{\gdef\@maybedot{.}}}
+\NewDocumentEnvironment{clopt}{ m }
+  {%
+    \par\vskip 3.25ex\@plus -1ex \@minus -.2ex\relax
+    \bgroup
+    \def\sopt##1{\hypertarget{cl:##1}{\code{\hyph##1}}}%
+    \def\lopt##1{\hypertarget{cl:##1}{\code{\hyph{}\hyph##1}}}%
+    \needspace{3ex}\noindent #1\egroup
+    \begin{manual@entry}%
+  }
+  {\ifvmode\else\unskip\fi\end{manual@entry}}
 
-\newenvironment{commandes}[3]{%
-  \def\thecmd{\noexpand#1}%
-  \def\bmtext{#2}%
-  \def\thelabel{#3}%
-  \SaveVerbatim[samepage, gobble=2]{verbmat}%
-}{%
-  \endSaveVerbatim
-  \xdef\sectioncmd{\noexpand\@nodotthistime
-    \thecmd[\bmtext]{%
-      \if@framed
-        \unexpanded{\normalsize\normalfont
-          \fbox{\raisebox{\@dec}{\BUseVerbatim[baseline=t]{verbmat}}}}%
-      \else
-        \unexpanded{\normalsize\normalfont
-          \BUseVerbatim{verbmat}}%
-      \fi
-      \noexpand\label{\thelabel}}}%
-  \aftergroup\sectioncmd
-}
-
-\newenvironment{cmdsubsec}[2]
-  {\@framedtrue \commandes\subsection{#1}{#2}}
-  {\endcommandes}
-
-\newenvironment{cmdsubsub}[2]
-  {\@framedfalse \commandes\subsubsection{#1}{#2}}
-  {\endcommandes}
+\NewDocumentEnvironment{confitem}{ m m o }
+  {%
+    \par\vskip 3.25ex\@plus -1ex \@minus -.2ex\relax
+    \bgroup
+    \def\_{-}\def\meta##1{##1}%
+    \edef\x{\noexpand\def\noexpand\@tmp@hyname{cf:#1}}%
+    \expandafter\egroup\x
+    \needspace{3ex}\noindent
+    \hypertarget{\@tmp@hyname}{\code{#1 = #2}}%
+    \IfNoValueF{#3}{\hfill (#3)}%
+    \begin{manual@entry}%
+  }
+  {\ifvmode\else\unskip\fi\end{manual@entry}}
 
 % code in hors-text
 \newenvironment{htcode}
-  {\SaveVerbatim[samepage, gobble=2]{verbmat}}
+  {\SaveVerbatim[samepage]{verbmat}}
   {%
     \endSaveVerbatim
     \par\medskip\noindent\hspace*{\parindent}%

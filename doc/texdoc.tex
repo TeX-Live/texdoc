@@ -2,7 +2,7 @@
 % Texdoc user manual
 % Copyright 2008 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
-\documentclass[a4paper,oneside]{scrartcl}
+\documentclass[a4paper,oneside,parskip=half-]{scrartcl}
 \usepackage[draft]{texdoc-doc}
 
 \title{Texdoc}
@@ -17,9 +17,7 @@
 
 \maketitle
 
-\section{Quick guide}
-
-\subsection{Basics}
+\section{Quick Guide}
 
 Texdoc is a command line tool which find and view documentation in {\TL}.
 If you type
@@ -33,7 +31,8 @@ course, you have to replace |«name»| with the actual name of the package. To
 look up the documentation of more than one package at once, just use multiple
 |«name»|s as arguments.
 
-\subsection{Modes}\label{ss-modes}
+\subsection{Modes}
+\label{sec:modes}
 
 Texdoc has different modes that determine how results will be handled. In the
 default, ``view'' mode, it opens the first (supposedly the best) result with a
@@ -62,23 +61,25 @@ If you always (or mostly) use the same mode, you don't want to keep typing the
 same option. The next section describes how to customize Texdoc using
 configurations files.
 
-\subsection{Configuration files}\label{ss-quick-file}
+\subsection{Configuration files}
+\label{sec:quick-file}
 
 Use |texdoc --files| to know where to put your personal configuration file;
 you'll need to create this file (a possibly some directories) the first time.
 (If you want to know the full list of possible configuration files,
-see~\ref{ss-prec}.)
+see Section~\ref{sec:prec}.)
 
-In order to select you favorite mode, just insert a line |mode = «mode»| in
-this file, where |«mode»| is one of |view|, |mixed|, |list| or |showall|. To
-set your favorite language, use |lang = «2-letter code»|, though it is usually
-detected automatically.
+To set your favorite mode, just insert a line |mode = «mode»| in this file,
+where |«mode»| is one of |view|, |mixed|, |list| or |showall|. To set your
+preferred language, use |lang = «2-letter code»|, but it is usually detected
+automatically.
 
 The configuration file can be used to tweak Texdoc in many ways, the most
 useful of which is probably the selection of the viewers for various types of
 documents, explained in the next section.
 
-\subsection{Viewers}\label{ss-viewer}
+\subsection{Viewers}
+\label{sec:viewer}
 
 Texdoc's mechanism for choosing a viewer varies according to your platform.
 On Windows, macOS, or Unix with KDE, GNOME, or XFCE, it uses your file
@@ -99,32 +100,32 @@ insert the line |viewer_pdf = xpdf %s &| in your configuration file. Here,
 Following parts explain Texdoc's mechanisms for finding the best results and
 how to customize them. We have been trying hard to optimize the default
 configuration values so that you normally don't need to fiddle with that, but
-you may be curious or have special needs.
-
-The final part is a full reference including a few points omitted in the
-present and next parts.
+you may be curious or have special needs. The final part is a full reference
+including a few points omitted in the present and next parts.
 
 \clearpage
 
-\section{File search, aliases, score}
+\section{File Searching, Aliases, Scoring}
 
 \subsection{An overview of how Texdoc works}
 
 When you type |texdoc «keyword»|, Texdoc first makes a list of files, from two
 sources:
+%
 \begin{enumerate}
-  \item In the trees containing documentation (given by the
-    \href{https://www.tug.org/kpathsea/} {kpathsea} variable |TEXDOCS|), it
-    selects all files containing |«keyword»| in their name (including the
-    directory name);
-  \item In the {\TL} Database, it looks for packages named
-    |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may be
-    |sty| or |cls|, and selects all the documentation files from this package.
+\item In the trees containing documentation (given by the
+  \href{https://www.tug.org/kpathsea/} {kpathsea} variable |TEXDOCS|), it
+  selects all files containing |«keyword»| in their name (including the
+  directory name);
+\item In the {\TL} Database, it looks for packages named
+  |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may be
+  |sty| or |cls|, and selects all the documentation files from this package.
 \end{enumerate}
+%
 Files are filtered by extension: only files with known extensions may be
 selected. In case Texdoc cannot find any documentation here, fuzzy search will
 find the closest package name to the |«keyword»| and reselect the files (see
-\ref{ss-fuzzy}).
+Section~\ref{sec:fuzzy}).
 
 The selected files are then score according to some simple heuristics. For
 example, a file named |«keyword».pdf|, is good, |«keyword»-«lang».pdf| will
@@ -133,18 +134,16 @@ score higher if your favorite language |«lang»| is detected or configured,
 directory named exactly |«keyword»| get a bonus, etc.
 
 Score may also be adjusted base on file extensions or known names (or
-subwords): for example, by default, |Makefile|s get a very bad score since
-they are almost never documentation.\footnote{They often end up in the doc
-  tree, since the source of documentation is often in the same directory as
-  the documentation itself in {\TL}. Other source files are discriminated
-  by extension.}
+subwords): for example, by default, |Makefile|s get a very bad score since they
+are almost never documentation.\footnote{They often end up in the doc tree,
+since the source of documentation is often in the same directory as the
+documentation itself in {\TL}. Other source files are discriminated by
+extension.}
 
 Finally, depending on the mode, the file with the highest score is opened in a
 viewer, or the list of results is shown. Usually, only results with a positive
 score are displayed, except in showall mode. Results with very bad scores
 (-100 and below) are never displayed.
-
-\medskip
 
 This model for searching and scoring is quite efficient, but is unfortunately
 not perfect: Texdoc may sometimes need a hint, either to find a relevant file
@@ -161,35 +160,37 @@ Texdoc knows it has to look primarily for |base/doc|. Note that Texdoc will
 also look for the original name, and that a name can be aliased to more than
 one new name.
 
-\medskip
-
 We will soon see how you can configure this, but let's start with a few
 definitions about how a file can match keyword (all matching is
 case-insensitive):
+%
 \begin{enumerate}
-  \item The keyword is a substring of the file name.
-  \item The keyword is a ``subword'' of the file name; words are defined as
-    sequences of alphanumeric characters delimited by punctuation characters
-    (there is no space in file names in {\TL}) and a subword is a
-    substring both ends of which are a word boundary.
-  \item The keyword matches ``exactly'' the file name: that is, the file
-    name is the keyword, possibly plus an extension.
+\item The keyword is a substring of the file name.
+\item The keyword is a ``subword'' of the file name; words are defined as
+  sequences of alphanumeric characters delimited by punctuation characters
+  (there is no space in file names in {\TL}) and a subword is a
+  substring both ends of which are a word boundary.
+\item The keyword matches ``exactly'' the file name: that is, the file
+  name is the keyword, possibly plus an extension.
 \end{enumerate}
 
-\subsection{Alias directives}\label{ss-alias}
+\subsection{Alias directives}
+\label{sec:alias}
 
 \begin{htcode}
-  alias «original keyword» = «name»
-  alias(«score») «original keyword» = «name»
+alias «original keyword» = «name»
+alias(«score») «original keyword» = «name»
 \end{htcode}
-
-You can define your own aliases in Texdoc's configuration files
-(see~\ref{ss-quick-file} or \ref{ss-prec}). For example,
+%
+You can define your own aliases in Texdoc's configuration files (see
+Section~\ref{sec:quick-file} or \ref{sec:prec}). For example,
 insert\footnote{Actually, you don't need to do this, the default configuration
-  file already includes this directive.}
+file already includes this directive.}
+%
 \begin{htcode}
-  alias shortvrb = base/doc
+alias shortvrb = base/doc
 \end{htcode}
+%
 in order to alias |shortvrb| to |base/doc|. Precisely, it means that files in
 the doc trees matching exactly |base/doc| will be added to the result list
 when you look for |shortvrb|, and get a score of 10 (default score for alias
@@ -226,25 +227,26 @@ only aliases associated to the original keyword are used.
 the |alias| directive (10 by default), regardless of the adjustments described
 in the next subsections.
 
-\subsection{Score directives}\label{ss-score}
+\subsection{Score directives}
+\label{sec:score}
 
 \begin{htcode}
-  adjscore «pattern» = «score adjustment»
-  adjscore(«keyword») «pattern» = «score adjustment»
+adjscore «pattern» = «score adjustment»
+adjscore(«keyword») «pattern» = «score adjustment»
 \end{htcode}
-
+%
 It is possible to adjust the score of results containing some pattern as a
 subword, either globally (for the result of all searches) or only when
 searching with a particular keyword. This is done in a configuration file
-(\ref{ss-quick-file} or \ref{ss-prec}) using the |adjscore| directive. Here are
-a few examples from the default configuration file.
+(Section~\ref{sec:quick-file} and \ref{sec:prec}) using the |adjscore|
+directive. Here are a few examples from the default configuration file.
 
 \begin{htcode}
-  adjscore /Makefile = -1000
-  adjscore /tex-virtual-academy-pl/ = -50
-  adjscore(tex) texdoc = -10
+adjscore /Makefile = -1000
+adjscore /tex-virtual-academy-pl/ = -50
+adjscore(tex) texdoc = -10
 \end{htcode}
-
+%
 All files named |Makefile| (and also files named |Makefile-foo| if there are
 any) are ``killed'' : by adjusting their score with such a large negative
 value, their final score will most probably be less than -100, so they will
@@ -264,7 +266,8 @@ range of heuristic scoring, etc.) may change in a future version of Texdoc.
 So, don't be surprised if you need to adapt your scoring directives after a
 future update of Texdoc. This warning will hopefully disappear at some point.
 
-\subsection{File extensions and names}\label{ss-ext}
+\subsection{File extensions and names}
+\label{sec:ext}
 
 The allowed file extensions are defined by the configuration item |ext_list|
 (default: pdf, html, htm, txt, md, ps, dvi, no extension). You can configure it
@@ -287,7 +290,8 @@ are similar to |ext_list| and |badext_list|. So, a file will be selected if
 either its extension or its base name is known, and get a lesser score if
 either is known to be ``bad.''
 
-\subsection{Variants}\label{ss-variants}
+\subsection{Variants}
+\label{sec:variants}
 
 The documentation for a given package is often found in a file named like
 |«package»-doc|. To handle this properly, Texdoc gives a special score files
@@ -299,7 +303,8 @@ configuration file. Be warned, it will replace the default list, no expand
 it. You'll find the default list in the shipped configuration file; feel free
 to suggest additions on the {\TexdocML} (with a real-life example).
 
-\subsection{Fuzzy search}\label{ss-fuzzy}
+\subsection{Fuzzy search}
+\label{sec:fuzzy}
 
 When the normal search can't find any document in {\TL}, Texdoc will
 execute fuzzy search without user-interactions. The fuzzy search finds the
@@ -309,137 +314,136 @@ by the fuzzy search.} to the input |«keyword»|. The results of fuzzy search ar
 shown by as an informational message (you can see that with option |-v|).
 
 The default allowance of Levenshtein distance is 5. You can change this default
-value by specifying |fuzzy_level| in your |texdoc.cnf| (see
-\ref{cf-fuzzy_level}). Results of fuzzy search could be irreproducible if
-multiple strings have the same Levenshtein distance.
+value by specifying \ci{fuzzy\_level} in your |texdoc.cnf|. Results of fuzzy
+search could be irreproducible if multiple strings have the same Levenshtein
+distance.
 
 \clearpage
 
-\section{Full reference}
+\section{Full Reference}
 
-\subsection{Precedence of configuration sources}\label{ss-prec}
+\subsection{Precedence of configuration sources}
+\label{sec:prec}
 
 Values for a particular setting can come from several sources. The sources are
 treated in the following order and the first value found is always used:
+%
 \begin{enumerate}
-  \item Command-line options.
-  \item Environment variables ending with |_texdoc|.
-  \item Other environment variables.
-  \item Values from configuration files (see below).
-  \item Hard-coded defaults that may depend on the current machine.
+\item Command-line options.
+\item Environment variables ending with |_texdoc|.
+\item Other environment variables.
+\item Values from configuration files (see below).
+\item Hard-coded defaults that may depend on the current machine.
 \end{enumerate}
 
-The configuration files are found in the directories |TEXMF/texdoc|, where
-|TEXMF| is the kpathsea variable, in the order given by this variable. Inside
-each directory, three files are recognized, in this order:
+The configuration files are found in the directories \path{TEXMF/texdoc}, where
+\path{TEXMF} is the kpathsea variable, in the order given by this variable.
+Inside each directory, three files are recognized, in this order:
+%
 \begin{enumerate}
-  \item |texdoc-«platform».cnf| where |«platform»| is the name of the current
-    platform (defined as the name of the directories where the {\TL}
-    binaries are located, for example |x86-64-linux|). This may be useful when
-    an installation is shared across machines with different architectures
-    needing different settings, for example for viewers. Their use is not
-    recommended in any other situation.
-  \item |texdoc.cnf| is the recommended file for normal use.
-  \item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
-    (including its default configuration file) in your home while retaining
-    the use of the previous file for your personal setting; see
-    \href{https://github.com/TeX-Live/texdoc}{our GitHub repository} for
-    instructions on running the development version.
+\item |texdoc-«platform».cnf| where |«platform»| is the name of the current
+  platform (defined as the name of the directories where the {\TL}
+  binaries are located, for example |x86-64-linux|). This may be useful when
+  an installation is shared across machines with different architectures
+  needing different settings, for example for viewers. Their use is not
+  recommended in any other situation.
+\item |texdoc.cnf| is the recommended file for normal use.
+\item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
+  (including its default configuration file) in your home while retaining
+  the use of the previous file for your personal setting; see
+  \href{https://github.com/TeX-Live/texdoc}{our GitHub repository} for
+  instructions on running the development version.
 \end{enumerate}
 
-\subsection{Command-line options}\label{ss-cl}
+\subsection{Command-line options}
+\label{sec:cl}
 
-All command-line options (except the first four below) correspond to
-configuration item that can be set in the configuration files: we refer
-the reader to the corresponding section for the meaning of this configuration
-item.
+Command-line options except the first four below correspond to configuration
+items that can be set in the configuration files.
 
-\begin{cmdsubsub}{-h, --help}{cl-h}
-  -h, --help
-\end{cmdsubsub}
-
+\begin{clopt}{\sopt{h}, \lopt{help}}
 Shows a quick help message (namely a list of command-line options) and exit
 successfully.
+\end{clopt}
 
-\begin{cmdsubsub}{-V, --version}{cl-V}
-  -V, --version
-\end{cmdsubsub}
-
+\begin{clopt}{\sopt{V}, \lopt{version}}
 Shows the current version of the program and exit successfully.
+\end{clopt}
 
-\begin{cmdsubsub}{-f, --files}{cl-f}
-  -f, --files
-\end{cmdsubsub}
-
+\begin{clopt}{\sopt{f}, \lopt{files}}
 Shows the list of configuration files for the current installation and
 platform, with their status and exit successfully. Normally, only ``active''
-and ``disabled'' files are shown (see~\ref{cf-lastfile_switch}). To show ``not
-found'' files as well, you can use |--verbose|.
+and ``disabled'' files are shown (see~\ci{lastfile\_switch}). To show ``not
+found'' files as well, you can use \lopt{verbose}.
+\end{clopt}
 
-\begin{cmdsubsub}{--just-view}{cl-just-view}
-  --just-view «file»
-\end{cmdsubsub}
-
+\begin{clopt}{\code{\lopt{just-view} \meta{file}}}
 Open |«file»| in the usual viewer. The file should be given with full path,
 absolutely no searching is done. This option is not really meant for users,
 but rather intended to be used from another program, like a GUI front-end to
 Texdoc.
+\end{clopt}
 
-\begin{cmdsubsub}{-w, -l, -m, -s, --view, --list, --mixed, --showall}{cl-mode}
-  -w, --view, -l, --list, -m, --mixed, -s, --showall
-\end{cmdsubsub}
+\begin{clopt}{\sopt{w}, \lopt{view}}
+Set \ci{mode} to |view|.
+\end{clopt}
 
-Set |mode| to the given value, see~\ref{cf-mode}.
+\begin{clopt}{\sopt{l}, \lopt{list}}
+Set \ci{mode} to |list|.
+\end{clopt}
 
-\begin{cmdsubsub}{-i, -I, --interact, --nointeract}{cl-i}
-  -i, --interact, -I, --nointeract
-\end{cmdsubsub}
+\begin{clopt}{\sopt{m}, \lopt{mixed}}
+Set \ci{mode} to |mixed|.
+\end{clopt}
 
-Set |interact_switch| to true (or false), see~\ref{cf-interact_switch}.
+\begin{clopt}{\sopt{s}, \lopt{showall}}
+Set \ci{mode} to |showall|.
+\end{clopt}
 
-\begin{cmdsubsub}{-M, --machine}{cl-M}
-  -M, --machine
-\end{cmdsubsub}
+\begin{clopt}{\sopt{i}, \lopt{interact}}
+Set \ci{interact\_switch} to |true|.
+\end{clopt}
 
-Set |machine_switch| to true, see~\ref{cf-machine_switch}.
+\begin{clopt}{\sopt{I}, \lopt{nointeract}}
+Set \ci{interact\_switch} to |false|.
+\end{clopt}
 
-\begin{cmdsubsub}{-q, --quiet}{cl-q}
-  -q, --quiet
-\end{cmdsubsub}
+\begin{clopt}{\sopt{M}, \lopt{machine}}
+Set \ci{machine\_switch} to |true|.
+\end{clopt}
 
-Set |verbosity_level| to minimum, see~\ref{cf-verbosity_level}.
+\begin{clopt}{\sopt{q}, \lopt{quiet}}
+Set \ci{verbosity\_level} to minimum.
+\end{clopt}
 
-\begin{cmdsubsub}{-v, --verbose}{cl-v}
-  -v, --verbose
-\end{cmdsubsub}
+\begin{clopt}{\sopt{v}, \lopt{verbose}}
+Set \ci{verbosity\_level} to maximum.
+\end{clopt}
 
-Set |verbosity_level| to maximum, see~\ref{cf-verbosity_level}.
+\begin{clopt}{%
+  \code{\sopt{d} \meta{list}}, \code{\lopt{debug}=\meta{list}},
+  \sopt{D}, \lopt{debug}}
+Set \ci{debug\_list}. You can specify multiple items separated by commas. If
+you specify |-D| or |--debug| without specifying a list, activates all
+available debug items.
+\end{clopt}
 
-\begin{cmdsubsub}{-d, -D, --debug}{cl-d}
-  -d «list», --debug=«list», -D, --debug
-\end{cmdsubsub}
-
-Set |debug_list|, see~\ref{cf-debug_list}. You can specify multiple items
-separated by commas. If you specify |-D| or |--debug| without specifying a
-list, activates all available debug items.
-
-\begin{cmdsubsub}{-c}{cl-c}
-  -c «name»=«value»
-\end{cmdsubsub}
-
+\begin{clopt}{\code{\sopt{c} \meta{name}=\meta{value}}}
 Set configuration item |«name»| to |«value»|. This is a general way to access
-any configuration items listed in \ref{ss-conf} from command line.
+any configuration items listed in Section~\ref{sec:conf} from command line.
+\end{clopt}
 
-\subsection{Environment variables}\label{ss-envvar}
+\subsection{Environment variables}
+\label{sec:envvar}
 
-They all correspond to some |viewer_«ext»| setting, and the reader is referred
-to~\ref{cf-viewer_*} for details.\footnote{Old names of environment variables,
-namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
-|TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You can
-append |_texdoc| to every name in the first column: this wins over every other
-name. These variables can be split by colon |:| and the first non-nil occurrence
-is used. If a viewer command contains colon, please specify it by |viewer_«ext»|.
-
+They all correspond to some \ci{viewer\_\meta{ext}} setting.\footnote{Old names
+of environment variables, namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
+|TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You
+can append |_texdoc| to every name in the first column: this wins over every
+other name. These variables can be split by colon |:| and the first non-nil
+occurrence is used. If a viewer command contains colon, please specify it by
+\ci{viewer\_\meta{ext}}.
+%
 \begin{center}
 \begin{tabular}{ll}
 Environment variables & Configuration items \\
@@ -451,31 +455,31 @@ Environment variables & Configuration items \\
 |PSVIEWER|            & |viewer_ps|         \\
 \end{tabular}
 \end{center}
-
+%
 Also, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
-are used for the default value of |lang|.
+are used for the default value of \ci{lang}.
 
-\subsection{Configuration items}\label{ss-conf}
-
-\subsubsection{Structure of configuration files}\label{sss-sonf-struct}
+\subsection{Configuration items}
+\label{sec:conf}
 
 Configuration files are line-oriented text files. Comments begin with a |#|
 and run to the end of line. Lines containing only space are ignored. Space at
 the beginning or end of a line, as well as around an |=| sign, is ignored.
 Apart from comments and empty lines, each line must be of one of the following
 forms.
-
+%
 \begin{htcode}
-  «configuration item» = «value»
-  alias «original keyword» = «name»
-  alias(«score») «original keyword» = «name»
-  stopalias «original keyword»
-  adjscore «pattern» = «score adjustment»
-  adjscore(«keyword») «pattern» = «score adjustment»
+«configuration item» = «value»
+alias «original keyword» = «name»
+alias(«score») «original keyword» = «name»
+stopalias «original keyword»
+adjscore «pattern» = «score adjustment»
+adjscore(«keyword») «pattern» = «score adjustment»
 \end{htcode}
 
 We will concentrate on the |«configuration item»| part here, since other
-directives have already been presented (\ref{ss-alias} and \ref{ss-score}).
+directives have already been presented (Section~\ref{sec:alias} and
+\ref{sec:score}).
 
 In the above, |«value»|  never needs to be quoted: quotes would be interpreted
 as part of the value, not as quotation marks (this also holds for the other
@@ -484,56 +488,47 @@ directives).
 Lines which do not obey these rules raise a warning, as well as unrecognised
 values of |«configuration item»|. The |«value»| can be an arbitrary string,
 except when the name of the |«configuration item»| ends with:
+%
 \begin{enumerate}
-  \item |_list|, then |«value»| is a coma-separated list of strings. Space
-    around commas is ignored. Two consecutive comas or a coma at the beginning
-    or end of the list means the empty string at the corresponding place.
-  \item |_switch|, then |«value»| must be either |true| or |false|
-    (lowercase).
-  \item |_level|, then |«value»| is an integer.
+\item |_list|, then |«value»| is a coma-separated list of strings. Spaces
+  around commas are ignored. Two consecutive comas or a coma at the beginning
+  or end of the list means the empty string at the corresponding place.
+\item |_switch|, then |«value»| must be either |true| or |false|
+  (lowercase).
+\item |_level| and |_lines|, then |«value»| is an integer.
 \end{enumerate}
+%
 In these cases, an improper |«value»| will raise a warning too.
 
-\begin{cmdsubsub}{mode}{cf-mode}
-  mode = «view, list, mixed, showall»
-\end{cmdsubsub}
-Set the  mode to the given value. Default is |view|. The various modes
-have been presented in~\ref{ss-modes}.
+\begin{confitem}{mode}
+  {\choice{view, list, mixed, showall}}[default: \code{view}]
+Set the  mode to the given value. The various modes have been described
+in Section~\ref{sec:modes}.
+\end{confitem}
 
-\begin{cmdsubsub}{interact}{cf-interact_switch}
-  interact_switch = «true, false»
-\end{cmdsubsub}
+\begin{confitem}{interact\_switch}{\choice{true, false}}[default: \code{true}]
+Turn on or off interaction. Turning interaction off prevents Texdoc from asking
+you to choose a file to view when there are multiple choices, so it just prints
+the list of files found.
+\end{confitem}
 
-Turn on or off interaction. Default is on. Turning interaction off prevents
-Texdoc from asking you to choose a file to view when there are multiple
-choices, so it just prints the list of files found.
+\begin{confitem}{suffix\_list}{\meta{list}}[default: empty]
+Set the list of known suffixes to |«list»| (see Section~\ref{sec:variants}).
+Default is the empty list, but see the shipped configuration file for more.
+\end{confitem}
 
-\begin{cmdsubsub}{suffix_list}{cf-suffix_list}
-  suffix_list = «list»
-\end{cmdsubsub}
-
-Set the list of known suffixes to |«list»| (see~\ref{ss-variants}). Default is
-the empty list, but see the shipped configuration file for more.
-
-\begin{cmdsubsub}{ext_list}{cf-ext_list}
-  ext_list = «list»
-\end{cmdsubsub}
-
-Set the list of recognised extensions to |«list»|. The default value is:
+\begin{confitem}{ext\_list}
+  {\meta{list}}[default: \code{pdf, html, htm, txt, md, dvi, ps,}]
+Set the list of recognised extensions to |«list»|. This list is used to filter
+and  sort the results that have the same score (with the default value: pdf
+first, etc). Two special values are recognised:
 %
-\begin{htcode}
-  pdf, html, htm, txt, md, dvi, ps,
-\end{htcode}
-%
-This list is used to filter and  sort the results that have the same
-score (with the default value: pdf first, etc). Two special values are
-recognised:
 \begin{itemize}
-  \item \emph{The empty element}. This means files without extensions, or more
-    precisely without a dot in their name. This is meant for files like
-    |README|, etc. The file is assumed to be plain text for viewing purpose.
-  \item |*| means any extension. Of course if it is present in the list, it
-    can be the only element!
+\item \emph{The empty element}. This means files without extensions, or more
+  precisely without a dot in their name. This is meant for files like
+  |README|, etc. The file is assumed to be plain text for viewing purpose.
+\item |*| means any extension. Of course if it is present in the list, it
+  can be the only element!
 \end{itemize}
 
 There is a very special case: if the searched |«name»| has |.sty| extension,
@@ -547,92 +542,76 @@ For each |«ext»| in |ext_list| there should be a corresponding |viewer_«ext»
 value set. Defaults are defined corresponding to the default |ext_list|, but
 you can add values if you want. For example, if you want Texdoc to be able
 to find man pages and display them with the |man| command, you can use
+%
 \begin{htcode}
-  ext_list = pdf, html, htm, 1, 5, txt, md, dvi, ps,
-  viewer_1 = man
-  viewer_5 = man
+ext_list = pdf, html, htm, 1, 5, txt, md, dvi, ps,
+viewer_1 = man
+viewer_5 = man
 \end{htcode}
 
 As a special case, if the extension is |sty|, then the |txt| viewer is used;
 similarly, if it is |htm| the |html| viewer is used. Otherwise, the |txt|
 viewer is used and a warning is issued.
+\end{confitem}
 
-\begin{cmdsubsub}{badext_list}{cf-badext_list}
-  badext_list = «list»
-\end{cmdsubsub}
+\begin{confitem}{badext\_list}{\meta{list}}[default: \code{txt}]
+Set the list of ``bad'' extensions to |«list»|. Files with those extensions get
+a malus of |1| on their heuristic score if it was previously positive.
+\end{confitem}
 
-Set the list of ``bad'' extensions to |«list»|. Default is ``|txt,|''. Files
-with those extensions get a malus of |1| on their heuristic score if it was
-previously positive.
+\begin{confitem}{basename\_list}
+  {\meta{list}}[default: \code{readme, 00readme}]
+Set the list of ``known'' base names to |«list»|. Files with those base names
+are selected regardless of their extension. If the extension is unknown, the
+text viewer will be used to view the file.
+\end{confitem}
 
-\begin{cmdsubsub}{basename_list}{cf-basename_list}
-  basename_list = «list»
-\end{cmdsubsub}
+\begin{confitem}{badbasename\_list}
+  {\meta{list}}[default: \code{readme, 00readme}]
 
-Set the list of ``known'' base names to |«list»|. Default is ``|readme|''.
-Files with those base names are selected regardless of their extension. If the
-extension is unknown, the text viewer will be used to view the file.
+Set the list of ``bad'' base names to |«list»|. Files with those names get a
+malus of |1| on their heuristic score if it was previously positive.
+\end{confitem}
 
-\begin{cmdsubsub}{badbasename_list}{cf-badbasename_list}
-  badbasename_list = «list»
-\end{cmdsubsub}
+\begin{confitem}{viewer\_\meta{ext}}{\meta{command}}
+Set the viewer command for files with extension |«ext»| to |«command»|. For
+files without an extension, |viewer_txt| is used. Note that there is no
+|viewer_| variable. In |«command»|, |%s| can be used as a placeholder for the
+file name, which is otherwise inserted at the end of the command. The command
+can be an arbitrary shell construct.
+\end{confitem}
 
-Set the list of ``bad'' base names to |«list»|. Default is ``|readme|''. Files
-with those names get a malus of |1| on their heuristic score if it was
-previously positive.
+\begin{confitem}{lang}{\meta{2-letter code}}
+Set your preferred language. Defaults to your system's locale.
+\end{confitem}
 
-\begin{cmdsubsub}{viewer_*}{cf-viewer_*}
-  viewer_«ext» = «cmd»
-\end{cmdsubsub}
-
-Set the viewer command for files with extension |«ext»| to |«cmd»|. For files
-without extension, |viewer_txt| is used, and there's no |viewer_| variable.
-In |«cmd»|, |%s| can be used as a placeholder for the file name, which is
-otherwise inserted at the end of the command. The command can be an arbitrary
-shell construct.
-
-\begin{cmdsubsub}{lang}{cf-lang}
-  lang = «2-letter code»
-\end{cmdsubsub}
-
-Set you preferred language. Defaults to your system's locale.
-
-\begin{cmdsubsub}{verbosity_level}{cf-verbosity_level}
-  verbosity_level = «n»
-\end{cmdsubsub}
-
-Set the verbosity level to |«n»| (default: 2). At level~3, errors, warnings and
-informational messages will be printed on stderr; 2 means only errors and
-warnings, 1 only errors and 0 nothing except internal errors (obviously not
+\begin{confitem}{verbosity\_level}{\meta{number}}[default: \code{2}]
+Set the verbosity level to |«number»|. At level~|3|, errors, warnings and
+informational messages will be printed on stderr; |2| means only errors and
+warnings, |1| only errors and |0| nothing except internal errors (obviously not
 recommended).
+\end{confitem}
 
-\begin{cmdsubsub}{debug_list}{cf-debug_list}
-  debug_list = «list»
-\end{cmdsubsub}
+\begin{confitem}{debug\_list}{\meta{list}}[default: empty]
+Set the list of activated debug items. Available debug items are |config|,
+|files|, |search|, |score|, |texdocs|, |tlpdb|, |version|, |view|, and |all| to
+activate all of these. Implies |--verbose|. Debug information are printed on
+standard error.
+\end{confitem}
 
-Set the list of activated debug items (default: none). Available debug items
-are |config|, |files|, |search|, |score|, |texdocs|, |tlpdb|, |version|,
-|view|, and |all| to activate all of these. Implies |--verbose|. Debug
-information are printed on standard error.
-
-\begin{cmdsubsub}{max_line}{cf-max_lines}
-  max_lines = «number»
-\end{cmdsubsub}
-
+\begin{confitem}{max\_lines}{\meta{number}}[default: \code{20}]
 Set the maximum number of results to be printed without confirmation in list,
-mixed or showall mode (default: 20). This setting has no effect if interaction
-is disabled.
+mixed or showall mode. This setting has no effect if interaction is disabled.
+\end{confitem}
 
-\begin{cmdsubsub}{machine_switch}{cf-machine_switch}
-  machine_switch = «true, false»
-\end{cmdsubsub}
-
-Turn on or off machine-readable output (default: off). With this option
-active, the value of |interact_switch| is forced to |false|, and each line of
-output is
+\begin{confitem}{machine\_switch}{\choice{true, false}}[default: \code{false}]
+Turn on or off machine-readable output. With this option active, the value of
+|interact_switch| is forced to |false|, and each line of output is
+%
 \begin{htcode}
   «argument»\t«score»\t«filename»
 \end{htcode}
+%
 where |«argument»| is the name of the argument to which the results correspond
 (mainly useful if there were many arguments), |\t| is the tab (ASCII \#9)
 character, and the other entries are pretty self-explanatory. Nothing else is
@@ -644,71 +623,66 @@ Currently, there are two additional fields: a two-letter language code, and an
 unstructured description, both taken from the CTAN catalogue (via the {\TL}
 database). These fields may be empty, and they are not guaranteed to keep the
 same meaning in future versions of Texdoc.
+\end{confitem}
 
-\begin{cmdsubsub}{zipext_list}{cf-zipext_list}
-  zipext_list = «list»
-\end{cmdsubsub}
+\begin{confitem}{zipext\_list}{\meta{list}}[default: empty]
+List of supported extensions for zipped files. Allows compressed files with
+names like |foobar.«zip»|, with |«zip»| in the given |«list»|, to be found and
+unzipped before the viewer is started (the temporary file will be destroyed
+right after).
 
-List of supported extensions for zipped files (default: empty). Allows
-compressed files with names like |foobar.«zip»|, with |«zip»| in the given
-|«list»|, to be found and unzipped before the viewer is started (the
-temporary file will be destroyed right after).
+Warning: Support for zipped documentation is not meant to work on windows, a
+Unix shell is assumed! If you add anything to this list, please make sure that
+you also set a corresponding |unzip=«ext»| value for each |«ext»| in the list.
+At the same time, make sure you are using blocking (i.e., not returning
+immediately) viewers.
 
-\textbf{Warning.} Support for zipped documentation is not meant to work on
-windows, a Unix shell is assumed! If you add anything to this list, please make
-sure that you also set a corresponding |unzip=«ext»| value for each |«ext»| in
-the list. At the same time, make sure you are using blocking (i.e., not
-returning immediately) viewers.
+Remark: {\TL} doesn't ship compressed documentation files, so this option is
+mainly useful with re-packaged version of {\TL} that do, for example in Linux
+distributions.
+\end{confitem}
 
-\textit{Remark.} {\TL} doesn't ship compressed documentation files, so
-this option is mainly useful with re-packaged version of {\TL} that do,
-for example in Linux distributions.
+\begin{confitem}{unzip\_\meta{zipext}}{\meta{command}}[no default]
+The unzipping command for compressed files with extension |«zipext»|. Define
+one for each item in \ci{zipext\_list}. The command must print the result on
+stdout, like |gzip -d -c| does.
+\end{confitem}
 
-\begin{cmdsubsub}{unzip_*}{cf-unzip_star}
-  unzip_«zipext» = «command»
-\end{cmdsubsub}
+\begin{confitem}{rm\_file}{\meta{command}}[default: \code{rm -f}]
+Commands for removing files on your system. Only useful for zipped documents
+(see \ci{zipext\_list}).
+\end{confitem}
 
-The unzipping command for compressed files with extension |«zipext»| (default:
-none). Define one for each item in |zipext_list|. The command must print
-the result on stdout, like |gzip -d -c| does.
+\begin{confitem}{rm\_dir}{\meta{command}}[default: \code{rmdir}]
+Commands for removing directories on your system. Also only useful for zipped
+documents (see \ci{zipext\_list}).
+\end{confitem}
 
-\begin{cmdsubsub}{rm_file, rm_dir}{cf-rm_star}
-  rm_file = «command»
-  rm_dir  = «command»
-\end{cmdsubsub}
-
-Commands for removing files (resp. directories) on your system (defaults:
-|rm -f| and |rmdir|). Only useful for zipped documents (see |zipext_list|).
-
-\begin{cmdsubsub}{lastfile_switch}{cf-lastfile_switch}
-  lastfile_switch = «true, false»
-\end{cmdsubsub}
-
+\begin{confitem}{lastfile\_switch}{\choice{true, false}}[default: \code{false}]
 If set to true, prevents Texdoc from reading any other configuration file after
 this one (they will be reported as ``disabled'' by |texdoc -f|). Mainly useful
 for installing a newer version of Texdoc in your home and preventing the
 default configuration file from older versions to be used (see the
 \href{https://github.com/TeX-Live/texdoc}{README} for instructions on how to do
 so).
+\end{confitem}
 
-\begin{cmdsubsub}{fuzzy_level}{cf-fuzzy_level}
-  fuzzy_level = «n»
-\end{cmdsubsub}
+\begin{confitem}{fuzzy\_level}{\meta{number}}[default: \code{5}]
+Set the allowance of Levenshtein distance to |«number»| for fuzzy search. At
+level~|0|, the fuzzy search feature is disabled.
+\end{confitem}
 
-Set the allowance of Levenshtein distance to |«n»| for the fuzzy search
-(default: 5). At level 0, the fuzzy search feature is disabled.
-
-\begin{cmdsubsub}{texlive_tlpdb}{cf-texlive_tlpdb}
-  texlive_tlpdb = «path»
-\end{cmdsubsub}
-
+\begin{confitem}{texlive\_tlpdb}{\meta{path}}[no default]
 This enables you to specify the |«path»| for the database |texlive.tlpdb| which
 Texdoc uses for searching documents. By default, Texdoc uses
 \path{TEXMFROOT/tlpkg/texlive.tlpdb}. Usually, you don't have to (or should
 not) set this configuration item. This is only useful when you want to use
-Texdoc within a {\TL}-based distribution which does not ship |texlive.tlpdb|.
+Texdoc within a {\TL}-based {\TeX} distribution which does not ship
+|texlive.tlpdb|.
+\end{confitem}
 
-\subsection{Exit codes}\label{ss-exit}
+\subsection{Exit codes}
+\label{sec:exit}
 
 The current exit codes are:
 \begin{enumerate}[start=0]
@@ -718,7 +692,8 @@ The current exit codes are:
   \item No documentation found.
 \end{enumerate}
 
-\section{Licence}\label{s-licence}
+\section{Licence}
+\label{sec:licence}
 
 The current version of Texdoc program and its documentation are copyright 2008
 Manuel Pégourié-Gonnard, Takuto Asakura, and the {\TL} Team.
@@ -739,16 +714,19 @@ this program. If not, see \url{http://www.gnu.org/licenses/}.
 \bigskip
 
 Previous work (Texdoc program) in the public domain:
+%
 \begin{itemize}
-  \item Contributions from Reinhard Kotucha (2008).
-  \item First texlua versions by Frank Küster (2007).
-  \item Original shell script by Thomas Esser, David Aspinall, and Simon
-	Wilkinson.
+\item Contributions from Reinhard Kotucha (2008).
+\item First texlua versions by Frank K\"uster (2007).
+\item Original shell script version by Thomas Esser, David Aspinall, and Simon
+  Wilkinson.
 \end{itemize}
 
 \bigskip
-\begin{center}\Large\bfseries
-  Happy {\TeX}ing!
+
+\begin{center}
+\Large\bfseries
+Happy {\TeX}ing!
 \end{center}
 
 \end{document}
