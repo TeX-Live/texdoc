@@ -103,6 +103,155 @@ special needs.
 
 \clearpage
 
+\section{Controlling Texdoc}
+
+\subsection{Precedence of configuration sources}
+\label{sec:prec}
+
+Values for a particular setting can come from several sources. The sources are
+treated in the following order and the first value found is always used:
+%
+\begin{enumerate}
+\item Command-line options.
+\item Environment variables ending with |_texdoc|.
+\item Other environment variables.
+\item Values from configuration files (see below).
+\item Hard-coded defaults that may depend on the current machine.
+\end{enumerate}
+
+The configuration files are found in the directories \path{TEXMF/texdoc}, where
+\path{TEXMF} is the kpathsea variable, in the order given by this variable.
+Inside each directory, three files are recognized, in this order:
+%
+\begin{enumerate}
+\item |texdoc-«platform».cnf| where |«platform»| is the name of the current
+  platform (defined as the name of the directories where the {\TL}
+  binaries are located, for example |x86-64-linux|). This may be useful when
+  an installation is shared across machines with different architectures
+  needing different settings, for example for viewers. Their use is not
+  recommended in any other situation.
+\item |texdoc.cnf| is the recommended file for normal use.
+\item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
+  (including its default configuration file) in your home while retaining
+  the use of the previous file for your personal setting; see
+  {\TexdocRepo} for instructions on running the development version.
+\end{enumerate}
+
+\subsection{Command-line options}
+\label{sec:cl}
+
+Command-line options except the first four below correspond to configuration
+items that can be set in the configuration files.
+
+\begin{clopt}{\sopt{h}, \lopt{help}}
+Shows a quick help message (namely a list of command-line options) and exit
+successfully.
+\end{clopt}
+
+\begin{clopt}{\sopt{V}, \lopt{version}}
+Shows the current version of the program and exit successfully.
+\end{clopt}
+
+\begin{clopt}{\sopt{f}, \lopt{files}}
+Shows the list of configuration files for the current installation and
+platform, with their status and exit successfully. Normally, only ``active''
+and ``disabled'' files are shown (see~\ci{lastfile\_switch}). To show ``not
+found'' files as well, you can use \lopt{verbose}.
+\end{clopt}
+
+\begin{clopt}{\code{\lopt{just-view} \meta{file}}}
+Open |«file»| in the usual viewer. The file should be given with full path,
+absolutely no searching is done. This option is not really meant for users,
+but rather intended to be used from another program, like a GUI front-end to
+Texdoc.
+\end{clopt}
+
+\begin{clopt}{\sopt{w}, \lopt{view}}
+Set \ci{mode} to |view|.
+\end{clopt}
+
+\begin{clopt}{\sopt{l}, \lopt{list}}
+Set \ci{mode} to |list|.
+\end{clopt}
+
+\begin{clopt}{\sopt{m}, \lopt{mixed}}
+Set \ci{mode} to |mixed|.
+\end{clopt}
+
+\begin{clopt}{\sopt{s}, \lopt{showall}}
+Set \ci{mode} to |showall|.
+\end{clopt}
+
+\begin{clopt}{\sopt{i}, \lopt{interact}}
+Set \ci{interact\_switch} to |true|.
+\end{clopt}
+
+\begin{clopt}{\sopt{I}, \lopt{nointeract}}
+Set \ci{interact\_switch} to |false|.
+\end{clopt}
+
+\begin{clopt}{\sopt{M}, \lopt{machine}}
+Set \ci{machine\_switch} to |true|.
+\end{clopt}
+
+\begin{clopt}{\sopt{q}, \lopt{quiet}}
+Set \ci{verbosity\_level} to minimum.
+\end{clopt}
+
+\begin{clopt}{\sopt{v}, \lopt{verbose}}
+Set \ci{verbosity\_level} to maximum.
+\end{clopt}
+
+\begin{clopt}{%
+  \code{\sopt{d} \meta{list}}, \code{\lopt{debug}=\meta{list}},
+  \sopt{D}, \lopt{debug}}
+Set \ci{debug\_list}. You can specify multiple items separated by commas. If
+you specify |-D| or |--debug| without specifying a list, activates all
+available debug items.
+\end{clopt}
+
+\begin{clopt}{\code{\sopt{c} \meta{name}=\meta{value}}}
+Set configuration item |«name»| to |«value»|. This is a general way to access
+any configuration items listed in Section~\ref{sec:conf} from command line.
+\end{clopt}
+
+\subsection{Environment variables}
+\label{sec:envvar}
+
+They all correspond to some \ci{viewer\_\meta{ext}} setting.\footnote{Old names
+of environment variables, namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
+|TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You
+can append |_texdoc| to every name in the first column: this wins over every
+other name. These variables can be split by colon |:| and the first non-nil
+occurrence is used. If a viewer command contains colon, please specify it by
+\ci{viewer\_\meta{ext}}.
+%
+\begin{center}
+\begin{tabular}{ll}
+Environment variables & Configuration items \\
+|BROWSER|             & |viewer_html|       \\
+|DVIVIEWER|           & |viewer_dvi|        \\
+|MDVIEWER|            & |viewer_md|         \\
+|PAGER|               & |viewer_txt|        \\
+|PDFVIEWER|           & |viewer_pdf|        \\
+|PSVIEWER|            & |viewer_ps|         \\
+\end{tabular}
+\end{center}
+%
+Also, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
+are used for the default value of \ci{lang}.
+
+\subsection{Exit codes}
+\label{sec:exit}
+
+The current exit codes are:
+\begin{enumerate}[start=0]
+  \item Success.
+  \item Internal error.
+  \item Usage error.
+  \item No documentation found.
+\end{enumerate}
+
 \section{Customizing the Search Results}
 
 \subsection{An overview of how Texdoc works}
@@ -300,145 +449,7 @@ allowance by using the configuration item \ci{fuzzy\_level}. Results of fuzzy
 search could be different among executions if multiple package names have the
 same Levenshtein distance to the input.
 
-\section{Full Reference}
-
-\subsection{Precedence of configuration sources}
-\label{sec:prec}
-
-Values for a particular setting can come from several sources. The sources are
-treated in the following order and the first value found is always used:
-%
-\begin{enumerate}
-\item Command-line options.
-\item Environment variables ending with |_texdoc|.
-\item Other environment variables.
-\item Values from configuration files (see below).
-\item Hard-coded defaults that may depend on the current machine.
-\end{enumerate}
-
-The configuration files are found in the directories \path{TEXMF/texdoc}, where
-\path{TEXMF} is the kpathsea variable, in the order given by this variable.
-Inside each directory, three files are recognized, in this order:
-%
-\begin{enumerate}
-\item |texdoc-«platform».cnf| where |«platform»| is the name of the current
-  platform (defined as the name of the directories where the {\TL}
-  binaries are located, for example |x86-64-linux|). This may be useful when
-  an installation is shared across machines with different architectures
-  needing different settings, for example for viewers. Their use is not
-  recommended in any other situation.
-\item |texdoc.cnf| is the recommended file for normal use.
-\item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
-  (including its default configuration file) in your home while retaining
-  the use of the previous file for your personal setting; see
-  {\TexdocRepo} for instructions on running the development version.
-\end{enumerate}
-
-\subsection{Command-line options}
-\label{sec:cl}
-
-Command-line options except the first four below correspond to configuration
-items that can be set in the configuration files.
-
-\begin{clopt}{\sopt{h}, \lopt{help}}
-Shows a quick help message (namely a list of command-line options) and exit
-successfully.
-\end{clopt}
-
-\begin{clopt}{\sopt{V}, \lopt{version}}
-Shows the current version of the program and exit successfully.
-\end{clopt}
-
-\begin{clopt}{\sopt{f}, \lopt{files}}
-Shows the list of configuration files for the current installation and
-platform, with their status and exit successfully. Normally, only ``active''
-and ``disabled'' files are shown (see~\ci{lastfile\_switch}). To show ``not
-found'' files as well, you can use \lopt{verbose}.
-\end{clopt}
-
-\begin{clopt}{\code{\lopt{just-view} \meta{file}}}
-Open |«file»| in the usual viewer. The file should be given with full path,
-absolutely no searching is done. This option is not really meant for users,
-but rather intended to be used from another program, like a GUI front-end to
-Texdoc.
-\end{clopt}
-
-\begin{clopt}{\sopt{w}, \lopt{view}}
-Set \ci{mode} to |view|.
-\end{clopt}
-
-\begin{clopt}{\sopt{l}, \lopt{list}}
-Set \ci{mode} to |list|.
-\end{clopt}
-
-\begin{clopt}{\sopt{m}, \lopt{mixed}}
-Set \ci{mode} to |mixed|.
-\end{clopt}
-
-\begin{clopt}{\sopt{s}, \lopt{showall}}
-Set \ci{mode} to |showall|.
-\end{clopt}
-
-\begin{clopt}{\sopt{i}, \lopt{interact}}
-Set \ci{interact\_switch} to |true|.
-\end{clopt}
-
-\begin{clopt}{\sopt{I}, \lopt{nointeract}}
-Set \ci{interact\_switch} to |false|.
-\end{clopt}
-
-\begin{clopt}{\sopt{M}, \lopt{machine}}
-Set \ci{machine\_switch} to |true|.
-\end{clopt}
-
-\begin{clopt}{\sopt{q}, \lopt{quiet}}
-Set \ci{verbosity\_level} to minimum.
-\end{clopt}
-
-\begin{clopt}{\sopt{v}, \lopt{verbose}}
-Set \ci{verbosity\_level} to maximum.
-\end{clopt}
-
-\begin{clopt}{%
-  \code{\sopt{d} \meta{list}}, \code{\lopt{debug}=\meta{list}},
-  \sopt{D}, \lopt{debug}}
-Set \ci{debug\_list}. You can specify multiple items separated by commas. If
-you specify |-D| or |--debug| without specifying a list, activates all
-available debug items.
-\end{clopt}
-
-\begin{clopt}{\code{\sopt{c} \meta{name}=\meta{value}}}
-Set configuration item |«name»| to |«value»|. This is a general way to access
-any configuration items listed in Section~\ref{sec:conf} from command line.
-\end{clopt}
-
-\subsection{Environment variables}
-\label{sec:envvar}
-
-They all correspond to some \ci{viewer\_\meta{ext}} setting.\footnote{Old names
-of environment variables, namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
-|TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You
-can append |_texdoc| to every name in the first column: this wins over every
-other name. These variables can be split by colon |:| and the first non-nil
-occurrence is used. If a viewer command contains colon, please specify it by
-\ci{viewer\_\meta{ext}}.
-%
-\begin{center}
-\begin{tabular}{ll}
-Environment variables & Configuration items \\
-|BROWSER|             & |viewer_html|       \\
-|DVIVIEWER|           & |viewer_dvi|        \\
-|MDVIEWER|            & |viewer_md|         \\
-|PAGER|               & |viewer_txt|        \\
-|PDFVIEWER|           & |viewer_pdf|        \\
-|PSVIEWER|            & |viewer_ps|         \\
-\end{tabular}
-\end{center}
-%
-Also, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
-are used for the default value of \ci{lang}.
-
-\subsection{Configuration items}
+\section{Configuration items}
 \label{sec:conf}
 
 Configuration files are line-oriented text files. Comments begin with a |#|
@@ -660,17 +671,6 @@ not) set this configuration item. This is only useful when you want to use
 Texdoc within a {\TL}-based {\TeX} distribution which does not ship
 |texlive.tlpdb|.
 \end{confitem}
-
-\subsection{Exit codes}
-\label{sec:exit}
-
-The current exit codes are:
-\begin{enumerate}[start=0]
-  \item Success.
-  \item Internal error.
-  \item Usage error.
-  \item No documentation found.
-\end{enumerate}
 
 \section{Licence}
 \label{sec:licence}
