@@ -206,11 +206,47 @@ adjscore(layout) /tools/ = +1
 # To override one of the settings below, use the 'noalias' directive in
 # your personal configuration file, see the manual for details.
 
-## Essential documentation
+## TeX Live documentation
+
+# texlive-en for general, but prioritized local version if exists
+alias texlive = texlive-en
+alias texlive-cz = texlive-cz
+alias texlive-de = texlive-de
+alias texlive-en = texlive-en
+alias texlive-es = texlive-es
+alias texlive-fr = texlive-fr
+alias texlive-it = texlive-it
+alias texlive-ja = texlive-ja
+alias texlive-pl = texlive-pl
+alias texlive-ru = texlive-ru
+alias texlive-sr = texlive-sr
+alias texlive-zh-cn = texlive-zh-cn
 
 alias live = texlive-en
-alias texlive = texlive-en
+alias live-cz = texlive-cz
+alias live-de = texlive-de
+alias live-en = texlive-en
+alias live-es = texlive-es
+alias live-fr = texlive-fr
+alias live-it = texlive-it
+alias live-ja = texlive-ja
+alias live-pl = texlive-pl
+alias live-ru = texlive-ru
+alias live-sr = texlive-sr
+alias live-zh-cn = texlive-zh-cn
+
 alias tex-live = texlive-en
+alias tex-live-cz = texlive-cz
+alias tex-live-de = texlive-de
+alias tex-live-en = texlive-en
+alias tex-live-es = texlive-es
+alias tex-live-fr = texlive-fr
+alias tex-live-it = texlive-it
+alias tex-live-ja = texlive-ja
+alias tex-live-pl = texlive-pl
+alias tex-live-ru = texlive-ru
+alias tex-live-sr = texlive-sr
+alias tex-live-zh-cn = texlive-zh-cn
 
 ## various stuff
 
