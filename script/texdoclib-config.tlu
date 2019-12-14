@@ -353,12 +353,20 @@ end -- end scope of config_files
 
 ----------------------   config from locale settings   -------------------------
 
+-- set up the locale from the system setting
+-- Note that luatex set the locale to a neutral value for a reason, so we need
+-- to set the locale (for the category 'all') to nil to ignore it.
 local function setup_config_from_locale()
-    local current = os.setlocale(nil, 'all')
-    os.setlocale('', 'all')
-    local native = os.setlocale(nil, 'time')
-    os.setlocale(current, 'all')
-    local lang = string.match(native, '^[a-z][a-z]')
+    local current, native, lang
+    current = os.setlocale(nil, 'all')  -- save the default value
+    os.setlocale('', 'all')             -- set it to nil temporary
+    native = os.setlocale(nil, 'all')   -- get the actual system locale
+    os.setlocale(current, 'all')        -- put back the default value
+    if native == 'C' then -- the default C locale is en
+        lang = 'en'
+    else
+        lang = string.match(native, '^[a-z][a-z]')
+    end
     if lang then
         set_config_element('lang', lang, {src='loc'})
     end
