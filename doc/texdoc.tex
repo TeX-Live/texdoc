@@ -24,9 +24,10 @@ Texdoc is a command-line tool to find and view documents in {\TL}. Typing
 texdoc «name»
 \end{htcode}
 %
-in your command line, a document of the |«name»| package will pop up. To look
-up the documentation of more than one package at once, just give multiple
-|«name»|s as arguments.
+in your command line, you will see a document of the |«name»| package is popped
+up. Of course, you have to replace |«name»| with the actual name of a package.
+To look up the documentation of more than one packages at once, just give
+multiple |«name»|s as arguments.
 
 \subsection{Modes}
 \label{sec:modes}
@@ -75,10 +76,6 @@ and |showall|. Though your preferred language is usually detected automatically
 by getting the system locale, you can set it explicitly with a line
 |\ci{lang} = «2-letter code»| in the configuration file.
 
-%The configuration file enables you to tweak Texdoc in many ways. The most
-%important usage of the file may be the selection of the viewers for various
-%types of documents, explained in the next section.
-
 \subsection{Viewers}
 \label{sec:viewer}
 
@@ -96,152 +93,144 @@ you want to set \code{xpdf} as your default PDF viewer, and run it in the
 background, insert the line |viewer_pdf = xpdf %s &| in your configuration
 file. Herein, |%s| is a place holder for the name of the file to view.
 
-\subsection{You can stop reading now}
+\subsection*{\underline{You can stop reading now}}
 
 The following parts explain the mechanisms of Texdoc for finding the best
 results and how to customize them. We have been trying hard to optimize the
 default configuration values so that normal users do not need to fiddle with
 it. Thus, the following parts are useful only when you are curious or have
-special needs. The final part of this document is a full reference including a
-few points omitted in the other parts.
+special needs.
 
 \clearpage
 
-\section{File Searching, Aliases, Scoring}
+\section{Customizing the Search Results}
 
 \subsection{An overview of how Texdoc works}
 
-When you type |texdoc «keyword»|, Texdoc first makes a list of files, from two
-sources:
+When you type |texdoc «keyword»|, first filenames related to the |«keyword»|
+are collected from the two following sources.
 %
 \begin{enumerate}
-\item In the trees containing documentation (given by the
-  \href{https://www.tug.org/kpathsea/} {kpathsea} variable |TEXDOCS|), it
-  selects all files containing |«keyword»| in their name (including the
-  directory name);
-\item In the {\TL} Database, it looks for packages named
-  |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may be
-  |sty| or |cls|, and selects all the documentation files from this package.
+\item the |TEXMF| trees containing documentation that specified by the
+  \href{https://www.tug.org/kpathsea/}{kpathsea} variable |TEXDOCS|: Texdoc
+  collects all files containing |«keyword»| in their filenames or in the names
+  of their parent directories.
+\item the {\TL} Database (|texlive.tlpdb|): Texdoc searches for packages named
+  |«keyword»| or containing a file |«keyword».«ext»| where |«ext»| may be |sty|
+  or |cls|, and collects all document files of the found packages.
 \end{enumerate}
-%
-Files are filtered by extension: only files with known extensions may be
-selected. In case Texdoc cannot find any documentation here, fuzzy search will
-find the closest package name to the |«keyword»| and reselect the files (see
+
+Second, the collected filenames are filtered by their extensions. After
+filtering, only files with known extensions (listed in \ci{ext\_list}) remain.
+If Texdoc cannot find any documentation, the fuzzy search will find the closest
+package name to the |«keyword»| and it will recollect document files (see
 Section~\ref{sec:fuzzy}).
 
-The selected files are then score according to some simple heuristics. For
-example, a file named |«keyword».pdf|, is good, |«keyword»-«lang».pdf| will
-score higher if your favorite language |«lang»| is detected or configured,
-|«keyword»-doc| will be preferred over |«keyword»whatever|, files in a
-directory named exactly |«keyword»| get a bonus, etc.
+Third, the collected filenames are given numeric scores by using some
+heuristics. For example, a filename |«keyword».pdf| is good, and thus gets a
+high score. A name |«keyword»-«lang».pdf| is also good and gets a higher score
+if the |«lang»| is the preferred language code in your configuration. In
+addition, there are several rules such as ``a name |«keyword»-doc| always wins
+over any names |«keyword»whatever|'' and ``files under a directory named
+exactly |«keyword»| get bonuses''. Scores may also be adjusted based on the
+extensions and some known names or subwords. For example, by default,
+|Makefile|s get very low scores because basically they are not
+documents.\footnote{Nevertheless, they often end up in the |doc| trees,
+because in {\TL}, sources of documents are usually in the same directory as the
+documents themselves. Other source files for documents are discriminated by
+their extensions.}
 
-Score may also be adjusted base on file extensions or known names (or
-subwords): for example, by default, |Makefile|s get a very bad score since they
-are almost never documentation.\footnote{They often end up in the doc tree,
-since the source of documentation is often in the same directory as the
-documentation itself in {\TL}. Other source files are discriminated by
-extension.}
+Finally, a file with the highest score is opened with a viewer, or the list
+of results is shown, depending on the current mode. Usually, only results with
+positive scores are displayed, except in the |showall| mode. Results with very
+bad scores, that are lower than |-100|, are never displayed.
 
-Finally, depending on the mode, the file with the highest score is opened in a
-viewer, or the list of results is shown. Usually, only results with a positive
-score are displayed, except in showall mode. Results with very bad scores
-(-100 and below) are never displayed.
+This model for searching and scoring is efficient, but unfortunately, it is not
+perfect: Texdoc may sometimes need a hint, either to find a relevant file or,
+more likely, to recognize which of the found files is the best. For example,
+suppose you are looking for a document of the {\LaTeX} package |shortvrb|.
+Texdoc will successfully find |shortvrb.sty| in the {\TL} package |latex|.
+However, Texdoc will not be able to sort a number of documents in the |latex|
+package correctly because none of them contains the string |shortvrb|.
 
-This model for searching and scoring is quite efficient, but is unfortunately
-not perfect: Texdoc may sometimes need a hint, either to find a relevant file
-or, more likely, to recognize which of the files found is the most relevant.
+For such cases, \emph{aliases} are useful: in the default configuration file,
+|shortvrb| is aliased to |base/doc|, so that Texdoc primarily look for
+|base/doc| when you type |texdoc shortvrb|. Note that Texdoc will also look for
+the original keyword, and that a name can be aliased to more than one new
+name.
 
-For example, assume you are looking for the documentation of the shortvrb
-{\LaTeX} package. Texdoc will find |shortvrb.sty| in the |latex| {\TL}
-package, but since this package contains a lot of documentation files, none of
-which contains the string |shortvrb|, it will sort them basically at random.
-
-Here comes the notion of \emph{alias}: in the default configuration file,
-|shortvrb| is aliased to |base/doc|, so that when you type |texdoc shortvrb|,
-Texdoc knows it has to look primarily for |base/doc|. Note that Texdoc will
-also look for the original name, and that a name can be aliased to more than
-one new name.
-
-We will soon see how you can configure this, but let's start with a few
-definitions about how a file can match keyword (all matching is
-case-insensitive):
-%
-\begin{enumerate}
-\item The keyword is a substring of the file name.
-\item The keyword is a ``subword'' of the file name; words are defined as
-  sequences of alphanumeric characters delimited by punctuation characters
-  (there is no space in file names in {\TL}) and a subword is a
-  substring both ends of which are a word boundary.
-\item The keyword matches ``exactly'' the file name: that is, the file
-  name is the keyword, possibly plus an extension.
-\end{enumerate}
-
-\subsection{Alias directives}
+\subsection{Aliases}
 \label{sec:alias}
 
+Aliases can be set in configuration files of Texdoc with the following syntax:
+%
 \begin{htcode}
 alias «original keyword» = «name»
 alias(«score») «original keyword» = «name»
 \end{htcode}
 %
-You can define your own aliases in Texdoc's configuration files (see
-Section~\ref{sec:quick-file} or \ref{sec:prec}). For example,
-insert\footnote{Actually, you don't need to do this, the default configuration
-file already includes this directive.}
+A number of aliases are already set in the default configuration file. You can
+also define your own aliases in your personal configuration files (see
+Section~\ref{sec:quick-file} or \ref{sec:prec} to know where is that). For example,
+you can add a line
 %
 \begin{htcode}
-alias shortvrb = base/doc
+alias td = texdoc
 \end{htcode}
 %
-in order to alias |shortvrb| to |base/doc|. Precisely, it means that files in
-the doc trees matching exactly |base/doc| will be added to the result list
-when you look for |shortvrb|, and get a score of 10 (default score for alias
-results). This is greater than the results of heuristic scoring: it means that
-results found via aliases will always rank before results associated to the
-original keyword.
+to the file to alias |td| to |texdoc|. Then, files in the doc trees matching
+exactly with |texdoc|, \ie this document |texdoc.pdf|, will be added to the
+result list when you search for the keyword |td|.
 
-If you want the results associated to a particular alias to have a custom
-score instead of the default 10, you can use the optional argument to the
-alias directive. This can be useful if you associate many aliases to
-a keyword and want one of them to show up first.
+By default, files match with the aliased name get a score of |10|. This score
+is greater than any result of heuristic scoring. It means that results found
+via aliases will always be ranked higher than results found for the original
+keyword. If you want the results associated with a particular alias to have a
+custom score instead of the default score |10|, you can use the optional
+argument to the |alias| directive. This can be useful if you associate multiple
+aliases to a keyword and want to specify the priorities for them.
 
-Additionally, starting from with v0.80, aliases for |«keyword»-«lang»|, where
-|«lang»| is your preferred language's 2-letter code (as detected or
-configured, see the |lang| option) are also used for |«keyword»| and get a
-|+1| score upgrade.
+In addition, aliases for |«keyword»-«lang»|, where |«lang»| is your preferred
+language's 2-letter code (as detected or configured, see the |lang| option), are
+also used when searching for |«keyword»|. Files match with these language-based
+aliases get additional bonus scores so that they win over the results for
+language-independent aliases.
 
-You can have a look at the configuration file provided (the last shown by
-|texdoc -f|) for examples. If you feel one of the aliases you defined locally
-should be added to the default configuration, please share it on the
-{\TexdocML}.
+For concrete examples, please have a look at the default configuration file,
+which can be found in the last line of the output for |texdoc -f|. If you think
+aliases you defined locally should be added to the default configuration,
+please share the idea to the {\TexdocML} or {\TexdocRepo}.
 
 Aliases are additive: if you define your own aliases for a keyword in your
 configuration file, and there are also aliases for the same keyword in the
-default configuration, they will add up. To prevent the default aliases
-from being applied for a particular keyword, include |stopalias «keyword»| in
+default configuration, they will add up. To prevent the default aliases from
+being applied for a particular keyword, add a line |stopalias «keyword»| in
 your personal configuration file. It will preserve the aliases defined before
-this directive (if any) but prevent all further aliasing on this keyword.
+this directive if any, but prevent all further aliasing on this keyword.
 
-\textit{Remark.} Aliasing is case-insensitive, and doesn't cascade:
-only aliases associated to the original keyword are used.
+Here are some notes for aliases. First, they are case-insensitive. Second, they
+do not work recursively: only aliases set to the original keyword are used.
+Third, results found for aliases always get the score defined by the |alias|
+directive (|10| by default). The adjustments described in the other subsections
+are not applied to results for aliases.
 
-\textbf{Warning.} Results found from aliases always have the score defined by
-the |alias| directive (10 by default), regardless of the adjustments described
-in the next subsections.
-
-\subsection{Score directives}
+\subsection{Score adjustments}
 \label{sec:score}
 
+Scores can be arbitrary adjusted by using the |adjscore| directive in the
+configuration files. The adjustment can be done either for global, \ie for any
+keywords, or a particular keyword. The syntax is as follow:
+%
 \begin{htcode}
 adjscore «pattern» = «score adjustment»
 adjscore(«keyword») «pattern» = «score adjustment»
 \end{htcode}
 %
-It is possible to adjust the score of results containing some pattern as a
-subword, either globally (for the result of all searches) or only when
-searching with a particular keyword. This is done in a configuration file
-(Section~\ref{sec:quick-file} and \ref{sec:prec}) using the |adjscore|
-directive. Here are a few examples from the default configuration file.
+When the optional argument |«keyword»| is specified, the adjustment will be
+applied only when a user searches for the |«keyword»|. Otherwise, the
+adjustment applied always for the |«pattern»|.
+
+Here are a few examples from the default configuration file.
 
 \begin{htcode}
 adjscore /Makefile = -1000
@@ -249,78 +238,67 @@ adjscore /tex-virtual-academy-pl/ = -50
 adjscore(tex) texdoc = -10
 \end{htcode}
 %
-All files named |Makefile| (and also files named |Makefile-foo| if there are
-any) are ``killed'' : by adjusting their score with such a large negative
-value, their final score will most probably be less than -100, so they will
-never be displayed. Files from the |tex-virtual-academy-pl| directory, on the
-other hand, are not killed but just get a malus, since they are a common
-source of ``fake'' matches which hide better results (even for the lucky ones
-who can read polish).
+Herein, all files named |Makefile|, and those with suffixes, \eg |Makefile.in|,
+will be eliminated from results: by adjusting their score with such a large
+negative value, their final score will be less than |-100|. Which means they
+will never be displayed.  Files from the |tex-virtual-academy-pl| directory, on
+the other hand, are not eliminated but get a negative adjustment, since they
+are a common source of ``fake'' matches which hide better results. The third
+line gives a minus adjustment for results containing |texdoc| only when the
+searched keyword is |tex|. Otherwise, such results would get high scores
+because the heuristic scoring would assume |texdoc| is the name of
+documentation for {\TeX} itself. The adjustment value |-10| is enough to ensure
+that those results will have a negative score, so the files containing |texdoc|
+will not be displayed unless |showall| mode is used.
 
-The third directive gives a malus for results containing |texdoc| only if the
-search keyword is |tex|. Otherwise, such results would get a high score
-because the heuristic scoring would think |texdoc| is the name of \TeX's
-documentation. The value -10 is enough to ensure that those results will have
-a negative score, so will not be displayed unless ``showall'' mode is active.
+Note that the values of scores, such as the default score for aliases and the
+range of heuristic scores, may be changed in a future version of Texdoc.
+Therefore, you may need to adapt your score adjustments after updating Texdoc
+in the future.
 
-\textbf{Warning}: Values of scores (like the default score for aliases, the
-range of heuristic scoring, etc.) may change in a future version of Texdoc.
-So, don't be surprised if you need to adapt your scoring directives after a
-future update of Texdoc. This warning will hopefully disappear at some point.
-
-\subsection{File extensions and names}
+\subsection{Extensions and basenames of files}
 \label{sec:ext}
 
-The allowed file extensions are defined by the configuration item |ext_list|
-(default: pdf, html, htm, txt, md, ps, dvi, no extension). You can configure it
-with a line |ext_list = «your, list»| in a configuration file. Be aware
-that it will completely override the default list, not add to it. An empty
-string in the list means files without extension (no dot in the name), while a
-star means any extension.
+File extensions regarded as documents by Texdoc can be specified with the
+configuration item \ci{ext\_list}. By default, files with extensions |pdf|,
+|html|, |htm|, |txt|, |md|, |ps|, and |dvi| and files without extension are
+recognized as documents.
 
-For scoring purposes, there is also a |badext_list| parameter: files whose
-extension is ``bad'' according to this list will get a lesser score (currently
-0).
+During the scoring process, the configuration item |badext_list| is also used:
+files with a ``bad'' extension appearing in this list will get a lesser score.
 
-Unfortunately, sometimes what follows a dot in a file name is not a ``real''
-extension. This often happens with readme files, for example |readme.fr| or
-|readme.texlive|. So, in addition to his list of known extensions, Texdoc has
-a list of known basenames, by default just |readme|.
+In the practical filenames, things which are not actually extensions can follow
+dots, \eg |readme.fr| and |readme.texlive|. Thus, in addition to the lists of
+known extensions, Texdoc has lists for known basenames: \ci{basename\_list} and
+\ci{badbasename\_list}.  These configuration items are respectively similar to
+\ci{ext\_list} and \ci{badext\_list}. In short, a file will be selected if
+either its extension or its basename is known, and get a lesser score if either
+is known to be ``bad''.
 
-The corresponding settings are |basename_list| and |badbasename_list|; both
-are similar to |ext_list| and |badext_list|. So, a file will be selected if
-either its extension or its base name is known, and get a lesser score if
-either is known to be ``bad.''
+\subsection{Common filenames}
+\label{sec:common-names}
 
-\subsection{Variants}
-\label{sec:variants}
-
-The documentation for a given package is often found in a file named like
-|«package»-doc|. To handle this properly, Texdoc gives a special score files
-named |«package»«suffix»| where |«suffix»| is one element of the list given by
-the configuration setting |suffix_list|.
-
-To customise this list, add a line with |suffix_list = «your, list»| in a
-configuration file. Be warned, it will replace the default list, no expand
-it. You'll find the default list in the shipped configuration file; feel free
-to suggest additions on the {\TexdocML} (with a real-life example).
+Document filenames of packages are often in the form of |«package»-doc|.
+Respecting this culture in the {\TeX} community, Texdoc gives a special score
+for files named |«package»«suffix»|, where |«suffix»| is an element of the list
+\ci{suffix\_list}. Please refer to the shipped configuration file for the
+default setting. Also, feel free to suggest additional elements for the list to
+the {\TexdocML} with a real-life example.
 
 \subsection{Fuzzy search}
 \label{sec:fuzzy}
 
-When the normal search can't find any document in {\TL}, Texdoc will
-execute fuzzy search without user-interactions. The fuzzy search finds the
-closest name of package in {\TL}\footnote{Note that the feature searches
-only package names at this point. Other objects such as aliases cannot be found
-by the fuzzy search.} to the input |«keyword»|. The results of fuzzy search are
-shown by as an informational message (you can see that with option |-v|).
+When the normal search cannot find any document in {\TL}, Texdoc will execute a
+fuzzy search. The fuzzy search tries to find the closest name of a package in
+{\TL}\footnote{Note that the feature searches only package names at this point.
+Other objects such as aliases cannot be found by the fuzzy search.} to the
+input |«keyword»|. The results of the fuzzy search are shown in an info
+message, which can be seen by using the command-line option |-v|.
 
-The default allowance of Levenshtein distance is 5. You can change this default
-value by specifying \ci{fuzzy\_level} in your |texdoc.cnf|. Results of fuzzy
-search could be irreproducible if multiple strings have the same Levenshtein
-distance.
-
-\clearpage
+The default allowance of Levenshtein distance is |5|. You can change this
+allowance by using the configuration item \ci{fuzzy\_level}. Results of fuzzy
+search could be different among executions if multiple package names have the
+same Levenshtein distance to the input.
 
 \section{Full Reference}
 
@@ -353,8 +331,7 @@ Inside each directory, three files are recognized, in this order:
 \item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
   (including its default configuration file) in your home while retaining
   the use of the previous file for your personal setting; see
-  \href{https://github.com/TeX-Live/texdoc}{our GitHub repository} for
-  instructions on running the development version.
+  {\TexdocRepo} for instructions on running the development version.
 \end{enumerate}
 
 \subsection{Command-line options}
@@ -515,8 +492,9 @@ the list of files found.
 \end{confitem}
 
 \begin{confitem}{suffix\_list}{\meta{list}}[default: empty]
-Set the list of known suffixes to |«list»| (see Section~\ref{sec:variants}).
-Default is the empty list, but see the shipped configuration file for more.
+Set the list of known suffixes to |«list»| (see
+Section~\ref{sec:common-names}).  Default is the empty list, but see the
+shipped configuration file for more.
 \end{confitem}
 
 \begin{confitem}{ext\_list}
@@ -579,7 +557,7 @@ malus of |1| on their heuristic score if it was previously positive.
 Set the viewer command for files with extension |«ext»| to |«command»|. For
 files without an extension, |viewer_txt| is used. Note that there is no
 |viewer_| variable. In |«command»|, |%s| can be used as a placeholder for the
-file name, which is otherwise inserted at the end of the command. The command
+filename, which is otherwise inserted at the end of the command. The command
 can be an arbitrary shell construct.
 \end{confitem}
 

@@ -5,9 +5,26 @@
 \ProvidesClass{texdoc-doc}
   [2019/12/10 Document class for Texdoc user manual]
 
-% package options
+% class options
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}
 \ProcessOptions\relax
+
+% remove "draft" from global options list
+% (code from https://tex.stackexchange.com/questions/33245/)
+\def\@clearglobaloption#1{%
+  \def\@tempa{#1}%
+  \def\@tempb{\@gobble}%
+  \@for\next:=\@classoptionslist\do
+    {\ifx\next\@tempa
+       \message{Cleared  option \next\space from global list}%
+     \else
+       \edef\@tempb{\@tempb,\next}%
+     \fi}%
+  \let\@classoptionslist\@tempb
+  \expandafter\ifx\@tempb\@gobble
+    \let\@classoptionslist\@empty
+  \fi}
+\@clearglobaloption{draft}
 
 % basic dependency
 \LoadClass[a4paper,oneside,parskip=half-]{scrartcl}
@@ -24,6 +41,10 @@
 \setsansfont{DejaVuSans}
 \setmonofont{DejaVuSansMono}
 \renewcommand{\familydefault}{\sfdefault}
+
+% for math
+%\RequirePackage{unicode-math}
+%\setmathfont[math-style=ISO,bold-style=ISO]{TeX Gyre DejaVu Math}
 
 \setkomafont{title}{}
 \setkomafont{subtitle}{\Large}
@@ -120,16 +141,18 @@
   \vskip 2em
 }
 
-% shortcuts
-\DeclareRobustCommand{\TL}{\texorpdfstring{\TeX\,\,Live}{TeX Live}}
-\DeclareRobustCommand{\TexdocML}
-  {\href{http://lists.tug.org/texdoc}{texdoc mailing list}}
-
 % Low layer settings
 \lastlinefit=500 % e-TeX powered
 \catcode`\ 10\relax % take care of non-breakable spaces
 
-% macros
+% some macros
+\DeclareRobustCommand{\TL}{\texorpdfstring{\TeX\,\,Live}{TeX Live}}
+\newcommand*{\TexdocML}
+  {\href{http://lists.tug.org/texdoc}{mailing list}}
+\newcommand*{\TexdocRepo}
+  {\href{https://github.com/TeX-Live/texdoc}{GitHub repository}}
+\newcommand*{\ie}{i.e.,\,}
+\newcommand*{\eg}{e.g.,\,}
 \newcommand*{\hyph}{-}
 \newcommand*{\meta}[1]{\bgroup
   \normalfont\color{special}$\langle$\textit{#1}$\rangle$\egroup}
