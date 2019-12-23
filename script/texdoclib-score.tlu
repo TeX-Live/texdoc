@@ -3,6 +3,7 @@
 -- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
 -- dependencies
+local md5 = require('md5')
 local texdoc = {
     util = require('texdoclib-util'),
     config = require('texdoclib-config'),
@@ -10,7 +11,6 @@ local texdoc = {
 
 -- shortcuts
 local M = {}
-local dbg_print = texdoc.util.dbg_print
 
 -- shared variables
 local global_adjscore, spec_adjscore = {}, {}
@@ -73,18 +73,19 @@ local function has_bad_basename(file)
 end
 
 -- compute a heuristic score -10 <= s < 10
-local function heuristic_score(file, pat)
-    dbg_print('score', 'Start heuristic scoring with pattern: ' .. pat)
+local function heuristic_score(file, pat, dbg_score)
+    dbg_score('Start heuristic scoring with pattern: ' .. pat)
+
     -- score management
     local score = -10
     local function upscore(s, reason, force)
         if s > score or force then
             score = s
-            dbg_print('score',
-                'New heuristic score: %.1f. Reason: %s', s, reason)
+            dbg_score('New heuristic score: %.1f. Reason: %s', s, reason)
         end
     end
     local slash = not not string.find(pat, '/', 1, true)
+
     -- look for exact or subword match
     if M.is_exact_locale(file, pat) then
         upscore(5, 'exact match with correct locale')
@@ -93,6 +94,7 @@ local function heuristic_score(file, pat)
     elseif is_subword(file, pat) then
         upscore(1, 'subword match')
     end
+
     -- try derivatives unless pat contains a slash
     if not slash then
         for _, suffix in ipairs(texdoc.config.get_value('suffix_list')) do
@@ -104,21 +106,25 @@ local function heuristic_score(file, pat)
             end
         end
     end
+
     -- if extension is bad, score becomes an epsilon
     local ext = texdoc.config.get_value('ext_list')[M.ext_pos(file)]
     if ext and texdoc.config.get_value('badext_list_inv')[ext] and score > 0 then
         upscore(0.1, 'bad extension', true)
     end
+
     -- if basename is bad, score becomes an epsilon
     if has_bad_basename(file) and score > 0 then
         upscore(0.1, 'bad basename', true)
     end
+
     -- bonus for being in the right directory
     if string.find('/' .. file, '/' .. pat .. '/', 1, true) and not slash then
         upscore(score + 1.5, 'directory bonus')
     end
+
     -- done
-    dbg_print('score', 'Final heuristic score: %.1f', score)
+    dbg_score('Final heuristic score: %.1f', score)
     return score
 end
 
@@ -126,70 +132,81 @@ end
 local function set_score(df, original_kw)
     -- scoring is case-insensitive (patterns are already lowercased)
     local name = string.lower(df.shortname)
-    dbg_print('score', '----------')
-    dbg_print('score', 'Start scoring ' .. df.realpath)
-    dbg_print('score', 'Name used: ' .. name)
+
+    local new_name = string.lower(df.normname)
+    local df_id = string.sub(md5.sumhexa(new_name), 1, 7)
+
+    -- special debugging function
+    local function dbg_score(msg, ...)
+        local msg = string.format('(%s) ', df_id) .. msg
+        texdoc.util.dbg_print('score', msg, ...)
+    end
+
+    dbg_score('Start scoring ' .. df.realpath)
+    dbg_score('Name used: ' .. name)
+
     -- get score from patterns
     local score = -10
     for _, pat in ipairs(df.matches) do
         local s = -10
         local p = string.lower(pat.name)
         if pat.original then
-            s = df.tree > -1 and heuristic_score(name, p) or 1
+            s = df.tree > -1 and heuristic_score(name, p, dbg_score) or 1
         elseif M.is_exact(name, p) then
             local bonus, note = 0, ''
             if pat.locale then
                 bonus, note = 5, ', (language-based)'
             end
             s = (pat.score or 10) + bonus -- default alias score is 10
-            dbg_print('score',
-                'Matching alias "%s", score: %.1f%s', pat.name, s, note)
+            dbg_score('Matching alias "%s", score: %.1f%s', pat.name, s, note)
         end
         if s > score then score = s end
     end
-    dbg_print('score', 'Max pattern score: %.1f', score)
+    dbg_score('Max pattern score: %.1f', score)
+
     -- get score from tlp associations
     if score == -10 and df.tlptodoc then
         score = -1
-        dbg_print('score',
-            'New score: %.1f from package name association', score)
+        dbg_score('New score: %.1f from package name association', score)
     end
+
     if score == -10 and df.runtodoc then
         score = -5
-        dbg_print('score',
-            'New score: %.1f from sty/cls association', score)
+        dbg_score('New score: %.1f from sty/cls association', score)
     end
+
     -- bonus for metadata
     if df.details then
         if string.find(string.lower(df.details), 'readme') then
             score = score + 0.1
-            dbg_print('score', 'Catalogue "readme" bonus: +0.1')
+            dbg_score('Catalogue "readme" bonus: +0.1')
         else
             score = score + 1.5
-            dbg_print('score', 'Catalogue details bonus: +1.5')
+            dbg_score('Catalogue details bonus: +1.5')
         end
     end
+
     -- adjust from keyword-specific tables
     if df.tree > -1 and spec_adjscore[original_kw] then
         for pat, val in pairs(spec_adjscore[original_kw]) do
             if val and is_subword('/' .. name, pat) then
                 score = score + val
-                dbg_print('score',
-                    'Adjust by %.1f from specific pattern "%s"', val, pat)
+                dbg_score('Adjust by %.1f from specific pattern "%s"', val, pat)
             end
         end
     end
+
     -- adjust from global tables
     if df.tree > -1 then
         for pat, val in pairs(global_adjscore) do
             if val and is_subword('/' .. name, pat) then
                 if score > -10 or val < 0 then score = score + val end
-                dbg_print('score',
-                    'Adjust by %.1f from global pattern "%s"', val, pat)
+                dbg_score('Adjust by %.1f from global pattern "%s"', val, pat)
             end
         end
     end
-    dbg_print('score', 'Final score: %.1f', score)
+
+    dbg_score('Final score: %.1f', score)
     df.score = score
 end
 
