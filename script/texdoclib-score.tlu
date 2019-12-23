@@ -131,13 +131,12 @@ end
 -- set the score of a docfile
 local function set_score(df, original_kw)
     -- scoring is case-insensitive (patterns are already lowercased)
-    local name = string.lower(df.shortname)
-
-    local new_name = string.lower(df.normname)
-    local df_id = string.sub(md5.sumhexa(new_name), 1, 7)
+    local name = string.lower(df.normname)
+    local df_id = string.sub(md5.sumhexa(name), 1, 7)
 
     -- special debugging function
     local function dbg_score(msg, ...)
+        -- add the hash id prefix to make the outputs grep-friendly
         local msg = string.format('(%s) ', df_id) .. msg
         texdoc.util.dbg_print('score', msg, ...)
     end
@@ -207,7 +206,9 @@ local function set_score(df, original_kw)
     end
 
     dbg_score('Final score: %.1f', score)
-    df.score = score
+
+    -- the final score should be a float value
+    df.score = score + 0.0
 end
 
 -- set the scores for a doclist

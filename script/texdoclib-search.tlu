@@ -128,7 +128,6 @@ docfile = {
     -- those are virtual members, see below
     realpath  = full path
     normname  = nomrmalised (path removed up to the 'doc' component)
-    shortname = short name used for scoring
     basename  = basename
     lang      = language tag from the catalogue metadata
     details   = details tag from the catalogue metadata
@@ -219,13 +218,6 @@ end
 function Docfile:get_details()
     local meta = s_meta[self.normname]
     return meta and (meta.details or false) or false
-end
-
--- return the short name used for scoring
-function Docfile:get_shortname()
-    if self.tree == -1 then return self.name end
-    -- remove first component of name if at least two directory levels
-    return string.match(self.normname, '^..-/(.+/.+)$') or self.normname
 end
 
 -- return the base name

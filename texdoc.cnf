@@ -141,6 +141,9 @@ adjscore /demos/ = -1
 adjscore /figures/ = -3
 adjscore /images/ = -3
 
+# latex-dev stuff are less important than stable ones
+adjscore /latex-dev/ = -1
+
 # readme files usually get negative scores because they have bad extensions,
 # but they're still slightly better than other results with negative scores
 adjscore readme = +0.1
@@ -165,6 +168,14 @@ adjscore(latex) tufte-latex = -10
 adjscore(latex) Content_LaTeX_Package_Demo = -10
 adjscore(latex) example_latex = -10
 adjscore(latex) test_latex = -10
+# dir names
+adjscore(latex) /latex/ = -4
+adjscore(latex) /latex-dev/ = -5
+adjscore(latex) /generic/ = -5
+
+# prioritize official documents for 'latex'
+adjscore(latex) /latex/base/ = +5
+adjscore(latex) /latex/tools/ = +5
 
 # beamer
 adjscore(beamer) beamer-tut-pt/tutorialbeamer = +10
