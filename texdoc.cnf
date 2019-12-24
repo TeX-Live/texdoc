@@ -328,6 +328,10 @@ alias textcomp = source2e
 alias tracefnt = source2e
 # TODO: try to avoid the huge amount of false positives for `doc' itself.
 
+# latex-dev instruction
+alias latex-dev = latex/base/ltnews30
+alias(9) latex-dev = latex-dev.man1
+
 # latex's required graphics bundle
 alias color-dev = color
 alias epsfig-dev = epsfig
