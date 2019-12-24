@@ -10,7 +10,7 @@ kpse.set_program_name('luatex')
 local ok = true
 local function printf(fmt, ...) print(fmt:format(...)) end
 
--- Table texdoc is only allowed to be global
+-- any global variable should not be added
 do
     local function table_keys(tab)
         local res = {}

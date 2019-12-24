@@ -149,14 +149,14 @@ local function set_score(df, original_kw)
     for _, pat in ipairs(df.matches) do
         local s = -10
         local p = string.lower(pat.name)
-        if pat.original then
+        if pat.original then  -- non-alias
             s = df.tree > -1 and heuristic_score(name, p, dbg_score) or 1
-        elseif M.is_exact(name, p) then
+        elseif M.is_exact(name, p) then  -- alias
             local bonus, note = 0, ''
             if pat.locale then
                 bonus, note = 5, ', (language-based)'
             end
-            s = (pat.score or 10) + bonus -- default alias score is 10
+            s = (pat.score or 10) + bonus  -- default alias score is 10
             dbg_score('Matching alias "%s", score: %.1f%s', pat.name, s, note)
         end
         if s > score then score = s end

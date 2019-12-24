@@ -5,7 +5,7 @@
 --[[ structure of the alias table
 
 alias = {
-  name1 = {<true or nill> stop, <aliasentry> aliasentry1, ...},
+  name1 = {<true or nil> stop, <aliasentry> aliasentry1, ...},
   ...
 }
 stop == true means further alias directives should be ignored
