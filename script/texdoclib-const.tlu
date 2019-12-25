@@ -4,7 +4,7 @@
 
 -- use an empty environment that will become texdoc_env.C (see EOF)
 local constants = {}
-local kpse = kpse
+local kpse = kpse or require 'kpse'
 local setfenv = setfenv
 local texdoc_env
 

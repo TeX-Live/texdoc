@@ -2,9 +2,12 @@
 --
 -- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
+-- dependencies
+local lfs = require 'lfs'
+
 -- shortcuts
 local M = {}
-local C = require('texdoclib-const')
+local C = require 'texdoclib-const'
 
 -- config is local to this file
 local config = {}

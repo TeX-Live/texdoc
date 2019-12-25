@@ -4,11 +4,11 @@
 
 -- dependencies
 local texdoc = {
-    const = require('texdoclib-const'),
-    util = require('texdoclib-util'),
-    config = require('texdoclib-config'),
-    search = require('texdoclib-search'),
-    view = require('texdoclib-view'),
+    const = require 'texdoclib-const',
+    util = require 'texdoclib-util',
+    config = require 'texdoclib-config',
+    search = require 'texdoclib-search',
+    view = require 'texdoclib-view',
 }
 
 -- shortcuts

@@ -5,12 +5,14 @@
 -- Warning: Some functions here assume that M.init_databases() has been called.
 
 -- dependencies
+local kpse = require 'kpse'
+local lfs = require 'lfs'
 local texdoc = {
-    const = require('texdoclib-const'),
-    util = require('texdoclib-util'),
-    alias = require('texdoclib-alias'),
-    score = require('texdoclib-score'),
-    config = require('texdoclib-config'),
+    const = require 'texdoclib-const',
+    util = require 'texdoclib-util',
+    alias = require 'texdoclib-alias',
+    score = require 'texdoclib-score',
+    config = require 'texdoclib-config',
 }
 
 -- shortcuts
@@ -367,7 +369,7 @@ init_texdocs_database = function()
 
     doc_roots = {}
     local sep = (os.type == 'windows') and ';' or ':'
-    local kpse_texdocs = kpse.expand_var("$TEXDOCS")
+    local kpse_texdocs = kpse.expand_var('$TEXDOCS')
 
     -- expand the path and turn it into a lua list
     local raw_doc_roots = string.explode(kpse.expand_braces(kpse_texdocs), sep)
@@ -650,8 +652,7 @@ end -- end scope of tlpinfo table
 
 -- get tlpinfo tables initialised by whatever mean
 local function init_tlp_database()
-    local TEXMFVAR = kpse.var_value('TEXMFVAR')
-    local cache_file = TEXMFVAR .. '/' .. C.cache_name
+    local cache_file = kpse.expand_var('$TEXMFVAR/' .. C.cache_name)
 
     -- set vanilla and detect texlive.tlpdb to use
     local texlive_tlpdb = get_tlroot() .. '/tlpkg/texlive.tlpdb'

@@ -3,10 +3,10 @@
 -- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
 -- dependencies
-local md5 = require('md5')
+local md5 = require 'md5'
 local texdoc = {
-    util = require('texdoclib-util'),
-    config = require('texdoclib-config'),
+    util = require 'texdoclib-util',
+    config = require 'texdoclib-config',
 }
 
 -- shortcuts

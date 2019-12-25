@@ -22,7 +22,7 @@ score == nil means to use the default score (defined in texdoclib-score.tlu)
 
 -- dependencies
 local texdoc = {
-    config = require('texdoclib-config'),
+    config = require 'texdoclib-config',
 }
 
 -- shortcuts
