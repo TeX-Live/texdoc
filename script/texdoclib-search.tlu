@@ -26,11 +26,11 @@ local s_doclist -- the Doclist object to be populated by various functions
 local s_meta -- {[normname] = meta, ...} (populated by init_tlp_database)
 local vanilla -- is this a vanilla TL or a re-package one without tlpdb?
 
-----------------------------   utility functions   -----------------------------
+---------------------------   utility functions   ----------------------------
 
 -- find the TeX Live root
 local function get_tlroot()
-    local tlroot = kpse.var_value('TEXMFROOT')
+    local tlroot = kpse.expand_path('$TEXMFROOT') -- it should be exisitng one
     get_tlroot = function() return tlroot end
     return tlroot
 end
@@ -38,7 +38,7 @@ end
 -- says if file has a known extension according to ext_list
 -- (or known basename according to basename_list)
 local function check_ext(file)
-    file = string.lower(file)
+    file = file:lower()
     -- remove zipext if applicable
     file = texdoc.util.parse_zip(file)
     -- then do the normal thing
@@ -46,12 +46,12 @@ local function check_ext(file)
         if e == '*' then
             return true
         elseif (e == '') then
-            if not string.find(file, '.', 1, true) then
+            if not file:find('.', 1, true) then
                 return true
             end
         else
-            local dot_e = '.'..e
-            if string.sub(file, -string.len(dot_e)) == dot_e then
+            local dot_e = '.' .. e
+            if file:sub(-#dot_e) == dot_e then
                 return true
             end
         end
@@ -65,7 +65,7 @@ local function check_ext(file)
     return false
 end
 
------------------------   docfile and doclist objects   ------------------------
+----------------------   docfile and doclist objects   -----------------------
 
 --[[
 doclist = {
@@ -202,7 +202,7 @@ end
 
 -- normalise a name from the tlpdb (use for s_meta indexes)
 local function reloc_tlpdb_path(name)
-    return string.gsub(name, '^texmf[^/]*/doc/', '', 1)
+    return name:gsub('^texmf[^/]*/doc/', '')
 end
 
 -- return normalised name
@@ -224,7 +224,7 @@ end
 
 -- return the base name
 function Docfile:get_basename()
-    return string.gsub(self.name, '.*/', '', 1)
+    return self.name:gsub('.*/', '')
 end
 
 -- for interface consistency, matches should always be a table, never nil
@@ -240,12 +240,12 @@ function Docfile:get_ext_pos()
     return texdoc.score.ext_pos(self.basename)
 end
 
---------------------   select results from TEXDOCS trees   ---------------------
+-------------------   select results from TEXDOCS trees   --------------------
 
 -- says if a file (with its path) matches a pattern
 local function matches(pattern, file)
     if pattern.original then
-        return string.find(file:lower(), pattern.name:lower(), 1, true)
+        return file:lower():find(pattern.name:lower(), 1, true)
     else
         return texdoc.score.is_exact(file, pattern.name)
     end
@@ -290,25 +290,28 @@ local function init_lsr_db(root, shift)
 
     -- scan it
     local db = {}
-    local maybe_dir, isdoc = true, false
+    local maybe_dir, is_doc = true, false
     local current_dir
     local l = #shift
     while true do
         local line = lsr:read('*line')
         while line == '' do line, maybe_dir = lsr:read('*line'), true end
         if line == nil then break end -- EOF
-        local dir_line = maybe_dir and string.match(line, '^%./(.*):$')
+        local dir_line = maybe_dir and line:match('^%./(.*):$')
         if dir_line then
             maybe_dir = false -- next line may not be a dir
             if string.sub(dir_line .. '/', 1, l) == shift then
-                isdoc = true
-                current_dir = string.sub(dir_line, l+1)
+                is_doc = true
+                current_dir = dir_line:sub(l + 1)
                 db[current_dir] = nil
-            elseif isdoc then
+            elseif is_doc then
                 break -- we're exiting the ./doc (or shift) dir, so it's over
             end
-        elseif isdoc then
-            local file = (current_dir == '') and line or current_dir .. '/' .. line
+        elseif is_doc then
+            local file = line
+            if current_dir ~= '' then
+                file = current_dir .. '/' .. line
+            end
             if check_ext(line) then db[file] = line end
         end
     end
@@ -355,14 +358,14 @@ init_texdocs_database = function()
     local function lsr_root(path)
         if not lfs.isdir (path) then return end
         local root, shift = path, ''
-        if string.sub(root, -1) == '/' then root = string.sub(root, 1, -2) end
-        while string.find(root, '/', 1, true) do
+        if root:sub(-1) == '/' then root = root:sub(1, -2) end
+        while root:find('/', 1, true) do
             if lfs.isfile(root .. '/ls-R') then
                 return root, shift
             end
-            local last_comp = string.match(root, '^.*/(.*)$')
+            local last_comp = root:match('^.*/(.*)$')
             -- /!\ cannot put last_comp in a regex: can contain special char
-            root = string.sub(root, 1, - (#last_comp + 2))
+            root = root:sub(1, - (#last_comp + 2))
             shift = last_comp .. '/' .. shift
         end
     end
@@ -372,7 +375,7 @@ init_texdocs_database = function()
     local kpse_texdocs = kpse.expand_var('$TEXDOCS')
 
     -- expand the path and turn it into a lua list
-    local raw_doc_roots = string.explode(kpse.expand_braces(kpse_texdocs), sep)
+    local raw_doc_roots = kpse.expand_braces(kpse_texdocs):explode(sep)
     local max = #raw_doc_roots + 1
 
     for j, dir in ipairs(raw_doc_roots) do
@@ -381,9 +384,9 @@ init_texdocs_database = function()
         local path, db
 
         -- get path, !! and // values
-        dir, n = string.gsub (dir, '//$', '')
+        dir, n = dir:gsub('//$', '')
         local recursion_allowed = (n == 1)
-        local path, n = string.gsub (dir, '^!!', '')
+        local path, n = dir:gsub('^!!', '')
         local index_mandatory = (n == 1)
         dbg_print('texdocs',
             'texdocs[%d] = %s (index_mandatory=%s, recursion_allowed=%s)',
@@ -420,7 +423,7 @@ end
 
 end -- end scope of doc_roots
 
-----------------------------   look for sty files   ----------------------------
+---------------------------   look for sty files   ---------------------------
 
 -- add doclist entries for sty files in patlist
 local function get_doclist_sty(patlist)
@@ -437,7 +440,7 @@ local function get_doclist_sty(patlist)
     end
 end
 
---------------------------------   use tlpdb   ---------------------------------
+-------------------------------   use tlpdb   --------------------------------
 
 -- tlpdb mean TeX Live Package DataBase and tlp means TeX Live Package
 
@@ -487,23 +490,23 @@ get_tlpinfo_from_tlpdb = function(filename)
     local curr_tlp
     local state = 'none'
     for line in io.lines(filename) do
-        if state == 'none' and string.find(line, '^name ') then
+        if state == 'none' and line:find('^name ') then
             -- begin a new package
-            curr_tlp = string.lower(string.sub(line, 6, -1))
+            curr_tlp = line:sub(6, -1):lower()
             tlp_doclist[curr_tlp] = {}
         elseif state == 'docfiles' then
-            if not string.find(line, '^ ') then
+            if not line:find('^ ') then
                 state = 'none'
             else
-                local file = string.match(line, '^ ([^ ]*)')
-                local meta = string.match(line, '^ [^ ]* (.+)')
-                local basename = string.match(file, '([^/]*)$')
+                local file = line:match('^ ([^ ]*)')
+                local meta = line:match('^ [^ ]* (.+)')
+                local basename = file:match('([^/]*)$')
                 if check_ext(basename) then
                     -- we've got a docfile here, add it
                     table.insert(tlp_doclist[curr_tlp], file)
                     if meta then
-                        local details = string.match(meta, 'details="([^"]+)"')
-                        local lang = string.match(meta, 'language="([^"]+)"')
+                        local details = meta:match('details="([^"]+)"')
+                        local lang = meta:match('language="([^"]+)"')
                         s_meta[reloc_tlpdb_path(file)] = {
                             details = details,
                             lang = lang,
@@ -512,22 +515,22 @@ get_tlpinfo_from_tlpdb = function(filename)
                 end
             end
         elseif state == 'runfiles' then
-            if not string.find(line, '^ ') then
+            if not line:find('^ ') then
                 state = 'none'
             else
                 -- check for interesting runfiles
-                local e = string.sub(line, -4, -1)
+                local e = line:sub(-4, -1)
                 if e == '.tex' or e == '.sty' or e == '.cls' then
-                    local f = string.match(line, '.*/(.*)%.')
+                    local f = line:match('.*/(.*)%.')
                     tlp_from_runfile[f] = tlp_from_runfile[f] or {}
                     tlp_from_runfile[f][curr_tlp] = true
                 end
             end
         end
         -- update state
-        if string.find(line, '^docfiles ') then
+        if line:find('^docfiles ') then
             state = 'docfiles'
-        elseif string.find(line, '^runfiles ') then
+        elseif line:find('^runfiles ') then
             state = 'runfiles'
         end
     end
@@ -652,6 +655,7 @@ end -- end scope of tlpinfo table
 
 -- get tlpinfo tables initialised by whatever mean
 local function init_tlp_database()
+    -- we assume TEXMFVAR always consists of an element
     local cache_file = kpse.expand_var('$TEXMFVAR/' .. C.cache_name)
 
     -- set vanilla and detect texlive.tlpdb to use
@@ -679,7 +683,8 @@ local function init_tlp_database()
             dbg_print('tlpdb', 'Using cached data from ' .. cache_file)
             get_tlpinfo_from_cache(cache_file)
         else
-            dbg_print('tlpdb', 'Getting data from tlpdb file ' .. texlive_tlpdb)
+            dbg_print('tlpdb',
+                'Getting data from tlpdb file ' .. texlive_tlpdb)
             get_tlpinfo_from_tlpdb(texlive_tlpdb)
             dbg_print('tlpdb', 'Writing data in cache file ' .. cache_file)
             local ok, msg = mkdir_p(texdoc.util.path_parent(cache_file))
@@ -697,7 +702,7 @@ local function init_tlp_database()
     end
 end
 
-------------------------------   main function   -------------------------------
+-----------------------------   main function   ------------------------------
 
 -- initialise the various databases (must be called first)
 function M.init_databases()
@@ -713,7 +718,7 @@ function M.get_doclist(pattern, no_alias)
     local function normal_vs_sty(list)
         local normal, sty = {}, {}
         for _, p in ipairs(list) do
-            if string.match(string.lower(p.name), '%.([^/.]*)$') == 'sty' then
+            if p.name:lower():match('%.([^/.]*)$') == 'sty' then
                 table.insert(sty, p)
             else
                 table.insert(normal, p)
