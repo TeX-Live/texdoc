@@ -81,7 +81,6 @@ end
 
 local function parse_options()
     local curr_arg
-    local action = true
     local cl_config = {}
 
     local function insert_cl_config(key, val, opt_name)
@@ -101,13 +100,13 @@ local function parse_options()
 
         -- action
         if (curr_arg == '-h') or (curr_arg == '--help') then
-            action = 'help'
+            return true, 'help', cl_config
         elseif (curr_arg == '-V') or (curr_arg == '--version') then
-            action = 'version'
+            return true, 'version', cl_config
         elseif (curr_arg == '-f') or (curr_arg == '--files') then
-            action = 'files'
+            return true, 'files', cl_config
         elseif curr_arg == '--just-view' then
-            action = 'view'
+            return true, 'view', cl_config
 
         -- mode
         elseif (curr_arg == '-w') or (curr_arg == '--view') then
@@ -154,7 +153,7 @@ local function parse_options()
         end
     end
 
-    return action, cl_config
+    return true, action, cl_config
 end
 
 --------------------------   process execution   --------------------------
@@ -202,9 +201,9 @@ end
 
 function M.exec()
     -- parsing command line options
-    local action, cl_config = parse_options()
+    local ok, action, cl_config = parse_options()
 
-    if not action then
+    if not ok then
         os.exit(C.exit_usage)
     end
 

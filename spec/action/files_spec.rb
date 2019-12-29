@@ -79,7 +79,7 @@ RSpec.describe 'The "files" action', :type => :aruba do
 
     context "with verbose setting" do
       before(:each) { set_environment_variable "TEXMFDIST", texmf_dist.to_s }
-      before(:each) { run_texdoc "-fv" }
+      before(:each) { run_texdoc "-vf" }
 
       it "should contain version information" do
         expect(stdout).to include(version_info)
