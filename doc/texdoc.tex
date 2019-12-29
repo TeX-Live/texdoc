@@ -105,38 +105,6 @@ special needs.
 
 \section{Controlling Texdoc}
 
-\subsection{Precedence of configuration sources}
-\label{sec:prec}
-
-Values for a particular setting can come from several sources. The sources are
-treated in the following order and the first value found is always used:
-%
-\begin{enumerate}
-\item Command-line options.
-\item Environment variables ending with |_texdoc|.
-\item Other environment variables.
-\item Values from configuration files (see below).
-\item Hard-coded defaults that may depend on the current machine.
-\end{enumerate}
-
-The configuration files are found in the directories \path{TEXMF/texdoc}, where
-\path{TEXMF} is the kpathsea variable, in the order given by this variable.
-Inside each directory, three files are recognized, in this order:
-%
-\begin{enumerate}
-\item |texdoc-«platform».cnf| where |«platform»| is the name of the current
-  platform (defined as the name of the directories where the {\TL}
-  binaries are located, for example |x86-64-linux|). This may be useful when
-  an installation is shared across machines with different architectures
-  needing different settings, for example for viewers. Their use is not
-  recommended in any other situation.
-\item |texdoc.cnf| is the recommended file for normal use.
-\item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
-  (including its default configuration file) in your home while retaining
-  the use of the previous file for your personal setting; see
-  {\TexdocRepo} for instructions on running the development version.
-\end{enumerate}
-
 \subsection{Command-line options}
 \label{sec:cl}
 
@@ -241,16 +209,52 @@ Environment variables & Configuration items \\
 Also, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
 are used for the default value of \ci{lang}.
 
+\subsection{Precedence of configuration sources}
+\label{sec:prec}
+
+Values for a particular setting can come from several sources. The sources are
+treated in the following order and the first value found is always used:
+%
+\begin{enumerate}
+\item Command-line options.
+\item Environment variables ending with |_texdoc|.
+\item Other environment variables.
+\item Values from configuration files (see below).
+\item Hard-coded defaults that may depend on the current machine.
+\end{enumerate}
+
+The configuration files are found in the directories \path{TEXMF/texdoc}, where
+\path{TEXMF} is the kpathsea variable, in the order given by this variable.
+Inside each directory, three files are recognized, in this order:
+%
+\begin{enumerate}
+\item |texdoc-«platform».cnf| where |«platform»| is the name of the current
+  platform (defined as the name of the directories where the {\TL}
+  binaries are located, for example |x86-64-linux|). This may be useful when
+  an installation is shared across machines with different architectures
+  needing different settings, for example for viewers. Their use is not
+  recommended in any other situation.
+\item |texdoc.cnf| is the recommended file for normal use.
+\item |texdoc-dist.cnf| is useful for installing a newer version of texdoc
+  (including its default configuration file) in your home while retaining
+  the use of the previous file for your personal setting; see
+  {\TexdocRepo} for instructions on running the development version.
+\end{enumerate}
+
 \subsection{Exit codes}
 \label{sec:exit}
 
-The current exit codes are:
-\begin{enumerate}[start=0]
-  \item Success.
-  \item Internal error.
-  \item Usage error.
-  \item No documentation found.
-\end{enumerate}
+The status of Texdoc, which is whether or not it was successfully executed and
+an expected result was delivered, can be grasped by seeing its exit code. This
+will be useful to manage Texdoc by other programs. The current exit codes of
+Texdoc are:
+%
+\begin{description}[left=2em]
+\item[\code{0}] Success.
+\item[\code{1}] Internal error.
+\item[\code{2}] Usage error.
+\item[\code{3}] No documentation found.
+\end{description}
 
 \section{Customizing the Search Results}
 
@@ -390,7 +394,7 @@ adjscore(tex) texdoc = -10
 Herein, all files named |Makefile|, and those with suffixes, \eg |Makefile.in|,
 will be eliminated from results: by adjusting their score with such a large
 negative value, their final score will be less than |-100|. Which means they
-will never be displayed.  Files from the |tex-virtual-academy-pl| directory, on
+will never be displayed. Files from the |tex-virtual-academy-pl| directory, on
 the other hand, are not eliminated but get a negative adjustment, since they
 are a common source of ``fake'' matches which hide better results. The third
 line gives a minus adjustment for results containing |texdoc| only when the
@@ -419,7 +423,7 @@ files with a ``bad'' extension appearing in this list will get a lesser score.
 In the practical filenames, things which are not actually extensions can follow
 dots, \eg |readme.fr| and |readme.texlive|. Thus, in addition to the lists of
 known extensions, Texdoc has lists for known basenames: \ci{basename\_list} and
-\ci{badbasename\_list}.  These configuration items are respectively similar to
+\ci{badbasename\_list}. These configuration items are respectively similar to
 \ci{ext\_list} and \ci{badext\_list}. In short, a file will be selected if
 either its extension or its basename is known, and get a lesser score if either
 is known to be ``bad''.
@@ -504,7 +508,7 @@ the list of files found.
 
 \begin{confitem}{suffix\_list}{\meta{list}}[default: empty]
 Set the list of known suffixes to |«list»| (see
-Section~\ref{sec:common-names}).  Default is the empty list, but see the
+Section~\ref{sec:common-names}). Default is the empty list, but see the
 shipped configuration file for more.
 \end{confitem}
 
@@ -573,7 +577,7 @@ can be an arbitrary shell construct.
 \end{confitem}
 
 \begin{confitem}{lang}{\meta{2-letter code}}
-Set your preferred language. Defaults to your system's locale.
+Set your preferred language. By default, it reflects your system's locale.
 \end{confitem}
 
 \begin{confitem}{verbosity\_level}{\meta{number}}[default: \code{2}]
