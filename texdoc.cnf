@@ -388,9 +388,6 @@ alias scrbook-de = scrguide
 alias scrreprt-de = scrguide
 alias typearea-de = scrguide
 
-# bidi
-alias bidi = bidi-doc
-
 # tugboat package and classes
 alias tugboat = ltubguid
 

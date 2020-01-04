@@ -98,11 +98,11 @@ local function heuristic_score(file, pat, dbg_score)
     -- try derivatives unless pat contains a slash
     if not slash then
         for _, suffix in ipairs(texdoc.config.get_value('suffix_list')) do
-            local deriv = pat..suffix
+            local deriv = pat .. suffix
             if M.is_exact(file, deriv) then
-                upscore(3, 'exact match for derived pattern: ' .. deriv)
+                upscore(4.5, 'exact match for derived pattern: ' .. deriv)
             elseif is_subword(file, deriv) then
-                upscore(2, 'subword match for derived pattern: ' .. deriv)
+                upscore(3.5, 'subword match for derived pattern: ' .. deriv)
             end
         end
     end
