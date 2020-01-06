@@ -29,5 +29,5 @@ tmp/*
 texdoc-*.zip
 
 # local
-Makefile
 *.vimrc
+output/*

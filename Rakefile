@@ -3,6 +3,7 @@
 require 'rake/clean'
 require 'pathname'
 require 'optparse'
+require 'date'
 
 # basics
 TEXDOC_VERSION = "3.1"
@@ -16,6 +17,10 @@ TMP_DIR = PWD + "tmp"
 TEXDOC_SCRIPT_DIR = PWD + "script"
 TEXDOC_CNF = PWD + "texdoc.cnf"
 TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
+
+# output dir
+OUTPUT_DIR = PWD + "output"
+directory OUTPUT_DIR
 
 # TEXMF
 if system("which kpsewhich > #{File::NULL} 2> #{File::NULL}")
@@ -230,6 +235,29 @@ task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
 
   # make sure to end this process
   exit 0
+end
+
+desc "Generate a pre-hashed cache file [options available]"
+task :save_output => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, OUTPUT_DIR] do
+  # settings
+  @output_file = OUTPUT_DIR / DateTime.now.strftime('output-%Y%m%d%H%M%S.txt')
+  queries = %w(texlive-en texdoc bxjscls)
+
+  def file_puts msg=""
+    File.open(@output_file, 'a') do |file|
+      file.puts msg
+    end
+  end
+
+  # use controlled environment
+  ENV["TEXMFHOME"] = PS_TEXMF.to_s
+  
+  # save the outputs
+  queries.each do |q|
+    file_puts "* texdoc -lM #{q}"
+    sh "texlua #{TEXDOC_TLU} -lM #{q} >> #{@output_file} 2> #{File::NULL}"
+    file_puts
+  end
 end
 
 desc "Generate all documentation"
