@@ -237,11 +237,11 @@ task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   exit 0
 end
 
-desc "Generate a pre-hashed cache file [options available]"
+desc "Save some outputs of Texdoc"
 task :save_output => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, OUTPUT_DIR] do
   # settings
-  @output_file = OUTPUT_DIR / DateTime.now.strftime('output-%Y%m%d%H%M%S.txt')
-  queries = %w(texlive-en texdoc bxjscls)
+  @output_file = OUTPUT_DIR / DateTime.now.strftime('%Y%m%d-%H%M%S.txt')
+  queries = %w(texlive-en texdoc bxjscls tikz latex)
 
   def file_puts msg=""
     File.open(@output_file, 'a') do |file|
@@ -255,7 +255,7 @@ task :save_output => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, OUTPUT_DIR] do
   # save the outputs
   queries.each do |q|
     file_puts "* texdoc -lM #{q}"
-    sh "texlua #{TEXDOC_TLU} -lM #{q} >> #{@output_file} 2> #{File::NULL}"
+    sh "texlua #{TEXDOC_TLU} -qlM #{q} >> #{@output_file}"
     file_puts
   end
 end
