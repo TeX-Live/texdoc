@@ -263,7 +263,7 @@ end
 desc "Generate all documentation"
 task :doc do
   cd "doc"
-  sh "latexmk -quiet texdoc.tex > #{File::NULL} 2> #{File::NULL}"
+  sh "llmk texdoc.tex > #{File::NULL} 2> #{File::NULL}"
   sh "bundle exec ronn -r #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md 2> #{File::NULL}"
 end
 
