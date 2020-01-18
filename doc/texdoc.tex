@@ -108,8 +108,25 @@ special needs.
 \subsection{Command-line options}
 \label{sec:cl}
 
-Command-line options except the first four below correspond to configuration
-items that can be set in the configuration files.
+The full usage of Texdoc can be summarized as follows:
+%
+\begin{htcode}
+texdoc «names»
+texdoc «options» «names»
+texdoc «action»
+texdoc «options» «action»
+\end{htcode}
+
+We have tried to implement a GNU-compatible option parser. Short options, each of
+which consists of a single letter, must start with a single hyphen |-|.
+Multiple short options can be specified with a single hyphen, \eg |-vl| is
+equivalent to |-v -l|. Long options have to be following double hyphens |--|.
+All options must be specified before the first argument. A String beginning
+with a hyphen after the first argument will be treated as an argument starting
+with a hyphen.
+
+Some options are called action options, which can be used for |«action»| in the
+above usage. Four actions are available:
 
 \begin{clopt}{\sopt{h}, \lopt{help}}
 Shows a quick help message (namely a list of command-line options) and exit
@@ -134,86 +151,120 @@ but rather intended to be used from another program, like a GUI front-end to
 Texdoc.
 \end{clopt}
 
-\begin{clopt}{\sopt{w}, \lopt{view}}
-Set \ci{mode} to |view|.
+Some normal options such as \sopt{v} are effective for some actions but note
+that you have to specify such options \emph{before} the action option. Options
+after an action option will be ignored.
+
+The followings are other normal command-line options:
+
+\begin{clopt}{\sopt{w}, \lopt{view}}[default]
+Set \ci{mode} to |view|. Texdoc will open the best results it found by the best
+application it knows. See Section~\ref{sec:modes}.
 \end{clopt}
 
 \begin{clopt}{\sopt{l}, \lopt{list}}
-Set \ci{mode} to |list|.
+Set \ci{mode} to |list|. Texdoc will show the lists of all relevant documents
+it found and ask you which to open. When used with the \lopt{nointeract}
+option, Texdoc will just show the lists of documents and exist successfully.
 \end{clopt}
 
 \begin{clopt}{\sopt{m}, \lopt{mixed}}
-Set \ci{mode} to |mixed|.
+Set \ci{mode} to |mixed|. If Texdoc finds only a document for your keyword,
+then it opens it, and if it finds multiple, then it will behave like in the
+|list| mode.
 \end{clopt}
 
 \begin{clopt}{\sopt{s}, \lopt{showall}}
-Set \ci{mode} to |showall|.
+Set \ci{mode} to |showall|. It also behave like in a |list| mode, but show all
+the documents it found including documents which seem to be not a good result.
 \end{clopt}
 
-\begin{clopt}{\sopt{i}, \lopt{interact}}
-Set \ci{interact\_switch} to |true|.
+\begin{clopt}{\sopt{i}, \lopt{interact}}[default]
+Texdoc may require user reactions, \eg ask you which document to open in the
+|list| mode. Internally, this sets \ci{interact\_switch} to |true|.
 \end{clopt}
 
 \begin{clopt}{\sopt{I}, \lopt{nointeract}}
-Set \ci{interact\_switch} to |false|.
+If this is specified, Texdoc will never request any input from users.
+Internally, this sets \ci{interact\_switch} to |false|.
 \end{clopt}
 
 \begin{clopt}{\sopt{M}, \lopt{machine}}
-Set \ci{machine\_switch} to |true|.
+This make the result list of Texdoc machine-readable. Only effective for the
+|list| mode and its friends. This option implies \lopt{nointeract}.
+Internally, this sets \ci{machine\_switch} to |true|.
 \end{clopt}
 
 \begin{clopt}{\sopt{q}, \lopt{quiet}}
-Set \ci{verbosity\_level} to minimum.
+This suppress warnings and most error messages. Internally, this sets
+\ci{verbosity\_level} to minimum.
 \end{clopt}
 
 \begin{clopt}{\sopt{v}, \lopt{verbose}}
-Set \ci{verbosity\_level} to maximum.
+Make Texdoc to print additional information such as viewer commands which are
+invoked by the program. Internally, this sets \ci{verbosity\_level} to maximum.
 \end{clopt}
 
 \begin{clopt}{%
   \code{\sopt{d} \meta{list}}, \code{\lopt{debug}=\meta{list}},
   \sopt{D}, \lopt{debug}}
-Set \ci{debug\_list}. You can specify multiple items separated by commas. If
-you specify |-D| or |--debug| without specifying a list, activates all
-available debug items.
+This sets \ci{debug\_list} to show dubbging information in the specified
+category. You can specify multiple categories with a comma-separated list. If
+you specify |-D| or |--debug| without specifying a list, it activates all
+available debug categories.
 \end{clopt}
 
 \begin{clopt}{\code{\sopt{c} \meta{name}=\meta{value}}}
-Set configuration item |«name»| to |«value»|. This is a general way to access
-any configuration items listed in Section~\ref{sec:conf} from command line.
+This enables you to set arbitrary configuration items |«name»| to |«value»|
+from the command-line. See Section~\ref{sec:conf} for the list of all available
+configuration items.
 \end{clopt}
 
 \subsection{Environment variables}
 \label{sec:envvar}
 
-They all correspond to some \ci{viewer\_\meta{ext}} setting.\footnote{Old names
-of environment variables, namely |TEXDOCVIEW_{html,dvi,md,txt,pdf,ps}| and
-|TEXDOC_VIEWER_{HTML,DVI,MD,TXT,PDF,PS}|, are deprecated but still work.} You
+Some environment variables affect the behavior of Texdoc. The environment
+variables can be roughly categorized into three groups.
+
+First, as well as other programs in {\TL}, searching path for the Texdoc are
+determined with the Kpathsea variables like |TEXMF*|. The mechanism of Kpathsea
+is complex, so please refer to `the {\TL} Guide', which supposed to be open by
+|texdoc texlive|, and the document of Kpathsea for the details. Usually, Texdoc
+searches documents for the |TEXMF| trees including |TEXMFDIST|, |TEXMFLOCAL|,
+and |TEXMFHOME| and trees specified in |TEXDOCS|. It also self-locates its own
+program using |TEXMF| search path. In addition, Texdoc uses |TEXMFROOT| and
+|TEXMFVAR| to look for the tlpdb database and the cache respectively.
+
+Second, the viewers for opening documents can be controlled by some environment
+variables.  They all correspond to some \ci{viewer\_\meta{ext}}
+setting.\footnote{Old names of environment variables, namely
+|TEXDOCVIEW_\{html,dvi,md,txt,pdf,ps\}| and
+|TEXDOC_VIEWER_\{HTML,DVI,MD,TXT,PDF,PS\}|, are deprecated but still work.} You
 can append |_texdoc| to every name in the first column: this wins over every
 other name. These variables can be split by colon |:| and the first non-nil
 occurrence is used. If a viewer command contains colon, please specify it by
 \ci{viewer\_\meta{ext}}.
 %
 \begin{center}
-\begin{tabular}{ll}
-Environment variables & Configuration items \\
-|BROWSER|             & |viewer_html|       \\
-|DVIVIEWER|           & |viewer_dvi|        \\
-|MDVIEWER|            & |viewer_md|         \\
-|PAGER|               & |viewer_txt|        \\
-|PDFVIEWER|           & |viewer_pdf|        \\
-|PSVIEWER|            & |viewer_ps|         \\
+\begin{tabular}{lll}
+Variable & Use for & Configuration item \\ \hline
+|BROWSER| & HTML files & |viewer_html| \\
+|DVIVIEWER| & DVI files & |viewer_dvi| \\
+|MDVIEWER| & Markdown files & |viewer_md| \\
+|PAGER| & Text files & |viewer_txt| \\
+|PDFVIEWER| & PDF files & |viewer_pdf| \\
+|PSVIEWER| & PS files & |viewer_ps| \\
 \end{tabular}
 \end{center}
-%
-Also, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
+
+Third, on Unix systems, locale-related variables such as |LANG| and |LC_ALL|
 are used for the default value of \ci{lang}.
 
 \subsection{Precedence of configuration sources}
 \label{sec:prec}
 
 Values for a particular setting can come from several sources. The sources are
-treated in the following order and the first value found is always used:
+looked at in the following order and the first value found is always used:
 %
 \begin{enumerate}
 \item Command-line options.
@@ -588,10 +639,10 @@ recommended).
 \end{confitem}
 
 \begin{confitem}{debug\_list}{\meta{list}}[default: empty]
-Set the list of activated debug items. Available debug items are |config|,
-|files|, |search|, |score|, |texdocs|, |tlpdb|, |version|, |view|, and |all| to
-activate all of these. Implies |--verbose|. Debug information are printed on
-standard error.
+Set the list of activated debug categories. Available debug categories are
+|config|, |files|, |search|, |score|, |texdocs|, |tlpdb|, |version|, |view|,
+and |all| to activate all of these. Implies |--verbose|. Debug information are
+printed on standard error.
 \end{confitem}
 
 \begin{confitem}{max\_lines}{\meta{number}}[default: \code{20}]

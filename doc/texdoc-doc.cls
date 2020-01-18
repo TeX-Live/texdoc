@@ -196,13 +196,14 @@
   \setlength{\rightmargin}{0em}%
   }\item}{\end{list}}
 
-\NewDocumentEnvironment{clopt}{ m }
+\NewDocumentEnvironment{clopt}{ m o }
   {%
     \par\vskip\baselineskip
     \bgroup
     \def\sopt##1{\hypertarget{cl:##1}{\code{\hyph##1}}}%
     \def\lopt##1{\hypertarget{cl:##1}{\code{\hyph{}\hyph##1}}}%
     \needspace{3ex}\noindent #1\egroup
+    \IfNoValueF{#2}{\hfill (#2)}%
     \begin{manual@entry}%
   }
   {\ifvmode\else\unskip\fi\end{manual@entry}}
