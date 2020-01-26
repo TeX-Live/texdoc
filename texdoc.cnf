@@ -142,7 +142,7 @@ adjscore /figures/ = -3
 adjscore /images/ = -3
 
 # latex-dev stuff are less important than stable ones
-adjscore /latex-dev/ = -1
+adjscore /latex-dev/ = -2
 
 # readme files usually get negative scores because they have bad extensions,
 # but they're still slightly better than other results with negative scores
