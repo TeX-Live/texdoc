@@ -1,9 +1,9 @@
 % Document style for Texdoc user manual
-% Copyright 2008 Manuel Pégourié-Gonnard and Takuto Asakura
+% Copyright 2008-2020 Manuel Pégourié-Gonnard and Takuto Asakura
 % distributed under the terms of GPL v3 or later
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{texdoc-doc}
-  [2019/12/10 Document class for Texdoc user manual]
+  [2020/02/02 Document class for Texdoc user manual]
 
 % class options
 \DeclareOption{draft}{\setlength\overfullrule{5pt}}

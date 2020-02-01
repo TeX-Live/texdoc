@@ -63,7 +63,7 @@ Repository: <https://github.com/TeX-Live/texdoc>
 Please email bugs to <texdoc@tug.org>.]]
 
 copyright_msg = [[
-Copyright 2008 Manuel Pégourié-Gonnard, Takuto Asakura, and the TeX Live Team.
+Copyright 2008-2020 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
 License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.]]
 

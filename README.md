@@ -106,7 +106,7 @@ More specific information (e.g., TODO) can be found in the Wiki of our GitHub re
 
 ## Copyright and License
 
-Copyright 2008 Manuel Pégourié-Gonnard, Takuto Asakura, and the TeX Live Team.
+Copyright 2008-2020 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
 
 This package is distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either [version 3](./COPYING) of the License, or (at your option) any later version.
 
