@@ -2,8 +2,8 @@
 
 ## SYNOPSIS
 
-`texdoc` [OPTION...] NAME...  
-`texdoc` [OPTION...] ACTION
+`texdoc` [OPTION]... NAME...  
+`texdoc` [OPTION]... ACTION
 
 ## DESCRIPTION
 
@@ -35,8 +35,8 @@ Alternatively, perform the given ACTION and exit.
 * `-D`, `--debug`:
   Activate all debug output (equal to "--debug=all").
 * `-d` LIST, `--debug`=LIST:
-  Activate debug output restricted to the items specified in LIST.  
-  Available items: `config`, `files`, `search`, `score`, `texdocs`,
+  Activate debug output restricted to the categories specified in LIST.  
+  Available categories: `config`, `files`, `search`, `score`, `texdocs`,
   `tlpdb`, `version`, `view`, and `all` to activate all of these.
 * `-c` NAME=VALUE:
   Set configuration item NAME to VALUE.

@@ -2,6 +2,13 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 3.2 (TeX Live 2020)
+===========================
+- Improved the scoring scheme to prioritize the latex tree than the latex-dev
+- Support invoking the program with absolute paths
+- The document was entirely rewritten
+- Other small improvements and bug fixes
+
 Version 3.1 (TeX Live 2019)
 ===========================
 - New option -c: changing configure temporally
