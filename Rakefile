@@ -6,7 +6,7 @@ require 'optparse'
 require 'date'
 
 # basics
-TEXDOC_VERSION = "3.1"
+TEXDOC_VERSION = "3.2"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 
 # woking/temporaly dirs
@@ -100,7 +100,7 @@ OPT_DATE = "--date=\"#{Time.now.strftime('%F')}\""
 
 # cleaning
 CLEAN.include(["doc/*", "tmp"])
-CLEAN.exclude(["doc/*.md", "doc/*.tex", "doc/*.pdf", "doc/*.1"])
+CLEAN.exclude(["doc/*.md", "doc/*.cls", "doc/*.tex", "doc/*.pdf", "doc/*.1"])
 CLOBBER.include(["doc/*.pdf", "script/*.lua", "*.zip"])
 
 desc "Install Texdoc to your system"
@@ -286,7 +286,7 @@ task :ctan => :doc do
   cp ["COPYING", "README.md", "NEWS", "texdoc.cnf"], TARGET_DIR
   cp Dir.glob("script/*.tlu"), TARGET_SCRIPT_DIR
 
-  docs = ["texdoc.tex", "texdoc.pdf", "texdoc.1"]
+  docs = ["texdoc-doc.cls", "texdoc.tex", "texdoc.pdf", "texdoc.1"]
   docs.each do |name|
     cp "doc/#{name}", TARGET_DOC_DIR
   end

@@ -21,7 +21,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   context "with -D" do
     before(:each) { run_texdoc "-D", "texlive-en" }
 
-    it "should activate all debug items" do
+    it "should activate all debug categories" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=all", "-D")
     end
@@ -30,7 +30,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   context "with --debug" do
     before(:each) { run_texdoc "--debug", "texlive-en" }
 
-    it "should activate all debug items" do
+    it "should activate all debug categories" do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=all", "--debug")
     end
@@ -39,7 +39,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   context "with -dconfig" do
     before(:each) { run_texdoc "-dconfig", "texlive-en" }
 
-    it 'should activate only debug item "config"' do
+    it 'should activate only debug category "config"' do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=config", "-d")
     end
@@ -48,7 +48,7 @@ RSpec.describe "The command line option parser", :type => :aruba do
   context "with --debug=config" do
     before(:each) { run_texdoc "--debug=config", "texlive-en" }
 
-    it 'should activate only debug item "config"' do
+    it 'should activate only debug category "config"' do
       expect(last_command_started).to be_successfully_executed
       expect(stderr).to include(set_cmo_line "debug_list=config", "--debug")
     end

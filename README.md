@@ -1,4 +1,4 @@
-# Texdoc 3.1 (2019-03-28)
+# Texdoc 3.2 (2020-02-02)
 
 [![Build Status](https://travis-ci.org/TeX-Live/texdoc.svg?branch=master)](https://travis-ci.org/TeX-Live/texdoc)
 [![Build status](https://ci.appveyor.com/api/projects/status/uq28ms7eba7ns6d3/branch/master?svg=true)](https://ci.appveyor.com/project/wtsnjp/texdoc/branch/master)
