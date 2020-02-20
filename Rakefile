@@ -6,7 +6,7 @@ require 'optparse'
 require 'date'
 
 # basics
-TEXDOC_VERSION = "3.2"
+TEXDOC_VERSION = "3.2.1"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 
 # woking/temporaly dirs

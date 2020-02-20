@@ -2,6 +2,10 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 3.2.1
+-------------
+- Bug fix: suspend a realpath not found error
+
 Version 3.2 (TeX Live 2020)
 ===========================
 - Improved the scoring scheme to prioritize the latex tree than the latex-dev
