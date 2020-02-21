@@ -236,7 +236,7 @@ program using |TEXMF| search path. In addition, Texdoc uses |TEXMFROOT| and
 |TEXMFVAR| to look for the tlpdb database and the cache respectively.
 
 Second, the viewers for opening documents can be controlled by some environment
-variables.  They all correspond to some \ci{viewer\_\meta{ext}}
+variables. They all correspond to some \ci{viewer\_\meta{ext}}
 setting.\footnote{Old names of environment variables, namely
 |TEXDOCVIEW_\{html,dvi,md,txt,pdf,ps\}| and
 |TEXDOC_VIEWER_\{HTML,DVI,MD,TXT,PDF,PS\}|, are deprecated but still work.} You
@@ -662,7 +662,7 @@ where |«argument»| is the name of the argument to which the results correspond
 (mainly useful if there were many arguments), {\metatab} is the tab (ASCII \#9)
 character, and the other entries are pretty self-explanatory. Nothing else is
 printed on stdout, except if an internal error occurs (in which case exit code
-will be 1). In the future, more tab-separated fields may be added at the end
+will be |1|). In the future, more tab-separated fields may be added at the end
 of the line, but the first 3 fields will remain unchanged.
 
 Currently, there are two additional fields: a two-letter language code, and an
@@ -673,25 +673,25 @@ same meaning in future versions of Texdoc.
 
 \begin{confitem}{zipext\_list}{\meta{list}}[default: empty]
 List of supported extensions for zipped files. Allows compressed files with
-names like |foobar.«zip»|, with |«zip»| in the given |«list»|, to be found and
-unzipped before the viewer is started (the temporary file will be destroyed
-right after).
+names like |foobar.«zipext»|, where |«zipext»| is an element in the given
+|«list»|, to be found and unzipped before the viewer is started (the temporary
+file will be destroyed right after).
 
 Warning: Support for zipped documentation is not meant to work on windows, a
 Unix shell is assumed! If you add anything to this list, please make sure that
-you also set a corresponding |unzip=«ext»| value for each |«ext»| in the list.
-At the same time, make sure you are using blocking (i.e., not returning
-immediately) viewers.
+you also set the corresponding \ci{unzip\_\meta{zipext}} item for each
+|«zipext»| in the list. At the same time, make sure you are using blocking
+(i.e., not returning immediately) viewers.
 
-Remark: {\TL} doesn't ship compressed documentation files, so this option is
-mainly useful with re-packaged version of {\TL} that do, for example in Linux
-distributions.
+Remark: {\TL} does not ship any compressed documentation file, so this option
+is mainly useful with re-packaged versions of {\TL} that do, for example one in
+Linux distributions.
 \end{confitem}
 
 \begin{confitem}{unzip\_\meta{zipext}}{\meta{command}}[no default]
-The unzipping command for compressed files with extension |«zipext»|. Define
-one for each item in \ci{zipext\_list}. The command must print the result on
-stdout, like |gzip -d -c| does.
+The unzipping command for compressed files with extension |«zipext»|. You
+should set one for each item in the \ci{zipext\_list}. The command must print
+the result on stdout, like |gzip -d -c| does.
 \end{confitem}
 
 \begin{confitem}{rm\_file}{\meta{command}}[default: \code{rm -f}]
