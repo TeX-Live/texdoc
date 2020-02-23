@@ -56,7 +56,7 @@ Many building tasks are defined as [Rake](https://github.com/ruby/rake) tasks:
 
 ### Generating all documentation
 
-Following will generate both the PDF and the manpage in `doc/` directory.
+The following will generate both the PDF and the manpage in `doc/` directory.
 
 ```
 $ rake doc
@@ -64,7 +64,7 @@ $ rake doc
 
 ### Generating a pre-hashed cache file
 
-Following will generate a pre-hashed cache file `script/Data.tlpdb.lua`. This task have to be done under a TeX Live setup with tlpdb.
+The following will generate a pre-hashed cache file `script/Data.tlpdb.lua`. This task have to be done under a TeX Live setup with tlpdb.
 
 ```
 $ rake gen_datafile
@@ -72,7 +72,7 @@ $ rake gen_datafile
 
 ### Running tests
 
-Following will run all tests in `spec/` directory.
+The following will run all tests in `spec/` directory.
 
 ```
 $ rake test
@@ -92,7 +92,7 @@ Following will show all available tasks with a short description.
 $ rake -T
 ```
 
-In addition to that, for options available tasks (e.g., `rake test` and `rake run_texdoc`) you can get options information with `-h` option for each task:
+In addition to that, for options available tasks, e.g., `rake test` and `rake run_texdoc`, you can get options information with `-h` option for each task:
 
 ```
 $ rake test -- -h
@@ -100,7 +100,7 @@ $ rake test -- -h
 
 ## Further Information
 
-More specific information (e.g., TODO) can be found in the Wiki of our GitHub repository. Please visit:
+More specific information, such as the TODO list of this project and some information for distributors, can be found in the Wiki of our GitHub repository. Please visit:
 
 * <https://github.com/TeX-Live/texdoc/wiki>
 
