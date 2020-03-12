@@ -11,15 +11,15 @@ PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 
 # woking/temporaly dirs
 PWD = Pathname.pwd
-TMP_DIR = PWD + "tmp"
+TMP_DIR = PWD / "tmp"
 
 # Texdoc files/dirs
-TEXDOC_SCRIPT_DIR = PWD + "script"
-TEXDOC_CNF = PWD + "texdoc.cnf"
-TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
+TEXDOC_SCRIPT_DIR = PWD / "script"
+TEXDOC_CNF = PWD / "texdoc.cnf"
+TEXDOC_TLU = TEXDOC_SCRIPT_DIR / "texdoc.tlu"
 
 # output dir
-OUTPUT_DIR = PWD + "output"
+OUTPUT_DIR = PWD / "output"
 directory OUTPUT_DIR
 
 # TEXMF
@@ -37,24 +37,24 @@ TEXMFROOT = Pathname(texmf_root)
 TEXMFHOME = Pathname(texmf_home)
 TEXMFVAR = Pathname(texmf_var)
 
-TEXMFHOME_SCRIPTS_DIR = TEXMFHOME + "scripts"
-TEXMFHOME_TEXDOC_DIR = TEXMFHOME + "texdoc"
+TEXMFHOME_SCRIPTS_DIR = TEXMFHOME / "scripts"
+TEXMFHOME_TEXDOC_DIR = TEXMFHOME / "texdoc"
 directory TEXMFHOME_SCRIPTS_DIR
 directory TEXMFHOME_TEXDOC_DIR
 
 # symlinks
-TEXDOC_LINK = TEXMFHOME_SCRIPTS_DIR + "texdoc"
-TEXDOC_CNF_LINK = TEXMFHOME_TEXDOC_DIR + "texdoc-dist.cnf"
+TEXDOC_LINK = TEXMFHOME_SCRIPTS_DIR / "texdoc"
+TEXDOC_CNF_LINK = TEXMFHOME_TEXDOC_DIR / "texdoc-dist.cnf"
 
 # pseudo TEXMF
-PS_TEXMF = TMP_DIR + "texmf"
-PS_TEXMF_SCRIPTS_DIR = PS_TEXMF + "scripts"
-PS_TEXMF_TEXDOC_DIR = PS_TEXMF + "texdoc"
+PS_TEXMF = TMP_DIR / "texmf"
+PS_TEXMF_SCRIPTS_DIR = PS_TEXMF / "scripts"
+PS_TEXMF_TEXDOC_DIR = PS_TEXMF / "texdoc"
 directory PS_TEXMF_SCRIPTS_DIR
 directory PS_TEXMF_TEXDOC_DIR
 
-PS_TEXDOC_LINK = PS_TEXMF_SCRIPTS_DIR + "texdoc"
-PS_TEXDOC_CNF_LINK = PS_TEXMF_TEXDOC_DIR + "texdoc-dist.cnf"
+PS_TEXDOC_LINK = PS_TEXMF_SCRIPTS_DIR / "texdoc"
+PS_TEXDOC_CNF_LINK = PS_TEXMF_TEXDOC_DIR / "texdoc-dist.cnf"
 file PS_TEXDOC_LINK => PS_TEXMF_SCRIPTS_DIR do
   ln_s TEXDOC_SCRIPT_DIR, PS_TEXDOC_LINK
 end
@@ -63,18 +63,18 @@ file PS_TEXDOC_CNF_LINK => PS_TEXMF_TEXDOC_DIR do
 end
 
 # link to texlive.tlpdb
-PS_TEXLIVE_TLPDB = TMP_DIR + "texlive.tlpdb"
+PS_TEXLIVE_TLPDB = TMP_DIR / "texlive.tlpdb"
 file PS_TEXLIVE_TLPDB do
-  ln_s TEXMFROOT + "tlpkg/texlive.tlpdb", PS_TEXLIVE_TLPDB
+  ln_s TEXMFROOT / "tlpkg/texlive.tlpdb", PS_TEXLIVE_TLPDB
 end
 
 # sample files
-SAMPLE_DOC_DIR = PS_TEXMF + "doc/sample"
+SAMPLE_DOC_DIR = PS_TEXMF / "doc/sample"
 directory SAMPLE_DOC_DIR
 
 SAMPLE_FILES = []
 ["html", "htm", "dvi", "md", "txt", "pdf", "ps", "tex"].each do |ext|
-  sample_file = SAMPLE_DOC_DIR + "sample.#{ext}"
+  sample_file = SAMPLE_DOC_DIR / "sample.#{ext}"
   file sample_file => SAMPLE_DOC_DIR do
     touch sample_file
   end
@@ -82,13 +82,13 @@ SAMPLE_FILES = []
 end
 
 # dummy texdoc.cnf
-PS_TEXMFDIST = TMP_DIR + "texmf-dist"
-PS_TEXMFDIST_TEXDOC_DIR = PS_TEXMFDIST + "texdoc"
+PS_TEXMFDIST = TMP_DIR / "texmf-dist"
+PS_TEXMFDIST_TEXDOC_DIR = PS_TEXMFDIST / "texdoc"
 directory PS_TEXMFDIST_TEXDOC_DIR
 
 DUMMY_TEXDOC_CNFS = []
 [PS_TEXMF_TEXDOC_DIR, PS_TEXMFDIST_TEXDOC_DIR].each do |texmf|
-  texdoc_cnf = texmf + "texdoc.cnf"
+  texdoc_cnf = texmf / "texdoc.cnf"
   file texdoc_cnf => texmf do touch texdoc_cnf end
   DUMMY_TEXDOC_CNFS << texdoc_cnf
 end
@@ -172,7 +172,7 @@ task :test =>
     sh "bundle exec rspec" + opt_args + opt_files
   rescue
     # show outputs if failed
-    log_file = TMP_DIR + "rspec.log"
+    log_file = TMP_DIR / "rspec.log"
     sh "cat #{log_file}", verbose: false
     fail
   end
@@ -231,7 +231,7 @@ task :gen_datafile => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   sh "texlua #{TEXDOC_TLU} #{clo} texlive-en > #{File::NULL}"
 
   # copy the cache file
-  cp TEXMFVAR + "texdoc/cache-tlpdb.lua", TEXDOC_SCRIPT_DIR + "Data.tlpdb.lua"
+  cp TEXMFVAR / "texdoc/cache-tlpdb.lua", TEXDOC_SCRIPT_DIR / "Data.tlpdb.lua"
 
   # make sure to end this process
   exit 0
@@ -276,8 +276,8 @@ end
 desc "Create an archive for CTAN"
 task :ctan => :doc do
   # initialize the target
-  TARGET_DIR = TMP_DIR + PKG_NAME
-  TARGET_SCRIPT_DIR, TARGET_DOC_DIR = TARGET_DIR + "script", TARGET_DIR + "doc"
+  TARGET_DIR = TMP_DIR / PKG_NAME
+  TARGET_SCRIPT_DIR, TARGET_DOC_DIR = TARGET_DIR / "script", TARGET_DIR / "doc"
   rm_rf TARGET_DIR
   mkdir_p [TARGET_SCRIPT_DIR, TARGET_DOC_DIR]
 
@@ -313,7 +313,7 @@ task :setup_travis do
 
     # prepare the install dir
     HOME = ENV["HOME"]
-    INSTALL_DIR = TMP_DIR + Time.now.strftime("%F")
+    INSTALL_DIR = TMP_DIR / Time.now.strftime("%F")
     mkdir_p INSTALL_DIR
     cd INSTALL_DIR
 
@@ -363,7 +363,7 @@ task :setup_appveyor do
     puts "* Installing TeX Live"
 
     # prepare the install dir
-    INSTALL_DIR = TMP_DIR + Time.now.strftime("%F")
+    INSTALL_DIR = TMP_DIR / Time.now.strftime("%F")
     mkdir_p INSTALL_DIR
     cd INSTALL_DIR
 
