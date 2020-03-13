@@ -12,12 +12,12 @@ local texdoc = {
 local M = {}
 local C = texdoc.const
 
--- change '/' to '\' on windows
+-- lowercase and change '/' to '\' on windows for display
 -- Note: Internal representation of files always use forward slashes.
 --       This function should be called only before displaying a path.
 if os.type == 'windows' then
     function M.w32_path(path)
-        return (string.gsub(path, '/', '\\'))
+        return (string.gsub(string.lower(path), '/', '\\'))
     end
 else
     function M.w32_path(path)
