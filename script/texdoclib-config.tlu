@@ -345,7 +345,8 @@ function M.show_config_files(is_action)
     if is_action then
         print_func('Recommended file(s) for personal settings:')
         local sep = (os.type == 'windows') and ';' or ':'
-        local texmfhomes = string.explode(kpse.expand_path('$TEXMFHOME'), sep)
+        -- here TEXMFHOMEs do not have to exist, and thus use kpse.var_value
+        local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
         for _, home in ipairs(texmfhomes) do
             print_func(indent .. w32_path(home .. '/texdoc/texdoc.cnf'))
         end
