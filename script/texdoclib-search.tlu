@@ -442,7 +442,7 @@ end
 
 -------------------------------   use tlpdb   --------------------------------
 
--- tlpdb mean TeX Live Package DataBase and tlp means TeX Live Package
+-- tlpdb means TeX Live Package DataBase and tlp means TeX Live Package
 
 -- return true if cache exists and is newer than original, false otherwise
 local function good_cache(cache, ori)

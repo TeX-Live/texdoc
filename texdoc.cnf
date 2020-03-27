@@ -117,6 +117,7 @@ suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, 
 # Makefile are never documentation, just as documents in src or source subdir
 # -1000 should be enough to kill them
 adjscore /Makefile = -1000
+adjscore /latexmkrc = -1000
 adjscore /src/ = -1000
 adjscore /source/ = -1000
 
@@ -206,6 +207,10 @@ adjscore(findhyph) findhyph.man1 = +5
 
 # prioritize official latex-tools
 adjscore(layout) /tools/ = +1
+
+# yathesis
+adjscore(yathesis) README-TRANSLATION = -1
+adjscore(yathesis) /specimen/a-plat/ = -1000
 
 # Aliases
 # =======
