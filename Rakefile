@@ -308,7 +308,7 @@ task :setup_travis do
 
     # install dependencies for the installer
     if platform == "osx"
-      sh "brew install lz4 xz"
+      sh "brew install lz4"
     end
 
     # prepare the install dir
