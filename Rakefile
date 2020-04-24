@@ -260,6 +260,31 @@ task :save_output => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, OUTPUT_DIR] do
   end
 end
 
+desc "Check aliases are alive"
+task :check_aliases  => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
+  # collect aliases
+  aliases = []
+
+  File.open(TEXDOC_CNF) do |file|
+    file.each_line do |line|
+      m = line.match(/^alias(\(.*?\)|)\s*(\S*)\s*=/)
+      if m
+        aliases.push(m[2])
+      end
+    end
+  end
+
+  # execute the check
+  aliases.each do |kw|
+    stderr = `texlua #{TEXDOC_TLU} -dscore -lM '#{kw}' 3>&2 2>&1 1>#{File::NULL}`
+    if stderr.include?("Matching alias")
+      puts "#{kw} ... OK"
+    else
+      puts "#{kw} ... missing"
+    end
+  end
+end
+
 desc "Generate all documentation"
 task :doc do
   cd "doc"
