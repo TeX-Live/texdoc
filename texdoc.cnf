@@ -267,8 +267,6 @@ alias tex-live-zh-cn = texlive-zh-cn
 ## various stuff
 
 # a few useful general documents
-alias faq-en = newfaq
-alias faq = newfaq
 alias latex = latex-doc-ptr
 
 # various lshort translations
@@ -286,7 +284,6 @@ alias etex-ref = etex_man
 alias pdftex-ref = pdftex-a
 #alias xetex-ref = xetex-reference # OK
 alias xelatex = xetex-reference
-alias luatex-ref = luatexref-t
 
 # by default, <engine> = <engine>-ref (duplicated: no alias cascading)
 alias e-tex = etex_man
@@ -294,15 +291,12 @@ alias etex = etex_man
 alias pdftex = pdftex-a
 #alias xetex = xetex-reference # OK
 alias xelatex = xetex-reference
-alias luatex = luatexref-t
 
 alias e-tex-man = etex.man1
 alias etex-man = etex.man1
 alias pdftex-man = pdftex.man1
 #alias xetex-man = xetex.man1 # missing
 alias luatex-man = luatex.man1
-
-alias luatex-pkg = oberdiek/luatex.pdf
 
 # latex/basic classes
 alias article = classes
@@ -319,12 +313,6 @@ alias letter = base/letter
 alias slides = base/slides
 alias(20) fontenc = encguide
 alias(20) textcomp = encguide
-alias fix-cm = fixltx2e
-alias bezier = latex209
-alias fleqn = latex209
-alias leqno = latex209
-alias openbib = latex209
-alias t1enc = latex209
 alias makeidx = makeindx
 alias showidx = makeindx
 alias flafter = source2e
@@ -369,10 +357,10 @@ alias amslatex2 = technote
 alias amsmath = amsldoc
 alias amsrefs = amsrdoc
 alias amsthm = amsthdoc
-alias amsart = instr-l
-alias amsbook = instr-l
-alias amscls = instr-l
-alias amsproc = instr-l
+#alias amsart = instr-l
+#alias amsbook = instr-l
+#alias amscls = instr-l
+#alias amsproc = instr-l
 alias amsart-dev = amsclass
 alias amsbook-dev = amsclass
 alias amscls-dev = amsclass
@@ -441,7 +429,6 @@ alias l3luatex = interface3
 # misc
 alias autofe = ucs
 alias afoot = arabtex-doc
-alias arabicfont = bezos
 alias bibtex = btxdoc
 alias btxdoc-ja = jbtxdoc
 alias btxhak-ja = jbtxhak
@@ -450,7 +437,7 @@ alias cm = cm/README
 alias(5) cmsuper = cm-super/FAQ
 alias cm-super = cm-super/README
 alias cmsuper = cm-super/README
-alias cyrillic = cyrillic/00readme.txt
+alias cyrillic = cyrillic/README
 alias elsarticle = elsdoc
 alias(0.1) fontinst = fontinstallationguide
 alias hyperref = hyperref/manual.pdf
@@ -461,7 +448,6 @@ alias nonfloat-de = nonfloat
 alias nonfloat = nonfloat-en
 alias nonumonpart = nonumonpart-en
 alias nonumonpart-fr = nonumonpart-fr
-alias xstring-fr = xstring_doc_fr
 alias arabic = arabi/user_guide
 alias 3parttable = threeparttable
 alias croatian = babel
@@ -469,10 +455,8 @@ alias mls = montex
 alias vrbexin = verbasef
 alias dtk = dtk/doc/beispiel.pdf
 alias musixtex = musixdoc
-alias mychemistry = mychemistry_en
-alias mychemistry-de = mychemistry_de
 alias cjk = CJK.txt                # FIXME: should be case insensitive
-alias ieee = IEEEtran_HOWTO
+#alias ieee = IEEEtran_HOWTO
 alias layouts = layman
 alias pkfix-helper = pkfix-helper.man1.pdf
 alias plnfss = plnfss.txt # XXX
@@ -497,7 +481,6 @@ alias ngerman = gerdoc
 alias jurabib-de = jbgerdoc
 alias ofs-cz = ofsdoc
 alias ofs = ofsdoc-e
-alias pst-geo = pst-map3d-doc
 
 ## aliases basically borrowed from texdoctk.dat with some adaptations
 alias akletter = akletter/lettereng
@@ -515,19 +498,17 @@ alias mathenv = mdwtab
 alias montex = mlsquick
 alias mltex = mltex/mltex.txt
 alias natbib2 = natnotes
-alias uktugfaq = newfaq
 alias onrannual = onrannual/README
 alias otibet = otibet/unidoc
 alias pbdiagram = pb-manual
 alias tikz = pgfmanual
 alias apmgraph = pmgraph
-alias preprint = preprint/00readme.txt
+alias preprint = preprint/README
 alias dutch = rapdoc
-alias startex = startex/base/guide
+alias startex = startex/guide
 alias tangles = t-angles/t-manual
 alias tex4ht = tex4ht/mn.html
 alias(60) akademia = tex-virtual-academy-pl/index.html
-alias treetex = tree_doc
 alias lineno = ulineno
 alias texguide = usrguide
 alias(5) xypic = xyrefer
