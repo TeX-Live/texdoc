@@ -264,25 +264,35 @@ desc "Check aliases are alive"
 task :check_aliases  => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK] do
   # collect aliases
   aliases = []
-
   File.open(TEXDOC_CNF) do |file|
     file.each_line do |line|
-      m = line.match(/^alias(\(.*?\)|)\s*(\S*)\s*=/)
+      m = line.match(/^alias(\(.*?\)|)\s*(\S*)\s*=\s*(\S*)\s*$/)
       if m
-        aliases.push(m[2])
+        aliases.push(m[2..3])
       end
     end
   end
 
   # execute the check
-  aliases.each do |kw|
-    stderr = `texlua #{TEXDOC_TLU} -dscore -lM '#{kw}' 3>&2 2>&1 1>#{File::NULL}`
-    if stderr.include?("Matching alias")
-      puts "#{kw} ... OK"
+  nof_ineffective = 0
+  aliases.each do |al|
+    stderr = `texlua #{TEXDOC_TLU} -dscore -lM '#{al[0]}' 3>&2 2>&1 1>#{File::NULL}`
+    if stderr.include?("Matching alias \"#{al[1]}\"")
+      puts "#{al[0]} -> #{al[1]} ... OK"
     else
-      puts "#{kw} ... missing"
+      puts "#{al[0]} -> #{al[1]} ... ineffective"
+      nof_ineffective += 1
     end
   end
+
+  # finale
+  if nof_ineffective == 0
+    msg = "All is OK."
+  else
+    msg = "#{nof_ineffective} aliases are ineffective."
+  end
+
+  puts "\n#{aliases.size} aliases found. #{msg}"
 end
 
 desc "Generate all documentation"

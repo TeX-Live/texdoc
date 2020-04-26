@@ -357,10 +357,10 @@ alias amslatex2 = technote
 alias amsmath = amsldoc
 alias amsrefs = amsrdoc
 alias amsthm = amsthdoc
-alias amsart = amscls-doc
-alias amsbook = amscls-doc
-alias amscls = amscls-doc
-alias amsproc = amscls-doc
+alias amsart = amscls-doc/Author_Handbook_Journals
+alias amsbook = amscls-doc/Author_Handbook_Journals
+alias amscls = amscls-doc/Author_Handbook_Journals
+alias amsproc = amscls-doc/Author_Handbook_Journals
 alias amsart-dev = amsclass
 alias amsbook-dev = amsclass
 alias amscls-dev = amsclass
@@ -386,7 +386,7 @@ alias tugboat = ltubguid
 
 # caption
 alias caption = caption-eng
-alias caption-dev = caption.pdf
+alias caption-dev = caption-eng
 
 # metapost by various names
 alias metapost = mpman
@@ -452,7 +452,7 @@ alias arabic = arabi/user_guide
 alias 3parttable = threeparttable
 alias croatian = babel
 alias mls = montex
-alias vrbexin = verbasef
+alias vrbexin = verbasef-doc
 alias dtk = dtk/doc/beispiel.pdf
 alias musixtex = musixdoc
 alias cjk = CJK.txt                # FIXME: should be case insensitive
