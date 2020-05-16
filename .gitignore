@@ -30,4 +30,5 @@ texdoc-*.zip
 
 # local
 *.vimrc
+.ruby-version
 output/*
