@@ -429,6 +429,9 @@ alias l3luatex = interface3
 # misc
 alias autofe = ucs
 alias afoot = arabtex-doc
+alias annee-scolaire = annee-scolaire-eng
+alias annee-scolaire-en = annee-scolaire-eng
+alias annee-scolaire-fr = annee-scolaire-fra
 alias bibtex = btxdoc
 alias btxdoc-ja = jbtxdoc
 alias btxhak-ja = jbtxhak
