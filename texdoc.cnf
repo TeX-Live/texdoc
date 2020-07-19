@@ -79,8 +79,8 @@
 
 # Built-in defaults (for reference):
 #
-# ext_list = pdf, html, htm, txt, md, ps, dvi,  # Note: empty string at end
-# badext_list = txt,                            # Note: empty string at end
+# ext_list = pdf, html, htm, txt, dat, md, ps, dvi,  # Note: empty string at end
+# badext_list = txt, dat,                            # Note: empty string at end
 # basename_list = readme, 00readme
 # badbasename_list = readme, 00readme
 
@@ -427,46 +427,47 @@ alias l3fp = interface3
 alias l3luatex = interface3
 
 # misc
-alias autofe = ucs
+alias 3parttable = threeparttable
 alias afoot = arabtex-doc
 alias annee-scolaire = annee-scolaire-eng
 alias annee-scolaire-en = annee-scolaire-eng
 alias annee-scolaire-fr = annee-scolaire-fra
+alias arabic = arabi/user_guide
+alias autofe = ucs
 alias bibtex = btxdoc
 alias btxdoc-ja = jbtxdoc
 alias btxhak-ja = jbtxhak
 alias changes = changes.english.pdf
+alias cjk = CJK.txt                # FIXME: should be case insensitive
 alias cm = cm/README
-alias(5) cmsuper = cm-super/FAQ
 alias cm-super = cm-super/README
 alias cmsuper = cm-super/README
+alias(5) cmsuper = cm-super/FAQ
+alias croatian = babel
+alias cweb = cwebman               # XXX: is in 'cweb' dir, should win
 alias cyrillic = cyrillic/README
+alias dtk = dtk/doc/beispiel.pdf
+alias einfuehrung = einfuehrung/README # tl should get "readme" tag
 alias elsarticle = elsdoc
 alias(0.1) fontinst = fontinstallationguide
 alias hyperref = hyperref/manual.pdf
 alias hyperref-dev = hyperref.pdf
 alias iso = isoman
+alias kvoptions-patch = kvoptions  # XXX?
+alias layouts = layman
 alias lettrine = lettrine          # to hide context/third/lettrine-doc.pdf
-alias nonfloat-de = nonfloat
+alias mls = montex
+alias musixtex = musixdoc
 alias nonfloat = nonfloat-en
+alias nonfloat-de = nonfloat
 alias nonumonpart = nonumonpart-en
 alias nonumonpart-fr = nonumonpart-fr
-alias arabic = arabi/user_guide
-alias 3parttable = threeparttable
-alias croatian = babel
-alias mls = montex
-alias vrbexin = verbasef-doc
-alias dtk = dtk/doc/beispiel.pdf
-alias musixtex = musixdoc
-alias cjk = CJK.txt                # FIXME: should be case insensitive
-alias layouts = layman
 alias pkfix-helper = pkfix-helper.man1.pdf
 alias plnfss = plnfss.txt # XXX
 alias teubner = teubner-doc
+alias vrbexin = verbasef-doc
 alias xypic = xyguide
-alias kvoptions-patch = kvoptions  # XXX?
-alias cweb = cwebman               # XXX: is in 'cweb' dir, should win
-alias einfuehrung = einfuehrung/README # tl should get "readme" tag
+alias zztex = zzdetails.dat
 
 ## a few easy patterns
 

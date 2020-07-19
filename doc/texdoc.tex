@@ -465,8 +465,8 @@ in the future.
 
 File extensions regarded as documents by Texdoc can be specified with the
 configuration item \ci{ext\_list}. By default, files with extensions |pdf|,
-|html|, |htm|, |txt|, |md|, |ps|, and |dvi| and files without extension are
-recognized as documents.
+|html|, |htm|, |txt|, |dat|, |md|, |ps|, and |dvi| and files without extension
+are recognized as documents.
 
 During the scoring process, the configuration item |badext_list| is also used:
 files with a ``bad'' extension appearing in this list will get a lesser score.
@@ -564,7 +564,7 @@ shipped configuration file for more.
 \end{confitem}
 
 \begin{confitem}{ext\_list}
-  {\meta{list}}[default: \code{pdf, html, htm, txt, md, dvi, ps,}]
+  {\meta{list}}[default: \code{pdf, html, htm, txt, dat, md, dvi, ps,}]
 Set the list of recognised extensions to |«list»|. This list is used to filter
 and  sort the results that have the same score (with the default value: pdf
 first, etc). Two special values are recognised:
@@ -600,7 +600,7 @@ similarly, if it is |htm| the |html| viewer is used. Otherwise, the |txt|
 viewer is used and a warning is issued.
 \end{confitem}
 
-\begin{confitem}{badext\_list}{\meta{list}}[default: \code{txt}]
+\begin{confitem}{badext\_list}{\meta{list}}[default: \code{txt, dat,}]
 Set the list of ``bad'' extensions to |«list»|. Files with those extensions get
 a malus of |1| on their heuristic score if it was previously positive.
 \end{confitem}

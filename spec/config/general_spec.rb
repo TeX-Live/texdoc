@@ -9,14 +9,14 @@ RSpec.describe "General configuration", :type => :aruba do
 
     it "most items should be set from built-in defaults" do
       defaults = [
-        "badext_list=txt, ",
+        "badext_list=txt, dat, ",
         "mode=view",
         "verbosity_level=2",
         "badbasename_list=readme, 00readme",
         "machine_switch=false",
         "max_lines=20",
         "basename_list=readme, 00readme",
-        "ext_list=pdf, htm, html, txt, md, ps, dvi, ",
+        "ext_list=pdf, htm, html, txt, dat, md, ps, dvi, ",
         "interact_switch=true",
         "fuzzy_level=3",
         "rm_dir=rmdir",
