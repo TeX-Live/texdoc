@@ -241,7 +241,7 @@ desc "Save some outputs of Texdoc"
 task :save_output => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, OUTPUT_DIR] do
   # settings
   @output_file = OUTPUT_DIR / DateTime.now.strftime('%Y%m%d-%H%M%S.txt')
-  queries = %w(texlive-en texdoc bxjscls tikz latex)
+  queries = %w(texlive-en texdoc bxjscls tikz latex vntex)
 
   def file_puts msg=""
     File.open(@output_file, 'a') do |file|
