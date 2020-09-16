@@ -2,6 +2,11 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 3.2.2
+-------------
+- Several aliases are added
+- Small documentation fixes
+
 Version 3.2.1
 -------------
 - Bug fix: suspend a realpath not found error

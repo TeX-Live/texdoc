@@ -21,8 +21,8 @@ end
 -- progname and version
 fullname = kpse.find_file('texdoc/texdoclib', 'lua')
 progname = 'Texdoc'
-version = '3.2.1'
-release_date = '2020-02-20'
+version = '3.2.2'
+release_date = '2020-09-16'
 
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant

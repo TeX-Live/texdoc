@@ -6,7 +6,7 @@ require 'optparse'
 require 'date'
 
 # basics
-TEXDOC_VERSION = "3.2.1"
+TEXDOC_VERSION = "3.2.2"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 
 # woking/temporaly dirs
@@ -298,7 +298,7 @@ end
 desc "Generate all documentation"
 task :doc do
   cd "doc"
-  sh "llmk texdoc.tex > #{File::NULL} 2> #{File::NULL}"
+  sh "llmk -qs texdoc.tex"
   sh "bundle exec ronn -r #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md 2> #{File::NULL}"
 end
 
