@@ -32,14 +32,6 @@ local function try_viewing(view_command, viewer_replacement)
         view_command = view_command .. ' ' .. viewer_replacement
     end
 
-    -- try to catch problems with missing DISPLAY on Unix
-    if os.type == 'unix' and not (os.name == 'macosx')
-            and os.getenv('DISPLAY') == nil then
-        err_print('warning',
-            'DISPLAY is not set; your viewer will likely have problems.')
-        err_print('warning',
-            'Try --list to list results instead of displaying them.')
-    end
     err_print('info', 'View command: ' .. view_command)
 
     -- See long comment below this function for the LC_CTYPE story.
@@ -55,6 +47,12 @@ local function try_viewing(view_command, viewer_replacement)
     -- the big casino: run the external command.
     if os.execute(view_command) > 0 then
         err_print('error', 'Failed to execute: ' .. view_command)
+        -- try to catch problems with missing DISPLAY on Unix
+        if os.type == 'unix' and not (os.name == 'macosx')
+                and os.getenv('DISPLAY') == nil then
+            err_print('error',
+                'Maybe your viewer failed because DISPLAY is not set.')
+        end
         os.exit(C.exit_error)
     end
 
