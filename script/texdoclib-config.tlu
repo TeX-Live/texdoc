@@ -274,15 +274,15 @@ local function get_config_files()
     }
 
     -- get dirs
-    local sep = (os.type == 'windows') and ';' or ':'
-    local texmf_texdoc = kpse.expand_path('$TEXMF/texdoc')
-    local dirs = texmf_texdoc:explode(sep)
+    local kpse_texmf = kpse.expand_var('$TEXMF')
+    local texmfs = kpse.expand_braces(kpse_texmf):explode(C.kpse_sep)
 
     -- merge them
     local ret = {}
-    for _, dir in ipairs(dirs) do
+    for _, dir in ipairs(texmfs) do
+        local path = dir:gsub('^!!', '')
         for _, name in ipairs(names) do
-            local pathname = dir .. '/' .. name
+            local pathname = path .. '/texdoc/' .. name
             table.insert(ret, pathname)
         end
     end
@@ -344,9 +344,8 @@ function M.show_config_files(is_action)
     -- show the recommendation (only for the "files" action)
     if is_action then
         print_func('Recommended file(s) for personal settings:')
-        local sep = (os.type == 'windows') and ';' or ':'
         -- here TEXMFHOMEs do not have to exist, and thus use kpse.var_value
-        local texmfhomes = string.explode(kpse.var_value('TEXMFHOME'), sep)
+        local texmfhomes = kpse.var_value('TEXMFHOME'):explode(C.kpse_sep)
         for _, home in ipairs(texmfhomes) do
             print_func(indent .. w32_path(home .. '/texdoc/texdoc.cnf'))
         end

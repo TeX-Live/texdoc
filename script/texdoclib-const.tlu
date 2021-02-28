@@ -5,6 +5,7 @@
 -- use an empty environment that will become texdoc_env.C (see EOF)
 local constants = {}
 local kpse = kpse or require 'kpse'
+local os = os or require 'os'
 local setfenv = setfenv
 local texdoc_env
 
@@ -132,6 +133,9 @@ cache_name = 'texdoc/cache-tlpdb.lua' -- relative to TEXMFVAR
 data_tlpdb_name = 'texdoc/Data.tlpdb.lua'
 
 place_holder = '%%s' -- used for viewer commands
+
+-- kpse path separator
+kpse_sep = (os.type == 'windows') and ';' or ':'
 
 -- END constants
 

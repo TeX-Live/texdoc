@@ -280,7 +280,7 @@ local function scan_db(patlist, code, lsr_db)
     end
 end
 
----------------------   manage TEXDOCS trees à la kpse   ----------------------
+---------------------   manage TEXDOCS trees of the kpse   ----------------------
 
 -- build a db from a ls-R file
 local function init_lsr_db(root, shift)
@@ -371,11 +371,10 @@ init_texdocs_database = function()
     end
 
     doc_roots = {}
-    local sep = (os.type == 'windows') and ';' or ':'
     local kpse_texdocs = kpse.expand_var('$TEXDOCS')
 
     -- expand the path and turn it into a lua list
-    local raw_doc_roots = kpse.expand_braces(kpse_texdocs):explode(sep)
+    local raw_doc_roots = kpse.expand_braces(kpse_texdocs):explode(C.kpse_sep)
     local max = #raw_doc_roots + 1
 
     for j, dir in ipairs(raw_doc_roots) do
