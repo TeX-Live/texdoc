@@ -450,7 +450,6 @@ alias dtk = dtk/doc/beispiel.pdf
 alias einfuehrung = einfuehrung/README # tl should get "readme" tag
 alias elsarticle = elsdoc
 alias(0.1) fontinst = fontinstallationguide
-alias hyperref = hyperref/manual.pdf
 alias hyperref-dev = hyperref.pdf
 alias iso = isoman
 alias kvoptions-patch = kvoptions  # XXX?
