@@ -2,6 +2,13 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 3.3 (TeX Live 2021)
+===========================
+- Show all possible config files for -vf
+- Show diagnostic message of DISPLAY only if viewer failed
+- Alias adjustments
+- Documentation tweaks
+
 Version 3.2.2
 -------------
 - Several aliases are added
