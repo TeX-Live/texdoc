@@ -172,9 +172,7 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if OS.windows?
-    # TODO: support locale on Windows
-  else
+  if OS.mac?
     context "LC_ALL" do
       before(:each) { set_environment_variable "LC_ALL", "ja_JP.UTF-8" }
       before(:each) { run_texdoc "-dconfig", "texlive-en" }
@@ -184,6 +182,8 @@ RSpec.describe "Environment variable", :type => :aruba do
           debug_line "config", 'Setting "lang=ja" from operating system locale.')
       end
     end
+  else
+    # TODO: test as well on Windows and Linux
   end
 
   # check if texdoc works when an environment variable contains colon

@@ -8,6 +8,7 @@ require 'date'
 # basics
 TEXDOC_VERSION = "3.3"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
+CTAN_MIRROR = "http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
 
 # woking/temporaly dirs
 PWD = Pathname.pwd
@@ -168,14 +169,7 @@ task :test =>
   end
 
   # run rspec
-  begin
-    sh "bundle exec rspec" + opt_args + opt_files
-  rescue
-    # show outputs if failed
-    log_file = TMP_DIR / "rspec.log"
-    sh "cat #{log_file}", verbose: false
-    fail
-  end
+  sh "bundle exec rspec" + opt_args + opt_files
 
   # make sure to end this process
   exit 0
@@ -332,105 +326,83 @@ task :ctan => :doc do
   mv "#{PKG_NAME}.zip", PWD
 end
 
-desc "Setup TeX Live on Travis CI"
-task :setup_travis do
-  # judge platform
-  fail "This task only works on Travis CI" if not platform = ENV["TRAVIS_OS_NAME"]
+desc "Setup TeX Live on Unix-like pratforms"
+task :setup_unix do
+  # only for GitHub Actions
+  fail "This task only works on GitHub Actions" if not ENV["GITHUB_ACTIONS"]
 
-  # install TeX Live if the cached version of TeX Live is not available
-  if not system("which texlua > #{File::NULL} 2> #{File::NULL}")
-    puts "* Installing TeX Live"
+  # prepare the install dir
+  INSTALL_DIR = TMP_DIR + Time.now.strftime("%F")
+  mkdir_p INSTALL_DIR
+  cd INSTALL_DIR
 
-    # install dependencies for the installer
-    if platform == "osx"
-      sh "brew install lz4"
-    end
+  # download install-tl
+  sh "wget #{CTAN_MIRROR}/install-tl-unx.tar.gz"
+  sh "tar zxvf install-tl-unx.tar.gz"
+  cd Dir.glob("install-tl-20[0-9][0-9]*")[0]
 
-    # prepare the install dir
-    HOME = ENV["HOME"]
-    INSTALL_DIR = TMP_DIR / Time.now.strftime("%F")
-    mkdir_p INSTALL_DIR
-    cd INSTALL_DIR
+  # config
+  profile = <<~EOF
+    selected_scheme scheme-small
+    TEXDIR /tmp/texlive
+    TEXMFCONFIG ~/.texlive/texmf-config
+    TEXMFHOME ~/texmf
+    TEXMFLOCAL /tmp/texlive/texmf-local
+    TEXMFSYSCONFIG /tmp/texlive/texmf-config
+    TEXMFSYSVAR /tmp/texlive/texmf-var
+    TEXMFVAR ~/.texlive/texmf-var
+    tlpdbopt_install_srcfiles 0
+  EOF
 
-    # download install-tl
-    sh "wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz"
-    sh "tar zxvf install-tl-unx.tar.gz"
-    cd Dir.glob("install-tl-20[0-9][0-9]*")[0]
+  File.open("texdoc.profile", "w") {|f| f.puts(profile)}
 
-    # config
-    profile = <<~EOF
-      selected_scheme scheme-small
-      TEXDIR #{HOME}/texlive
-      TEXMFCONFIG #{HOME}/.texlive/texmf-config
-      TEXMFHOME #{HOME}/texmf
-      TEXMFLOCAL #{HOME}/texlive/texmf-local
-      TEXMFSYSCONFIG #{HOME}/texlive/texmf-config
-      TEXMFSYSVAR #{HOME}/texlive/texmf-var
-      TEXMFVAR #{HOME}/.texlive/texmf-var
-      option_src 0
-    EOF
+  # run install script
+  sh "./install-tl -profile ./texdoc.profile -repository #{CTAN_MIRROR}"
+  sh "tlmgr init-usertree"
 
-    if platform == "osx"
-      File.open("texdoc.profile", "w") {|f| f.puts(profile + "binary_x86_64-darwin 1")}
-    else
-      File.open("texdoc.profile", "w") {|f| f.puts(profile + "binary_x86_64-linux 1")}
-    end
-
-    # run install script
-    opt_profile = "-profile ./texdoc.profile"
-    opt_repo = "-repository http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
-    sh "./install-tl #{opt_profile} #{opt_repo}"
-    sh "tlmgr init-usertree"
-
-    # finish
-    cd PWD
-    rm_rf INSTALL_DIR
-  end
+  # finish
+  cd PWD
+  rm_rf INSTALL_DIR
 end
 
-desc "Setup TeX Live on AppVeyor"
-task :setup_appveyor do
-  # judge platform
-  fail "This task only works on AppVeyor" if not ENV["APPVEYOR"]
+desc "Setup TeX Live on Windows"
+task :setup_windows do
+  # only for GitHub Actions
+  fail "This task only works on GitHub Actions" if not ENV["GITHUB_ACTIONS"]
 
-  # install TeX Live if the cached version of TeX Live is not available
-  if not system("which texlua > #{File::NULL} 2> #{File::NULL}")
-    puts "* Installing TeX Live"
+  # prepare the install dir
+  INSTALL_DIR = TMP_DIR + Time.now.strftime("%F")
+  mkdir_p INSTALL_DIR
+  cd INSTALL_DIR
 
-    # prepare the install dir
-    INSTALL_DIR = TMP_DIR / Time.now.strftime("%F")
-    mkdir_p INSTALL_DIR
-    cd INSTALL_DIR
+  # download install-tl
+  sh "curl -O #{CTAN_MIRROR}/install-tl.zip"
+  sh "unzip install-tl.zip"
+  cd Dir.glob("install-tl-20[0-9][0-9]*")[0]
 
-    # download install-tl
-    sh "curl -O http://ctan.mirror.rafal.ca/systems/texlive/tlnet/install-tl.zip"
-    sh "unzip install-tl.zip"
-    cd Dir.glob("install-tl-20[0-9][0-9]*")[0]
+  # config
+  profile = <<~EOF
+    selected_scheme scheme-small
+    TEXDIR D:/texlive
+    TEXMFCONFIG ~/.texlive/texmf-config
+    TEXMFHOME ~/texmf
+    TEXMFLOCAL D:/texlive/texmf-local
+    TEXMFSYSCONFIG D:/texlive/texmf-config
+    TEXMFSYSVAR D:/texlive/texmf-var
+    TEXMFVAR ~/.texlive/texmf-var
+    binary_win32 1
+    tlpdbopt_install_srcfiles 0
+  EOF
 
-    # config
-    profile = <<~EOF
-      selected_scheme scheme-small
-      TEXDIR /texlive
-      TEXMFCONFIG /.texlive/texmf-config
-      TEXMFHOME /texmf
-      TEXMFLOCAL /texlive/texmf-local
-      TEXMFSYSCONFIG /texlive/texmf-config
-      TEXMFSYSVAR /texlive/texmf-var
-      TEXMFVAR /.texlive/texmf-var
-      binary_win32 1
-      option_src 0
-    EOF
+  File.open("texdoc.profile", "w") {|f| f.puts(profile)}
 
-    File.open("texdoc.profile", "w") {|f| f.puts(profile)}
+  # run install script
+  opt_profile = "-profile ./texdoc.profile"
+  opt_repo = "-repository #{CTAN_MIRROR}"
+  sh "echo y | install-tl-windows.bat #{opt_profile} #{opt_repo}"
+  sh "tlmgr.bat init-usertree"
 
-    # run install script
-    opt_profile = "-profile ./texdoc.profile"
-    opt_repo = "-repository http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
-    sh "echo y | install-tl-windows.bat #{opt_profile} #{opt_repo}"
-    sh "tlmgr.bat init-usertree"
-
-    # finish
-    cd PWD
-    rm_rf INSTALL_DIR
-  end
+  # finish
+  cd PWD
+  rm_rf INSTALL_DIR
 end
