@@ -468,7 +468,7 @@ configuration item \ci{ext\_list}. By default, files with extensions |pdf|,
 |html|, |htm|, |txt|, |dat|, |md|, |ps|, and |dvi| and files without extension
 are recognized as documents.
 
-During the scoring process, the configuration item |badext_list| is also used:
+During the scoring process, the configuration item \ci{badext\_list} is also used:
 files with a ``bad'' extension appearing in this list will get a lesser score.
 
 In the practical filenames, things which are not actually extensions can follow
@@ -607,7 +607,7 @@ a malus of |1| on their heuristic score if it was previously positive.
 
 \begin{confitem}{basename\_list}
   {\meta{list}}[default: \code{readme, 00readme}]
-Set the list of ``known'' base names to |«list»|. Files with those base names
+Set the list of ``known'' basenames to |«list»|. Files with those basenames
 are selected regardless of their extension. If the extension is unknown, the
 text viewer will be used to view the file.
 \end{confitem}
@@ -615,7 +615,7 @@ text viewer will be used to view the file.
 \begin{confitem}{badbasename\_list}
   {\meta{list}}[default: \code{readme, 00readme}]
 
-Set the list of ``bad'' base names to |«list»|. Files with those names get a
+Set the list of ``bad'' basenames to |«list»|. Files with those names get a
 malus of |1| on their heuristic score if it was previously positive.
 \end{confitem}
 
