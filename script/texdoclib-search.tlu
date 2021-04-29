@@ -453,13 +453,21 @@ end
 
 -- make sure a given directory exists, or return nil plus an error string
 local function mkdir_p(dir)
-    if lfs.isdir(dir) then return true end
+    if os.type == 'windows' and chgstrcp then
+        if lfs.isdir(chgstrcp.syscptoutf8(dir)) then return true end
+    else
+        if lfs.isdir(dir) then return true end
+    end
     local parent = texdoc.util.path_parent(dir)
     if parent then
         local ok, msg = mkdir_p(parent)
         if not ok then return nil, msg end
     end
-    return lfs.mkdir(dir)
+    if os.type == 'windows' and chgstrcp then
+        return lfs.mkdir(chgstrcp.syscptoutf8(dir))
+    else
+        return lfs.mkdir(dir)
+    end
 end
 
 local print_out_tlpinfo, get_doclist_tlpdb
@@ -538,7 +546,12 @@ end
 
 -- print out data from tlpdb in dofile()-able form
 print_out_tlpinfo = function(filename)
-    local fh = assert(io.open(filename, 'w'))
+    local fh
+    if os.type == 'windows' and chgstrcp then
+        fh = assert(io.open(chgstrcp.syscptoutf8(filename), 'w'))
+    else
+        fh = assert(io.open(filename, 'w'))
+    end
     local function printf(s, ...) fh:write(string.format(s, ...)) end
 
     -- s_meta
