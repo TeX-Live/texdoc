@@ -471,6 +471,7 @@ alias nonumonpart = nonumonpart-en
 alias nonumonpart-fr = nonumonpart-fr
 alias pkfix-helper = pkfix-helper.man1.pdf
 alias plnfss = plnfss.txt # XXX
+alias symbols = symbols-a4
 alias teubner = teubner-doc
 alias vntex = vntex               # should win over vntex-man in general
 alias vntex-vi = vntex-man
