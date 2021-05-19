@@ -250,7 +250,7 @@ end
 -- compare two docfile's: (see texdoclib-search.tlu for structure)
 -- 1. by score
 -- 2. then by extensions (ordered as in ext_list),
--- 3. then lexicographically by fullpath.
+-- 3. then lexicographically by normname.
 -- 4. then by tree.
 -- return true if a is better than b
 local function docfile_order(a, b)
@@ -258,8 +258,8 @@ local function docfile_order(a, b)
     elseif a.score < b.score       then return false
     elseif a.ext_pos < b.ext_pos   then return true
     elseif a.ext_pos > b.ext_pos   then return false
-    elseif a.realpath < b.realpath then return true
-    elseif a.realpath > b.realpath then return false
+    elseif a.normname < b.normname then return true
+    elseif a.normname > b.normname then return false
     else return (a.tree > b.tree)
     end
 end
