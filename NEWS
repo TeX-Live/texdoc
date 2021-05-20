@@ -2,6 +2,13 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 3.3.1
+-------------
+- Support non-ascii username on Windows (patch by A. Kakuto)
+- Better support for multiple doc trees
+- Alias adjustments
+- Documentation tweaks
+
 Version 3.3 (TeX Live 2021)
 ===========================
 - Show all possible config files for -vf
