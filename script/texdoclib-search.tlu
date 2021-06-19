@@ -20,6 +20,7 @@ local M = {}
 local C = texdoc.const
 local err_print = texdoc.util.err_print
 local dbg_print = texdoc.util.dbg_print
+local opairs = texdoc.util.opairs
 
 -- shared by all functions in this file
 local s_doclist -- the Doclist object to be populated by various functions
@@ -556,25 +557,25 @@ print_out_tlpinfo = function(filename)
 
     -- s_meta
     printf('local s_meta = {\n')
-    for k, v in pairs(s_meta) do
+    for k, v in opairs(s_meta) do
         printf('  [%q] = {', k)
-        for i, j in pairs(v) do printf('[%q] = %q, ', i, j) end
+        for i, j in opairs(v) do printf('[%q] = %q, ', i, j) end
         printf('},\n')
     end
     printf('}\n')
 
     -- tlp_from_runfile
     printf('local tlp_from_runfile = {\n')
-    for k, v in pairs(tlp_from_runfile) do
+    for k, v in opairs(tlp_from_runfile) do
         printf('  [%q] = {', k)
-        for f in pairs(v) do printf('[%q]=true,', f) end
+        for f in opairs(v) do printf('[%q]=true,', f) end
         printf('},\n')
     end
     printf('}\n')
 
     -- tlp_doclist
     printf('local tlp_doclist = {\n')
-    for k, v in pairs(tlp_doclist) do
+    for k, v in opairs(tlp_doclist) do
         printf('  [%q] = {\n', k)
         for _, f in ipairs(v) do printf('    %q,\n', f) end
         printf('  },\n')

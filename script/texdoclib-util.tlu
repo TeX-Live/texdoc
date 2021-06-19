@@ -122,6 +122,31 @@ function M.print_usage()
     print(C.usage_msg)
 end
 
+-- return an iterator that ouputs the keys in order
+function M.opairs(t)
+    local tkeys = {}
+
+    -- use the counter len to avoid the cost of table.insert and to save the
+    -- length of tkeys for later use in the iterator
+    local len = 0
+    for k in pairs(t) do
+        len = len + 1
+        tkeys[len] = k
+    end
+
+    table.sort(tkeys)
+
+    local i = 0
+    return function()
+               i = i + 1
+               if i > len then
+                   return nil
+               else
+                   return tkeys[i], t[tkeys[i]]
+               end
+           end
+end
+
 return M
 
 -- vim: ft=lua:
