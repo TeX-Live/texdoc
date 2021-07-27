@@ -28,6 +28,9 @@ vendor/*
 tmp/*
 texdoc-*.zip
 
+# Cache
+script/Data.tlpdb.lua
+
 # local
 *.vimrc
 output/*
