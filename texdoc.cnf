@@ -476,6 +476,7 @@ alias teubner = teubner-doc
 alias vntex = vntex               # should win over vntex-man in general
 alias vntex-vi = vntex-man
 alias vrbexin = verbasef-doc
+alias web = webman.pdf
 alias xypic = xyguide
 alias zztex = zzdetails.dat
 
