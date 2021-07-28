@@ -91,7 +91,7 @@
 # fuzzy_level = 3
 
 # Known suffixes for documentation
-suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, -man, notes, -info, ref
+suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, man, -man, notes, -info, ref
 
 # Score adjustments
 # =================
@@ -444,7 +444,6 @@ alias cm-super = cm-super/README
 alias cmsuper = cm-super/README
 alias(5) cmsuper = cm-super/FAQ
 alias croatian = babel
-alias cweb = cwebman               # XXX: is in 'cweb' dir, should win
 alias cyrillic = cyrillic/README
 alias dtk = dtk/doc/beispiel.pdf
 alias einfuehrung = einfuehrung/README # tl should get "readme" tag
@@ -476,7 +475,6 @@ alias teubner = teubner-doc
 alias vntex = vntex               # should win over vntex-man in general
 alias vntex-vi = vntex-man
 alias vrbexin = verbasef-doc
-alias web = webman.pdf
 alias xypic = xyguide
 alias zztex = zzdetails.dat
 
