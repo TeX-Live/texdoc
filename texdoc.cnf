@@ -84,14 +84,14 @@
 # basename_list = readme, 00readme
 # badbasename_list = readme, 00readme
 
+# Known suffixes for documentation
+suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, man, -man, notes, -info, ref
+
 ## Fuzzy search
 
 # Built-in defaults (for reference):
 #
 # fuzzy_level = 3
-
-# Known suffixes for documentation
-suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, /user_guide, -guide, -user, man, -man, notes, -info, ref
 
 # Score adjustments
 # =================
