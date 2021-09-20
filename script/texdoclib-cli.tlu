@@ -1,4 +1,4 @@
--- texdoclib-cli.tlu: command line interfaces for texdoc
+-- texdoclib-cli.tlu: command-line interfaces for texdoc
 --
 -- The TeX Live Team, GPLv3, see texdoclib.tlu for details
 
@@ -200,7 +200,7 @@ end
 --------------------------   the main function   --------------------------
 
 function M.exec()
-    -- parsing command line options
+    -- parsing command-line options
     local ok, action, cl_config = parse_options()
 
     if not ok then

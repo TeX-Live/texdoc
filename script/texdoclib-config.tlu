@@ -50,7 +50,7 @@ function M.get_value(key) return config[key] end
 local function context_to_string(context)
     if not context then return '(no context)' end
     if context.src == 'cl' then
-        return 'from command line option "' .. context.name .. '"'
+        return 'from command-line option "' .. context.name .. '"'
     elseif context.src == 'env' then
         return 'from environment variable "' .. context.name .. '"'
     elseif context.src == 'loc' then
@@ -169,9 +169,9 @@ local function set_config_list(conf, context)
     end
 end
 
-------------------------   config from command line   ------------------------
+------------------------   config from command-line   ------------------------
 
--- set config from the command line
+-- set config from the command-line
 -- Note: Make sure to set a default value in setup_config_from_defaults()
 --       if relevant.
 local function setup_config_from_cl(cl_config)
@@ -450,7 +450,7 @@ function M.get_default_viewers()
             -- Use 'start' to get file associations.
             -- We need to quote the filenames, but the first quoted argument
             -- is considered as the title by start, so we provide a dummy title.
-            -- Also, since the command line parser removes quotes if there
+            -- Also, since the command-line parser removes quotes if there
             -- is no space inside, the dummy title must contain spaces.
             viewer_dvi = 'start "texdoc dvi viewer"',
             viewer_html = 'start "texdoc html viewer"',
