@@ -99,7 +99,7 @@ local function has_bad_basename(file)
 end
 
 -- compute a pattern score -10 <= s < 10
-local function pattern_score(name, pruned_name, pat, dbg_score)
+local function pattern_score(name, pat, dbg_score)
     dbg_score('Start heuristic scoring with pattern: ' .. pat)
 
     -- score management
@@ -112,7 +112,7 @@ local function pattern_score(name, pruned_name, pat, dbg_score)
     end
 
     -- look for exact or subword match
-    if M.is_exact(name, pat) or pruned_name == pat then
+    if M.is_exact(name, pat) then
         upscore(4, 'exact match')
     elseif is_subword(name, pat) then
         upscore(1, 'subword match')
@@ -123,7 +123,7 @@ local function pattern_score(name, pruned_name, pat, dbg_score)
     if not slash then
         for _, suffix in ipairs(texdoc.config.get_value('suffix_list')) do
             local deriv = pat .. suffix
-            if M.is_exact(name, deriv) or pruned_name == pat then
+            if M.is_exact(name, deriv) then
                 upscore(4.5, 'exact match for derived pattern: ' .. deriv)
             elseif is_subword(name, deriv) then
                 upscore(3.5, 'subword match for derived pattern: ' .. deriv)
@@ -176,7 +176,7 @@ local function set_score(df, original_kw)
         local p = string.lower(pat.name)
         if pat.original then  -- non-alias
             if df.tree > -1 then
-                s = pattern_score(name, pruned_name, p, dbg_score)
+                s = pattern_score(name, p, dbg_score)
             else
                 s = 1
             end
