@@ -82,11 +82,6 @@ local function is_subword(str, pat)
         and (j == #str or is_delim(str, j) or is_delim(str, j+1)))
 end
 
--- says if str2 is a suffix of str1
-local function is_suffix(str1, str2)
-    return str1:sub(-#str2) == str2
-end
-
 -- says if a filename has a bad basename
 local function has_bad_basename(file)
     file = file:gsub('.*/', '')
@@ -280,7 +275,13 @@ function M.is_exact(filename, pattern)
     end
 
     -- finally check the bases
-    return is_suffix(f_base, p_base)
+    if (f_base == p_base
+        or (f_base:sub(-#p_base) == p_base
+            and f_base:sub(-#p_base - 1, -#p_base - 1) == '/')) then
+        return true
+    else
+        return false
+    end
 end
 
 -- compare two docfile's: (see texdoclib-search.tlu for structure)
