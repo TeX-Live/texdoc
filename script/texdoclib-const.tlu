@@ -104,7 +104,7 @@ notfound_msg_ph = 'PKGNAME'
 
 -- exit codes
 exit_ok = 0
-exit_error = 1 -- apparently hard-coded in Lua
+exit_error = 1  -- apparently hard-coded in Lua
 exit_usage = 2
 exit_notfound = 3
 
@@ -129,13 +129,34 @@ known_debugs = {
 }
 
 -- various cache or non-cache files
-cache_name = 'texdoc/cache-tlpdb.lua' -- relative to TEXMFVAR
+cache_name = 'texdoc/cache-tlpdb.lua'  -- relative to TEXMFVAR
 data_tlpdb_name = 'texdoc/Data.tlpdb.lua'
 
-place_holder = '%%s' -- used for viewer commands
+place_holder = '%%s'  -- used for viewer commands
 
 -- kpse path separator
 kpse_sep = (os.type == 'windows') and ';' or ':'
+
+-- language codes
+-- Note: corrected with `find $TEXMFDIST/doc/ | awk 'match(
+--       $0, /(.*)-(\w{2}).pdf/, a){print a[2]}'`
+lang_codes = {
+    cn = 'zh',  -- Chinese (alias)
+    cz = 'cz',  -- Chech/Slovak
+    de = 'de',  -- German
+    ee = 'et',  -- Estonian
+    en = 'en',  -- English
+    es = 'es',  -- Spanish
+    fr = 'fr',  -- French
+    it = 'it',  -- Italian
+    ja = 'ja',  -- Japanese
+    nl = 'nl',  -- Dutch
+    pl = 'pl',  -- Polish
+    ro = 'ro',  -- Romanian
+    ru = 'ru',  -- Russian
+    sr = 'sr',  -- Serbian
+    zh = 'zh',  -- Chinese
+}
 
 -- END constants
 

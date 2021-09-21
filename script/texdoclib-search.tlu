@@ -20,7 +20,6 @@ local M = {}
 local C = texdoc.const
 local err_print = texdoc.util.err_print
 local dbg_print = texdoc.util.dbg_print
-local opairs = texdoc.util.opairs
 
 -- shared by all functions in this file
 local s_doclist -- the Doclist object to be populated by various functions
@@ -40,22 +39,9 @@ end
 -- (or known basename according to basename_list)
 local function check_ext(file)
     file = file:lower()
-    -- remove zipext if applicable
-    file = texdoc.util.parse_zip(file)
-    -- then do the normal thing
-    for _, e in ipairs(texdoc.config.get_value('ext_list')) do
-        if e == '*' then
-            return true
-        elseif (e == '') then
-            if not file:find('.', 1, true) then
-                return true
-            end
-        else
-            local dot_e = '.' .. e
-            if file:sub(-#dot_e) == dot_e then
-                return true
-            end
-        end
+    -- has a known extention?
+    if texdoc.util.get_ext(file) ~= nil then
+        return true
     end
     -- is the basename good?
     for _, b in ipairs(texdoc.config.get_value('basename_list')) do
@@ -443,6 +429,33 @@ end
 -------------------------------   use tlpdb   --------------------------------
 
 -- tlpdb means TeX Live Package DataBase and tlp means TeX Live Package
+
+-- return an iterator that ouputs the keys in order
+local function opairs(t)
+    local tkeys = {}
+
+    -- use the counter len to avoid the cost of table.insert and to save the
+    -- length of tkeys for later use in the iterator
+    local len = 0
+    for k, _ in pairs(t) do
+        len = len + 1
+        tkeys[len] = k
+    end
+
+    table.sort(tkeys)
+
+    local i = 0
+    local function iterator()
+        i = i + 1
+        if i > len then
+           return nil
+        else
+           return tkeys[i], t[tkeys[i]]
+        end
+    end
+
+    return iterator
+end
 
 -- return true if cache exists and is newer than original, false otherwise
 local function good_cache(cache, ori)

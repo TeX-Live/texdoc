@@ -5,6 +5,7 @@
 -- dependencies
 local md5 = require 'md5'
 local texdoc = {
+    const = require 'texdoclib-const',
     util = require 'texdoclib-util',
     config = require 'texdoclib-config',
 }
@@ -49,6 +50,26 @@ end
 
 ----------------------------   score computation   -----------------------------
 
+-- parse filename into <base>, <lang>, <ext>
+local function parse(filename)
+    local base, lang, ext
+    ext = texdoc.util.get_ext(filename)
+    if ext ~= nil and ext ~= '' then
+        base = filename:sub(1, -#ext - 2)
+    else
+        base = filename
+    end
+
+    for lc, _ in pairs(texdoc.const.lang_codes) do
+        local hyph_lc = '-' .. lc
+        if base:sub(-#hyph_lc) == hyph_lc then
+            return base:sub(1, -#hyph_lc - 1), lc, ext
+        end
+    end
+
+    return base, lang, ext
+end
+
 -- says if pat is a "subword" of str
 local function is_subword(str, pat)
     local function is_delim(str, i)
@@ -59,6 +80,11 @@ local function is_subword(str, pat)
     return not not (i and j
         and (i == 1 or is_delim(str, i) or is_delim(str, i-1))
         and (j == #str or is_delim(str, j) or is_delim(str, j+1)))
+end
+
+-- says if str2 is a suffix of str1
+local function is_suffix(str1, str2)
+    return str1:sub(-#str2) == str2
 end
 
 -- says if a filename has a bad basename
@@ -72,8 +98,8 @@ local function has_bad_basename(file)
     return false
 end
 
--- compute a heuristic score -10 <= s < 10
-local function heuristic_score(file, pat, dbg_score)
+-- compute a pattern score -10 <= s < 10
+local function pattern_score(name, pruned_name, pat, dbg_score)
     dbg_score('Start heuristic scoring with pattern: ' .. pat)
 
     -- score management
@@ -84,42 +110,40 @@ local function heuristic_score(file, pat, dbg_score)
             dbg_score('New heuristic score: %.1f. Reason: %s', s, reason)
         end
     end
-    local slash = not not string.find(pat, '/', 1, true)
 
     -- look for exact or subword match
-    if M.is_exact_locale(file, pat) then
-        upscore(5, 'exact match with correct locale')
-    elseif M.is_exact(file, pat) then
+    if M.is_exact(name, pat) or pruned_name == pat then
         upscore(4, 'exact match')
-    elseif is_subword(file, pat) then
+    elseif is_subword(name, pat) then
         upscore(1, 'subword match')
     end
 
     -- try derivatives unless pat contains a slash
+    local slash = not not string.find(pat, '/', 1, true)
     if not slash then
         for _, suffix in ipairs(texdoc.config.get_value('suffix_list')) do
             local deriv = pat .. suffix
-            if M.is_exact(file, deriv) then
+            if M.is_exact(name, deriv) or pruned_name == pat then
                 upscore(4.5, 'exact match for derived pattern: ' .. deriv)
-            elseif is_subword(file, deriv) then
+            elseif is_subword(name, deriv) then
                 upscore(3.5, 'subword match for derived pattern: ' .. deriv)
             end
         end
     end
 
     -- if extension is bad, score becomes an epsilon
-    local ext = texdoc.config.get_value('ext_list')[M.ext_pos(file)]
+    local ext = texdoc.config.get_value('ext_list')[M.ext_pos(name)]
     if ext and texdoc.config.get_value('badext_list_inv')[ext] and score > 0 then
         upscore(0.1, 'bad extension', true)
     end
 
     -- if basename is bad, score becomes an epsilon
-    if has_bad_basename(file) and score > 0 then
+    if has_bad_basename(name) and score > 0 then
         upscore(0.1, 'bad basename', true)
     end
 
     -- bonus for being in the right directory
-    if string.find('/' .. file, '/' .. pat .. '/', 1, true) and not slash then
+    if string.find('/' .. name, '/' .. pat .. '/', 1, true) and not slash then
         upscore(score + 1.5, 'directory bonus')
     end
 
@@ -146,12 +170,18 @@ local function set_score(df, original_kw)
 
     -- get score from patterns
     local score = -10
+    local is_alias = false
     for _, pat in ipairs(df.matches) do
         local s = -10
         local p = string.lower(pat.name)
         if pat.original then  -- non-alias
-            s = df.tree > -1 and heuristic_score(name, p, dbg_score) or 1
+            if df.tree > -1 then
+                s = pattern_score(name, pruned_name, p, dbg_score)
+            else
+                s = 1
+            end
         elseif M.is_exact(name, p) then  -- alias
+            is_alias = true
             local bonus, note = 0, ''
             if pat.locale then
                 bonus, note = 5, ', (language-based)'
@@ -182,6 +212,22 @@ local function set_score(df, original_kw)
         else
             score = score + 1.5
             dbg_score('Catalogue details bonus: +1.5')
+        end
+    end
+
+    -- bonus for locale
+    if not is_alias then
+        local config_lang = texdoc.config.get_value('lang')
+        local file_lang = df.lang
+
+        if not file_lang then
+            _, file_lang, _ = parse(name)
+            file_lang = texdoc.const.lang_codes[file_lang]
+        end
+
+        if config_lang == file_lang then
+            score = score + 1
+            dbg_score('Locale match bonus: +1.0')
         end
     end
 
@@ -218,33 +264,23 @@ local function set_list_scores(list, original_kw)
     end
 end
 
--- says if file is an exact match for pat
-function M.is_exact(file, pat)
-    file = texdoc.util.parse_zip(file)
-    local slashes = string.gsub(pat, '[^/]+', '[^/]+')
-    basename = string.match(file, slashes .. '$')
-    if not basename then return nil end
-    if basename == pat then return true end
-    for _, ext in ipairs(texdoc.config.get_value('ext_list')) do
-        if ext ~= '' and ext ~= '*' and basename == pat .. '.' .. ext then
-            return true
-        end
-    end
-    return false
-end
+-- says if filename is an exact match for pat
+function M.is_exact(filename, pattern)
+    local f_base, f_lang, f_ext = parse(filename)
+    local p_base, p_lang, p_ext = parse(pattern)
 
--- says if file is an exact match for pat and the current locale
-function M.is_exact_locale(file, pat)
-    if string.match(pat, '%-%l%l%l?$') then
-        -- don't match if the pattern appears to include a language code
+    -- if the pattern contains lang, check if identical
+    if p_lang ~= nil and f_lang ~= p_lang then
         return false
     end
-    local lang = texdoc.config.get_value('lang')
-    if lang then
-        return M.is_exact(file, pat .. '-' .. lang)
-            or M.is_exact(file, lang .. '-' .. pat)
+
+    -- if the pattern contains ext, check if identical
+    if p_ext ~= nil and p_ext ~= '' and f_ext ~= p_ext then
+        return false
     end
-    return false
+
+    -- finally check the bases
+    return is_suffix(f_base, p_base)
 end
 
 -- compare two docfile's: (see texdoclib-search.tlu for structure)

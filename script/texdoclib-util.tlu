@@ -4,8 +4,8 @@
 
 -- dependencies
 local texdoc = {
-    const = require('texdoclib-const'),
-    config = require('texdoclib-config'),
+    const = require 'texdoclib-const',
+    config = require 'texdoclib-config',
 }
 
 -- shortcuts
@@ -103,50 +103,47 @@ end
 
 end -- end scope of active_debugs
 
--- if file is base .. '.' .. zip with zip in zipext_list, return: base, zip
--- otherwise, return: file, nil
-function M.parse_zip(file)
+-- if filename is base .. '.' .. zip with zip in zipext_list, return: base, zip
+-- otherwise, return: filename, nil
+function M.parse_zip(filename)
     local zip
     for _, zip in ipairs(texdoc.config.get_value('zipext_list')) do
         local l = #zip + 1
-        if string.sub(file, -l, -1) == '.' .. zip then
-            return string.sub(file, 1, -l - 1), zip
+        if string.sub(filename, -l, -1) == '.' .. zip then
+            return string.sub(filename, 1, -l - 1), zip
         end
     end
+    return filename, nil
+end
 
-    return file, nil
+-- take a known extension according to ext_list
+function M.get_ext(filename)
+    filename = M.parse_zip(filename)
+
+    for _, e in ipairs(texdoc.config.get_value('ext_list')) do
+        if e == '*' then
+            local dot = filename:find('.', 1, true)
+            if not dot then
+                return ''
+            else
+                return filename:sub(-dot + 1)
+            end
+        elseif (e == '') then
+            if not filename:find('.', 1, true) then
+                return ''
+            end
+        else
+            local dot_e = '.' .. e
+            if filename:sub(-#dot_e) == dot_e then
+                return dot_e:sub(2)
+            end
+        end
+    end
 end
 
 -- print a usage message
 function M.print_usage()
     print(C.usage_msg)
-end
-
--- return an iterator that ouputs the keys in order
-function M.opairs(t)
-    local tkeys = {}
-
-    -- use the counter len to avoid the cost of table.insert and to save the
-    -- length of tkeys for later use in the iterator
-    local len = 0
-    for k, _ in pairs(t) do
-        len = len + 1
-        tkeys[len] = k
-    end
-
-    table.sort(tkeys)
-
-    local i = 0
-    local function iterator()
-        i = i + 1
-        if i > len then
-           return nil
-        else
-           return tkeys[i], t[tkeys[i]]
-        end
-    end
-
-    return iterator
 end
 
 return M

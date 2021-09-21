@@ -12,6 +12,12 @@ local M = texdoc.util
 local ok = true
 local function printf(fmt, ...) print(fmt:format(...)) end
 
+-- pseudo config
+local pseudo_config = {
+    {'zipext_list', 'zip,gz', '-x'},
+}
+texdoc.config.setup_config_and_alias(pseudo_config)
+
 -- M.w32_path
 do
     local test_cases = {
@@ -56,26 +62,43 @@ do
 end
 
 -- M.parse_zip
---do
---    local test_cases = {
---        -- {<arg>, <result>}
---        {'foo.zip', 'foo'},
---        {'foo.txt', 'foo.txt'},
---    }
---
---    -- pseudo config
---    texdoc.config = {zipext_list = {'zip', 'gz'}}
---
---    for _, c in ipairs(test_cases) do
---        local res = M.parse_zip(c[1])
---
---        if res ~= c[2] then
---            printf('parse_zip(%q) should return %q but returns %q',
---                c[1], c[2], res)
---            ok = false
---        end
---    end
---end
+do
+    local test_cases = {
+        -- {<arg>, <result>}
+        {'foo.zip', 'foo'},
+        {'foo.txt', 'foo.txt'},
+    }
+
+    for _, c in ipairs(test_cases) do
+        local res = M.parse_zip(c[1])
+
+        if res ~= c[2] then
+            printf('parse_zip(%q) should return %q but returns %q',
+                c[1], c[2], res)
+            ok = false
+        end
+    end
+end
+
+-- M.get_ext
+do
+    local test_cases = {
+        -- {<arg>, <result>}
+        {'foo.txt', 'txt'},
+        {'bar.pdf', 'pdf'},
+        {'baz', ''},
+    }
+
+    for _, c in ipairs(test_cases) do
+        local res = M.get_ext(c[1])
+
+        if res ~= c[2] then
+            printf('get_ext(%q) should return %q but returns %q',
+                c[1], c[2], res)
+            ok = false
+        end
+    end
+end
 
 if not ok then
     os.exit(1)
