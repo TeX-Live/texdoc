@@ -183,6 +183,7 @@ adjscore(beamer) beamer-tut-pt/tutorialbeamer = +10
 adjscore(beamer) beamer-FUBerlin = -3
 adjscore(beamer) beamer-tut-pt = -10
 adjscore(beamer) presentations = -10
+adjscore(beamerarticle) bsp-beamerarticle = -10
 
 # misc
 adjscore(context) circuitikz = -10
