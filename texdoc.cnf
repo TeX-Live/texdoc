@@ -385,10 +385,6 @@ alias typearea-de = scrguide
 # tugboat package and classes
 alias tugboat = ltubguid
 
-# caption
-alias caption = caption-eng
-alias caption-dev = caption-eng
-
 # metapost by various names
 alias metapost = mpman
 alias(5) metapost = mpgraph
@@ -502,7 +498,6 @@ alias ofs = ofsdoc-e
 alias akletter = akletter/lettereng
 alias arydshln = arydshln-man
 alias cv = curve/curve
-alias datenumber-de = datenumber/docgerman
 alias labels(1) = envlab/elguide
 alias expressg = expeg
 alias flcards = flashcards
