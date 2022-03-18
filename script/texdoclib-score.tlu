@@ -211,8 +211,8 @@ local function set_score(df, original_kw)
     end
 
     -- bonus for locale
-    if not is_alias then
-        local config_lang = texdoc.config.get_value('lang')
+    local config_lang = texdoc.config.get_value('lang')
+    if not is_alias and config_lang ~= nil then
         local file_lang = df.lang
 
         if not file_lang then
