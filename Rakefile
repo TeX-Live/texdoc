@@ -6,7 +6,7 @@ require 'optparse'
 require 'date'
 
 # basics
-TEXDOC_VERSION = "3.4"
+TEXDOC_VERSION = "3.4.1"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 CTAN_MIRROR = "http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
 
@@ -300,6 +300,37 @@ desc "Preview the manpage"
 task :man do
   cd "doc"
   sh "bundle exec ronn -m #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md"
+end
+
+desc "Bump version"
+task :bump_version do
+  if ARGV.delete("--")
+    new_version = ARGV[1].gsub(".", "\\.")
+  end
+  fail "New version must be specified" if new_version == nil
+
+  old_version = TEXDOC_VERSION.gsub(".", "\\.")
+  this_year = Date.today.year.to_s
+  release_date = Date.today.strftime('%Y-%m-%d')
+
+  # version
+  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./spec/support/shared_contexts/version_context.rb"
+  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./script/texdoclib-const.tlu"
+  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./doc/texdoc.tex"
+  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./Rakefile"
+
+  # copyright year
+  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./spec/action/version_spec.rb"
+  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./script/texdoclib-const.tlu"
+  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./script/texdoclib.tlu"
+  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./doc/texdoc.1.md"
+  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./doc/texdoc.tex"
+
+  # release date
+  sh "sed -i '' -E 's/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/#{release_date}/' ./spec/support/shared_contexts/version_context.rb"
+  sh "sed -i '' -E 's/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/#{release_date}/' ./script/texdoclib-const.tlu"
+
+  exit 0
 end
 
 desc "Create an archive for CTAN"
