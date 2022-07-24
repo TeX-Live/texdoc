@@ -102,6 +102,35 @@ If you are unsure about the name, try full-text searching on CTAN.
 Search form: <https://www.ctan.org/search/>]]
 notfound_msg_ph = 'PKGNAME'
 
+badmatch_msg = [[
+Unfortunately, I couldn't find any good matches for "PKG".
+
+Here are the top 3 matches that I found:
+]]
+badmatch_msg_ph = 'PKG'
+badmatch_prompt = [[
+Enter (1/2/3) to open one of the listed documents, (y) to search online, or any other key to exit:
+]]
+
+nolocaldocs_msg = [[
+You don't appear to have any local documentation installed.
+
+]]
+nolocaldocs_prompt = [[
+Would you like to search online? (y/N)
+]]
+
+online_msg = [[
+There may be online documentation available for "PKG" at
+    URL
+This documentation may be for a different version than you have installed.
+
+]]
+online_msg_url = 'URL'
+online_msg_ph = 'PKG'
+online_baseurl = 'https://texdoc.org/serve/PKG/0'
+online_baseurl_ph = 'PKG'
+
 -- exit codes
 exit_ok = 0
 exit_error = 1  -- apparently hard-coded in Lua
