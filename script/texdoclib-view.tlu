@@ -169,8 +169,8 @@ local function print_menu(name, doclist, showall)
         -- there may be too many lines, count them
         local n = 0
         for _, doc in pairs(doclist) do
-            if doc.quality == 'good' or
-                    (showall and doc.quality ~= 'killed') then
+            if doc:get_quality() == 'good' or
+                    (showall and doc:get_quality() ~= 'killed') then
                 n = n + 1
             end
         end
@@ -187,8 +187,8 @@ local function print_menu(name, doclist, showall)
     end
     local i, doc, last_i
     for i, doc in ipairs(doclist) do
-        if doc.quality == 'killed' then break end
-        if doc.quality ~= 'good' and not showall then break end
+        if doc:get_quality() == 'killed' then break end
+        if doc:get_quality() ~= 'good' and not showall then break end
         if texdoc.config.get_value('machine_switch') == true then
             print(name, doc.score, texdoc.util.w32_path(doc.realpath),
             doc.lang or '', doc.details or '')
