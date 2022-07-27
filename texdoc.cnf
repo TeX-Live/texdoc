@@ -369,18 +369,18 @@ alias amsproc-dev = amsclass
 alias amsmath-dev = amsmath
 
 # koma-script
-alias koma = scrguien
-alias koma-script = scrguien
-alias scrartcl = scrguien
-alias scrbook = scrguien
-alias scrreprt = scrguien
-alias typearea = scrguien
-alias koma-de = scrguide
-alias koma-script-de = scrguide
-alias scrartcl-de = scrguide
-alias scrbook-de = scrguide
-alias scrreprt-de = scrguide
-alias typearea-de = scrguide
+alias koma = scrguide-en
+alias koma-script = scrguide-en
+alias scrartcl = scrguide-en
+alias scrbook = scrguide-en
+alias scrreprt = scrguide-en
+alias typearea = scrguide-en
+alias koma-de = scrguide-de
+alias koma-script-de = scrguide-de
+alias scrartcl-de = scrguide-de
+alias scrbook-de = scrguide-de
+alias scrreprt-de = scrguide-de
+alias typearea-de = scrguide-de
 
 # tugboat package and classes
 alias tugboat = ltubguid
