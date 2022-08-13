@@ -91,6 +91,7 @@ known_options = {
     'lang',
     'fuzzy_level',
     'texlive_tlpdb',
+    'online_url',
 }
 
 error_msg = [[
@@ -112,6 +113,12 @@ badmatch_prompt = [[
 Enter (1/2/3) to open one of the listed documents, (y) to search online, or any other key to exit:
 ]]
 
+nomatch_msg = [[
+Unfortunately, I couldn't find any matches for "PKG".
+
+]]
+nomatch_msg_ph = 'PKG'
+
 nolocaldocs_msg = [[
 You don't appear to have any local documentation installed.
 
@@ -128,7 +135,6 @@ This documentation may be for a different version than you have installed.
 ]]
 online_msg_url = 'URL'
 online_msg_ph = 'PKG'
-online_baseurl = 'https://texdoc.org/serve/PKG/0'
 online_baseurl_ph = 'PKG'
 
 -- exit codes
