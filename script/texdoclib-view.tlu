@@ -228,10 +228,12 @@ local function search_online(name, doclist)
         io.stderr:write(msg .. '') -- cast to string
     end
     -- Fuzzy heuristic to see if the user has _any_ local documentation
-    local texdoc_docs = texdoc.search.get_doclist("texdoc")
-    local docs_installed = texdoc[1] and texdoc[1].basename == "texdoc.pdf"
+    local kpathsea_docs = texdoc.search.get_doclist("kpathsea")
+    local docs_installed = kpathsea_docs[1] and
+                           kpathsea_docs[1].basename == "kpathsea.pdf" and
+                           not os.getenv("TEXDOC_NO_LOCAL_DOCS")
 
-    if docs_installed then
+    if docs_installed and doclist[1] then
         write(C.badmatch_msg:gsub(C.badmatch_msg_ph, name))
 
         for i=1,3 do
@@ -239,15 +241,19 @@ local function search_online(name, doclist)
             write('    ' .. i .. ' ' .. doc .. '\n')
         end
         write('\n')
+    elseif docs_installed then
+        write(C.nomatch_msg:gsub(C.nomatch_msg_ph, name))
     else
         write(C.nolocaldocs_msg)
     end
 
-    local url = C.online_baseurl:gsub(C.online_baseurl_ph, name)
+    local url = texdoc.config.get_value('online_url')
+                :gsub(C.online_baseurl_ph, name)
+
     write(C.online_msg:gsub(C.online_msg_url, url)
                       :gsub(C.online_msg_ph, name))
 
-    if docs_installed then
+    if docs_installed and doclist[1] then
         write(C.badmatch_prompt)
     else
         write(C.nolocaldocs_prompt)
