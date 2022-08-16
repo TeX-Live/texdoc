@@ -219,12 +219,6 @@
     \hypertarget{\@tmp@hyname}{\code{#1 = #2}}%
     \IfNoValueF{#3}{\hfill (#3)}%
     \begin{manual@entry}%
-    \bgroup%
-      \def\meta##1{##1}%
-      \def\_{\string_}%
-      \edef\conf@title{#1}%
-      \belowpdfbookmark{\conf@title}{\conf@title}%
-    \egroup%
   }
   {\ifvmode\else\unskip\fi\end{manual@entry}}
 

@@ -53,7 +53,14 @@ RSpec.describe "Errors", :type => :aruba do
     before(:each) { run_texdoc nonexist_pkg }
 
     it 'result in the "not found" error' do
-      expect(stderr).to include("Unfortunately, I couldn't find any matches for")
+      expect(stderr).to include(
+        <<~EXPECTED
+          Sorry, no documentation found for "#{nonexist_pkg}".
+          If you are unsure about the name, try full-text searching on CTAN.
+          Search form: <https://www.ctan.org/search/>
+        EXPECTED
+      )
+      expect(last_command_started).to have_exit_status(3)
     end
   end
 end

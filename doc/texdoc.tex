@@ -504,25 +504,6 @@ allowance by using the configuration item \ci{fuzzy\_level}. Results of fuzzy
 search could be different among executions if multiple package names have the
 same Levenshtein distance to the input.
 
-\subsection{Online Search}
-\label{sec:online}
-
-If Texdoc cannot find any good matches for a document, it may sometimes prompt
-you to search online.
-
-If you use the |view| option, there are no ``good'' matches
-(|score|${}\ge{}$0), but you have some local documentation installed, Texdoc will show you the three best locally-installed documents while also prompting
-you to search online.
-
-If you use the |view| option when you have no local documentation installed,
-Texdoc will skip showing any fuzzy matches, and will instead prompt you to
-search online immediately.
-
-Texdoc checks to see if the |kpathsea| documentation as a heuristic for
-if \emph{any} documentation is installed. If the documentation for Texdoc is
-installed, but no other documentation is installed, the online search prompt
-may produce unexpected results.
-
 \section{Configuration items}
 \label{sec:conf}
 
@@ -744,11 +725,6 @@ Texdoc uses for searching documents. By default, Texdoc uses
 not) set this configuration item. This is only useful when you want to use
 Texdoc within a {\TL}-based {\TeX} distribution which does not ship
 |texlive.tlpdb|.
-\end{confitem}
-
-\begin{confitem}{online\_url}{\meta{url}}[default: \code{https://texdoc.org/serve/PKG/0}]
-Sets the URL to use for online documentation. Texdoc will replace |PKG| with
-the name of the package to search for.
 \end{confitem}
 
 \section{Licence}
