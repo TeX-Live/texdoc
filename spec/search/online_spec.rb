@@ -32,4 +32,14 @@ RSpec.describe "Online searches", :type => :aruba do
     )
     end
   end
+
+  context "bad fuzzy results in the list mode" do
+    before(:each) { run_texdoc "-il", "scrgui", interactive: true }
+    before(:each) { type "\n" }
+    before(:each) { stop_all_commands }
+
+    it do
+      expect(last_command_started).to be_successfully_executed
+    end
+  end
 end
