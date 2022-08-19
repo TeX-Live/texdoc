@@ -14,4 +14,13 @@ RSpec.describe "Verbose outputs", :type => :aruba do
       expect(last_command_started).to be_successfully_executed
     end
   end
+
+  context "if no good result found" do
+    before(:each) { run_texdoc "-lIv", "-c ext_list=md", "times" }
+
+    it "should show an info message" do
+      expect(stderr).to include(
+        warning_line "No good result found, showing all results.")
+    end
+  end
 end

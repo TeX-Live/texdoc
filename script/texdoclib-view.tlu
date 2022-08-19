@@ -169,8 +169,8 @@ local function print_menu(name, doclist, showall)
         -- there may be too many lines, count them
         local n = 0
         for _, doc in pairs(doclist) do
-            if doc.quality == 'good' or
-                    (showall and doc.quality ~= 'killed') then
+            if doc:get_quality() == 'good' or
+                    (showall and doc:get_quality() ~= 'killed') then
                 n = n + 1
             end
         end
@@ -185,24 +185,41 @@ local function print_menu(name, doclist, showall)
             end
         end
     end
-    local i, doc, last_i
-    for i, doc in ipairs(doclist) do
-        if doc.quality == 'killed' then break end
-        if doc.quality ~= 'good' and not showall then break end
-        if texdoc.config.get_value('machine_switch') == true then
-            print(name, doc.score, texdoc.util.w32_path(doc.realpath),
-            doc.lang or '', doc.details or '')
-        else
+    local last_i
+    while true do
+        for i, doc in ipairs(doclist) do
+            if doc:get_quality() == 'killed' then break end
+            if doc:get_quality() ~= 'good' and not showall then break end
+
             last_i = i -- save for test below
-            print(string.format('%2d %s', i, texdoc.util.w32_path(doc.realpath)))
-            if doc.details or doc.lang then
-                local line = '   = '
-                if doc.lang then line = line .. '[' .. doc.lang .. '] ' end
-                if doc.details then line = line .. doc.details end
-                print(line)
+            if texdoc.config.get_value('machine_switch') == true then
+                print(name, doc.score, texdoc.util.w32_path(doc.realpath),
+                doc.lang or '', doc.details or '')
+            else
+                print(string.format('%2d %s', i, texdoc.util.w32_path(doc.realpath)))
+                if doc.details or doc.lang then
+                    local line = '   = '
+                    if doc.lang then line = line .. '[' .. doc.lang .. '] ' end
+                    if doc.details then line = line .. doc.details end
+                    print(line)
+                end
             end
         end
+
+        if last_i or showall then
+            break
+        else
+            err_print('warning', 'No good result found, showing all results.')
+            showall = true
+        end
     end
+
+    if not last_i then
+        local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
+        io.stderr:write(msg .. '\n') -- get rid of gsub's 2nd value
+        os.exit(C.exit_notfound)
+    end
+
     if texdoc.config.get_value('interact_switch') then
         io.write('Enter number of file to view, RET to view 1, anything else to skip: ')
         local num_str = io.read('*line')
