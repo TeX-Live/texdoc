@@ -6,10 +6,10 @@ RSpec.describe "Online searches", :type => :aruba do
 
   context "with no local docs" do
     before(:each) { set_environment_variable "TEXDOC_NO_LOCAL_DOCS", "true" }
+    before(:each) { set_environment_variable "TEXDOCS", "{}" }
     before(:each) {
-        run_texdoc \
+      run_texdoc \
         "-dtlpdb",
-        "-i",
         "-c texlive_tlpdb=" + Pathname.pwd.to_s + "/spec/support/no-docs.tlpdb",
         "lua-widow-control"
     }
@@ -22,9 +22,7 @@ RSpec.describe "Online searches", :type => :aruba do
   end
 
   context "bad fuzzy results" do
-    before(:each) {
-        run_texdoc "-i", "scrgui"
-    }
+    before(:each) { run_texdoc "-i", "scrgui" }
 
     it 'should say no good matches' do
       expect(stderr).to include(
