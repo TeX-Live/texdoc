@@ -6,6 +6,7 @@ RSpec.describe "Online searches", :type => :aruba do
 
   context "with no local docs" do
     before(:each) { set_environment_variable "TEXDOC_NO_LOCAL_DOCS", "true" }
+    before(:each) { set_environment_variable "TEXDOCS", "{}" }
     before(:each) {
         run_texdoc \
         "-dtlpdb",
