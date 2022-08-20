@@ -20,7 +20,7 @@ RSpec.describe "Verbose outputs", :type => :aruba do
 
     it "should show an info message" do
       expect(stderr).to include(
-        info_line "No good result found, showing all results.")
+        warning_line "No good result found, showing all results.")
     end
   end
 end

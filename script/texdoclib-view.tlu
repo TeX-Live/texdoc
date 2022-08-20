@@ -7,6 +7,7 @@ local texdoc = {
     const = require('texdoclib-const'),
     util = require('texdoclib-util'),
     config = require('texdoclib-config'),
+    search = require('texdoclib-search'),
 }
 
 -- shortcuts
@@ -116,6 +117,10 @@ function M.view_file(filename)
     -- files without extension are assumed to be text
     local viewext = (filename:match('.*%.([^/]*)$') or 'txt'):lower()
 
+    if filename:match('^http') then
+        viewext = 'html'
+    end
+
     -- special case : sty files use txt viewer
     -- FIXME: hardcoding such cases this way is not very clean
     if viewext == 'sty' then viewext = 'txt' end
@@ -164,8 +169,8 @@ local function print_menu(name, doclist, showall)
         -- there may be too many lines, count them
         local n = 0
         for _, doc in pairs(doclist) do
-            if doc.quality == 'good' or
-                    (showall and doc.quality ~= 'killed') then
+            if doc:get_quality() == 'good' or
+                    (showall and doc:get_quality() ~= 'killed') then
                 n = n + 1
             end
         end
@@ -180,24 +185,41 @@ local function print_menu(name, doclist, showall)
             end
         end
     end
-    local i, doc, last_i
-    for i, doc in ipairs(doclist) do
-        if doc.quality == 'killed' then break end
-        if doc.quality ~= 'good' and not showall then break end
-        if texdoc.config.get_value('machine_switch') == true then
-            print(name, doc.score, texdoc.util.w32_path(doc.realpath),
-            doc.lang or '', doc.details or '')
-        else
+    local last_i
+    while true do
+        for i, doc in ipairs(doclist) do
+            if doc:get_quality() == 'killed' then break end
+            if doc:get_quality() ~= 'good' and not showall then break end
+
             last_i = i -- save for test below
-            print(string.format('%2d %s', i, texdoc.util.w32_path(doc.realpath)))
-            if doc.details or doc.lang then
-                local line = '   = '
-                if doc.lang then line = line .. '[' .. doc.lang .. '] ' end
-                if doc.details then line = line .. doc.details end
-                print(line)
+            if texdoc.config.get_value('machine_switch') == true then
+                print(name, doc.score, texdoc.util.w32_path(doc.realpath),
+                doc.lang or '', doc.details or '')
+            else
+                print(string.format('%2d %s', i, texdoc.util.w32_path(doc.realpath)))
+                if doc.details or doc.lang then
+                    local line = '   = '
+                    if doc.lang then line = line .. '[' .. doc.lang .. '] ' end
+                    if doc.details then line = line .. doc.details end
+                    print(line)
+                end
             end
         end
+
+        if last_i or showall then
+            break
+        else
+            err_print('warning', 'No good result found, showing all results.')
+            showall = true
+        end
     end
+
+    if not last_i then
+        local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
+        io.stderr:write(msg .. '\n') -- get rid of gsub's 2nd value
+        os.exit(C.exit_notfound)
+    end
+
     if texdoc.config.get_value('interact_switch') then
         io.write('Enter number of file to view, RET to view 1, anything else to skip: ')
         local num_str = io.read('*line')
@@ -211,31 +233,86 @@ local function print_menu(name, doclist, showall)
     end
 end
 
+local function search_online(name, doclist)
+    if not texdoc.config.get_value('interact_switch') or
+        texdoc.config.get_value('machine_switch')
+    then
+        view_doc(doclist[1])
+        return
+    end
+
+    local function write(msg)
+        io.stderr:write(msg .. '') -- cast to string
+    end
+    -- Fuzzy heuristic to see if the user has _any_ local documentation
+    local kpathsea_docs = texdoc.search.get_doclist("kpathsea")
+    local docs_installed = kpathsea_docs[1] and
+                           kpathsea_docs[1].basename == "kpathsea.pdf" and
+                           not os.getenv("TEXDOC_NO_LOCAL_DOCS")
+
+    if docs_installed and doclist[1] then
+        write(C.badmatch_msg:gsub(C.badmatch_msg_ph, name))
+
+        for i=1,3 do
+            local doc = (doclist[i] and doclist[i].normname) or '<empty>'
+            write('    ' .. i .. ' ' .. doc .. '\n')
+        end
+        write('\n')
+    elseif docs_installed then
+        write(C.nomatch_msg:gsub(C.nomatch_msg_ph, name))
+    else
+        write(C.nolocaldocs_msg)
+    end
+
+    local url = texdoc.config.get_value('online_url')
+                :gsub(C.online_baseurl_ph, name)
+
+    write(C.online_msg:gsub(C.online_msg_url, url)
+                      :gsub(C.online_msg_ph, name))
+
+    if docs_installed and doclist[1] then
+        write(C.badmatch_prompt)
+    else
+        write(C.nolocaldocs_prompt)
+    end
+
+    local ans = io.read('*line')
+
+    if ans:match('^\r?[yY]') then
+        M.view_file(url)
+    elseif tonumber(ans) then
+        view_doc(doclist[tonumber(ans)])
+    end
+end
+
 -----------------------   deliver results based on mode   ---------------------
 
 function M.deliver_results(name, doclist, many)
     -- ensure that results were found or apologize
-    if not doclist[1] or doclist[1].quality == 'killed' then
+    if (not doclist[1] or doclist[1]:get_quality() == 'killed') and
+        not texdoc.config.get_value('interact_switch')
+    then
         local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
         io.stderr:write(msg .. '\n') -- get rid of gsub's 2nd value
         os.exit(C.exit_notfound)
     end
     -- shall we show all of them or only the "good" ones?
-    local showall = (texdoc.config.get_value('mode') == 'showall')
-    if not showall and doclist[1].quality ~= 'good' then
-        showall = true
-        err_print('info', 'No good result found, showing all results.')
-    end
+    local mode = texdoc.config.get_value('mode')
+
     -- view result or show menu based on mode and number of results
-    if (texdoc.config.get_value('mode') == 'view')
-            or texdoc.config.get_value('mode') == 'mixed' and (not doclist[2]
-            or (doclist[2].quality ~= 'good' and not showall)) then
+    if (mode == 'view' and doclist[1] and doclist[1]:get_quality() == 'good') or
+        (mode == 'mixed' and
+            (not doclist[2] or doclist[2]:get_quality() ~= 'good')
+        )
+    then
         view_doc(doclist[1])
-    else
+    elseif mode ~= 'view' then
         if many and not texdoc.config.get_value('machine_switch') then
             print('*** Results for: ' .. name .. ' ***')
         end
-        print_menu(name, doclist, showall)
+        print_menu(name, doclist, mode == 'showall')
+    else
+        search_online(name, doclist)
     end
 end
 

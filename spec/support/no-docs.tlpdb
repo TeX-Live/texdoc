@@ -1,0 +1,106 @@
+name 00texlive.config
+category Package
+depend minrelease/2016
+depend release/2022
+
+name 00texlive.installation
+category TLCore
+depend opt_install_docfiles:0
+depend opt_install_srcfiles:0
+
+name lua-widow-control
+category Package
+revision 63994
+shortdesc Automatically remove widows and orphans from any document
+longdesc Unmodified TeX has very few ways of preventing widows and
+longdesc orphans. In documents with figures, section headings, and
+longdesc equations, TeX can stretch the vertical glue between items in
+longdesc order to prevent widows and orphans, but many documents have no
+longdesc figures or headings. TeX can also shorten the page by 1 line,
+longdesc but this will give each page a different length which can make
+longdesc a document look uneven. The typical solution is to
+longdesc strategically insert \looseness=1, but this requires manual
+longdesc editing every time that the document is edited.
+longdesc Lua-widow-control is essentially an automation of the
+longdesc \looseness method: it uses Lua callbacks to find "stretchy"
+longdesc paragraphs, then it lengthens them to remove widows and
+longdesc orphans. Lua-widow-control is compatible with all LuaTeX-based
+longdesc formats. All that is required is to load the package at the
+longdesc start of your document. To load: Plain LuaTeX: \input
+longdesc lua-widow-control LuaLaTeX: \usepackage{lua-widow-control}
+longdesc ConTeXt: \usemodule[lua-widow-control] OpTeX:
+longdesc \load[lua-widow-control]
+containersize 16396
+containerchecksum c8d4cdd72687ff990ce2f591ec0f7081b5a7fa822e4bb4d5cd00f32ce34b9177b18e582e0d6b9dda5a99568226915abd6b367b8808630787fba71590ad54d63f
+doccontainersize 745928
+doccontainerchecksum 6dc59ea9bffa68f543af29adc1eec155aebe96b7f802a7796d0fbef3a7b4765e74f570cf901c3398afad1437c610a4bdbd56af5b8a6d9ddf11334e16b5875240
+srccontainersize 47940
+srccontainerchecksum afe2c83278b7dc5b73e4e52adb04384f1df2497c53c89f3112c1da4b4399d5e21f97b10c8a57e0646a639f3f42201c9596c669f4a0a7650736c25c240c5f0864
+runfiles size=19
+ texmf-dist/tex/context/third/lua-widow-control/t-lua-widow-control.mkiv
+ texmf-dist/tex/context/third/lua-widow-control/t-lua-widow-control.mkxl
+ texmf-dist/tex/lualatex/lua-widow-control/lua-widow-control-2022-02-22.sty
+ texmf-dist/tex/lualatex/lua-widow-control/lua-widow-control.sty
+ texmf-dist/tex/luatex/lua-widow-control/lua-widow-control.lua
+ texmf-dist/tex/luatex/lua-widow-control/lua-widow-control.tex
+ texmf-dist/tex/optex/lua-widow-control/lua-widow-control.opm
+catalogue-contact-bugs https://github.com/gucci-on-fleek/lua-widow-control/issues
+catalogue-contact-repository https://github.com/gucci-on-fleek/lua-widow-control
+catalogue-contact-support https://github.com/gucci-on-fleek/lua-widow-control/discussions
+catalogue-ctan /macros/luatex/generic/lua-widow-control
+catalogue-license other-free cc-by-sa-4
+catalogue-topics layout luatex expl3
+catalogue-version 2.2.1
+
+name kpathsea
+category TLCore
+revision 63534
+shortdesc Path searching library for TeX-related files
+longdesc Kpathsea is a library and utility programs which provide path
+longdesc searching facilities for TeX file types, including the
+longdesc self-locating feature required for movable installations,
+longdesc layered on top of a general search mechanism. It is not
+longdesc distributed separately, but rather is released and maintained
+longdesc as part of the TeX Live sources.
+depend kpathsea.ARCH
+containersize 32472
+containerchecksum fc14de3c5a2d42b27c1bc3eddfcb1da4c615b9ef84df2687388ca637244ec2a32ec332b6de7db8d7e61e5535d217e42a3f869cd8df32fbc85662a990461f41ca
+doccontainersize 1079700
+doccontainerchecksum 1ebd180d7047b7393fdfd862f0509e9d0dc7c0aa7306457675e08f151b785440caba794146b357c76f1588cd1979526b40d841807218b92f9992208b1b47f1ab
+runfiles size=52
+ texmf-dist/web2c/amiga-pl.tcx
+ texmf-dist/web2c/cp1250cs.tcx
+ texmf-dist/web2c/cp1250pl.tcx
+ texmf-dist/web2c/cp1250t1.tcx
+ texmf-dist/web2c/cp227.tcx
+ texmf-dist/web2c/cp852-cs.tcx
+ texmf-dist/web2c/cp852-pl.tcx
+ texmf-dist/web2c/cp8bit.tcx
+ texmf-dist/web2c/empty.tcx
+ texmf-dist/web2c/fmtutil.cnf
+ texmf-dist/web2c/il1-t1.tcx
+ texmf-dist/web2c/il2-cs.tcx
+ texmf-dist/web2c/il2-pl.tcx
+ texmf-dist/web2c/il2-t1.tcx
+ texmf-dist/web2c/kam-cs.tcx
+ texmf-dist/web2c/kam-t1.tcx
+ texmf-dist/web2c/macce-pl.tcx
+ texmf-dist/web2c/macce-t1.tcx
+ texmf-dist/web2c/maz-pl.tcx
+ texmf-dist/web2c/mktex.cnf
+ texmf-dist/web2c/mktex.opt
+ texmf-dist/web2c/mktexdir
+ texmf-dist/web2c/mktexdir.opt
+ texmf-dist/web2c/mktexnam
+ texmf-dist/web2c/mktexnam.opt
+ texmf-dist/web2c/mktexupd
+ texmf-dist/web2c/natural.tcx
+ texmf-dist/web2c/tcvn-t5.tcx
+ texmf-dist/web2c/texmf.cnf
+ texmf-dist/web2c/viscii-t5.tcx
+catalogue-contact-bugs https://lists.tug.org/tex-k
+catalogue-contact-home https://tug.org/kpathsea
+catalogue-contact-repository https://tug.org/svn/texlive/trunk/Build/source/texk/kpathsea/
+catalogue-contact-support https://lists.tug.org/tex-k
+catalogue-license lgpl2.1
+catalogue-topics sys-supp
