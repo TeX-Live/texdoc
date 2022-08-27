@@ -53,7 +53,7 @@ RSpec.describe "Errors", :type => :aruba do
     before(:each) { run_texdoc nonexist_pkg }
 
     it 'result in the "not found" error' do
-      expect(stderr).to include("Unfortunately, I couldn't find any matches for")
+      expect(stderr).to include("Unfortunately, there are no good matches for")
     end
   end
 end

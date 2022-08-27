@@ -26,7 +26,7 @@ RSpec.describe "Online searches", :type => :aruba do
 
     it 'should say no good matches' do
       expect(stderr).to include(
-        "Unfortunately, I couldn't find any good matches"
+        'Unfortunately, there are no good matches for "scrgui".'
     )
     end
   end
