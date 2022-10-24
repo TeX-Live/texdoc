@@ -98,7 +98,7 @@ suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, userguide, 
 # Here you can configure the URL to prompt the user to open when Texdoc
 # is unable to find any local matches.
 
-# online_url = https://texdoc.org/serve/PKG/0
+# online_url = https://texdoc.org/serve/PKGNAME/0
 
 # Score adjustments
 # =================

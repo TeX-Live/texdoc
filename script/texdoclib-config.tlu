@@ -545,7 +545,7 @@ local function setup_config_from_defaults()
         debug_list = '',
         max_lines = '20',
         fuzzy_level = '3',
-        online_url = 'https://texdoc.org/serve/PKG/0',
+        online_url = 'https://texdoc.org/serve/PKGNAME/0',
     }
     -- zip-related options
     set_config_ls {
