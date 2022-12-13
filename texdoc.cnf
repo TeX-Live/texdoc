@@ -297,7 +297,7 @@ alias xelatex = xetex-reference
 alias e-tex = etex_man
 alias etex = etex_man
 alias pdftex = pdftex-a
-#alias xetex = xetex-reference # OK
+alias xetex = xetex-reference # needed by packages with "xetex" in their names
 alias xelatex = xetex-reference
 
 alias e-tex-man = etex.man1
