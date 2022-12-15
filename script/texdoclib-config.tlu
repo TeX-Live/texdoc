@@ -239,14 +239,27 @@ local function read_config_file(configfile)
 
     local cnf = assert(io.open(configfile, 'r'))
     local lineno = 0
+    local line_cont, line_buffer = false, ''
     while true do
-        local line=cnf:read('*line')
+        local line = cnf:read('*line')
         lineno = lineno + 1
 
         if line == nil then break end  -- EOF
         line = string.gsub(line, '%s*#.*$', '') -- comments begin with #
         line = string.gsub(line, '%s*$', '')    -- remove trailing spaces
         line = string.gsub(line, '^%s*', '')    -- remove leading spaces
+
+        -- tailing \ indicates line continuation
+        if string.match(line, '\\$') then
+            line_cont = true
+            line = string.gsub(line, '\\$', '')
+            line_buffer = line_buffer .. line
+            goto continue
+        elseif line_cont then
+            line_cont = false
+            line = line_buffer .. line
+            line_buffer = ''
+        end
 
         -- try to interpret the line
         local ok = string.match(line, '^%s*$')
@@ -259,6 +272,8 @@ local function read_config_file(configfile)
             err_print('warning',
                 'syntax error in %s at line %d.', configfile, lineno)
         end
+
+        ::continue::
     end
     cnf:close()
 end

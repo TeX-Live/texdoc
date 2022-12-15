@@ -530,7 +530,7 @@ Configuration files are line-oriented text files. Comments begin with a |#|
 and run to the end of line. Lines containing only space are ignored. Space at
 the beginning or end of a line, as well as around an |=| sign, is ignored.
 Apart from comments and empty lines, each line must be of one of the following
-forms.
+forms:
 %
 \begin{htcode}
 «configuration item» = «value»
@@ -540,6 +540,9 @@ stopalias «original keyword»
 adjscore «pattern» = «score adjustment»
 adjscore(«keyword») «pattern» = «score adjustment»
 \end{htcode}
+%
+You can put a backslash (\code{\char`\\}) at the end of a line to indicate that
+the line is continued on the following line.
 
 We will concentrate on the |«configuration item»| part here, since other
 directives have already been presented (Section~\ref{sec:alias} and
