@@ -87,7 +87,7 @@
 # Known suffixes for documentation
 suffix_list = doc, -doc, _doc, .doc, /doc, manual, /manual, -manual, \
               userguide, /user_guide, -guide, -user, man, -man, \
-              notes, -info, ref
+              -documentation, notes, -info, ref
 
 ## Fuzzy search
 
