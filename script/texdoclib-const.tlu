@@ -35,33 +35,229 @@ Try to find appropriate TeX documentation for the specified NAME(s).
 Alternatively, perform the given ACTION and exit.
 
 Options:
-  -w, --view        Use view mode: start a viewer. (default)
-  -m, --mixed       Use mixed mode (view or list).
-  -l, --list        Use list mode: show a list of results.
-  -s, --showall     Use showall mode: show also "bad" results.
+{{mode}}
 
-  -i, --interact    Use interactive menus. (default)
-  -I, --nointeract  Use plain lists, no interaction required.
-  -M, --machine     Machine-readable output for lists (implies -I).
+{{interaction}}
 
-  -q, --quiet       Suppress warnings and most error messages.
-  -v, --verbose     Print additional information (e.g., viewer command).
-  -D, --debug       Activate all debug output (equal to "--debug=all").
-  -d LIST, --debug=LIST
-                    Activate debug output restricted to LIST.
-  -c NAME=VALUE     Set configuration item NAME to VALUE.
+{{debug}}
 
 Actions:
-  -h, --help        Print this help message.
-  -V, --version     Print the version number.
-  -f, --files       Print the list of configuration files used.
-  --just-view FILE  Display FILE, given with full path (no searching).
+{{action}}
 
 Full manual available via `texdoc texdoc'.
 
 Website: <https://tug.org/texdoc/>
 Repository: <https://github.com/TeX-Live/texdoc>
 Please email bugs to <texdoc@tug.org>.]]
+
+zsh_completion = [[
+compdef __texdoc texdoc
+
+__texdoc() {
+  local options=(
+    {{action}}
+    + mode
+    {{mode}}
+    + interaction
+    {{interaction}}
+    + debug
+    {{debug}}
+  )
+  _arguments -C -A $options \
+    '*: :->arguments' && return
+  case $state in
+    arguments)
+      local tlpdb="$(kpsewhich -var-value TEXMFROOT)/tlpkg/texlive.tlpdb"
+      _values package $(awk '/^name[^.]*$/ {print $2}' $tlpdb)
+    ;;
+  esac
+}
+]]
+
+--[[ structure of the options table
+
+options = {
+    {
+        desc = 'description',
+        long = 'long name',
+        short = 'short name',
+        type = 'argument type'
+        group = 'same group will only complete once, that is `texdoc --interact <TAB>` will not complete `--nointeract`'
+        action = function to be called
+    },
+    ...
+}
+--]]
+
+options = {
+    -- action
+    {
+        desc = 'Print this help message.',
+        long = 'help',
+        short = 'h',
+        type = 'boolean',
+        group = 'action'
+    },
+    {
+        desc = 'Print the version number.',
+        long = 'version',
+        short = 'V',
+        type = 'boolean',
+        group = 'action'
+    },
+    {
+        desc = 'Print the list of configuration files used.',
+        long = 'files',
+        short = 'f',
+        type = 'boolean',
+        group = 'action'
+    },
+    {
+        desc = 'Display FILE, given with full path (no searching).',
+        long = 'just-view',
+        type = 'string',
+        metavar = 'FILE',
+        complete = 'files',
+        group = 'action'
+    },
+    {
+        desc = 'Print SHELL completion.',
+        long = 'print-completion',
+        type = 'string',
+        metavar = 'SHELL',
+        complete = {'zsh'},
+        group = 'action',
+    },
+    -- mode
+    {
+        desc = 'Use view mode: start a viewer. (default)',
+        long = 'view',
+        short = 'w',
+        type = 'boolean',
+        group = 'mode',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'mode', 'view', opt_name})
+        end
+    },
+    {
+        desc = 'Use mixed mode (view or list).',
+        long = 'mixed',
+        short = 'm',
+        type = 'boolean',
+        group = 'mode',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'mode', 'mixed', opt_name})
+        end
+    },
+    {
+        desc = 'Use list mode: show a list of results.',
+        long = 'list',
+        short = 'l',
+        type = 'boolean',
+        group = 'mode',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'mode', 'list', opt_name})
+        end
+    },
+    {
+        desc = 'Use showall mode: show also "bad" results.',
+        long = 'showall',
+        short = 's',
+        type = 'boolean',
+        group = 'mode',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'mode', 'showall', opt_name})
+        end
+    },
+    -- interaction
+    {
+        desc = 'Use interactive menus. (default)',
+        long = 'interact',
+        short = 'i',
+        type = 'boolean',
+        group = 'interaction',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'interact_switch', 'true', opt_name})
+        end
+    },
+    {
+        desc = 'Use plain lists, no interaction required.',
+        long = 'nointeract',
+        short = 'I',
+        type = 'boolean',
+        group = 'interaction',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'interact_switch', 'false', opt_name})
+        end
+    },
+    -- output format
+    {
+        desc = 'Machine-readable output for lists (implies -I).',
+        long = 'machine',
+        short = 'M',
+        type = 'boolean',
+        group = 'interaction',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'machine_switch', 'true', opt_name})
+        end
+    },
+    -- verbosity
+    {
+        desc = 'Suppress warnings and most error messages.',
+        long = 'quiet',
+        short = 'q',
+        type = 'boolean',
+        group = 'debug',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'verbosity_level', '0', opt_name})
+        end
+    },
+    {
+        desc = 'Print additional information (e.g., viewer command).',
+        long = 'verbose',
+        short = 'v',
+        type = 'boolean',
+        group = 'debug',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'verbosity_level', '3', opt_name})
+        end
+    },
+    -- debug
+    {
+        desc = 'Activate all debug output (equal to "--debug=all").',
+        short = 'D',
+        type = 'boolean',
+        group = 'debug',
+        action = function(cl_config, opt_name)
+            table.insert(cl_config, {'debug_list', 'all', opt_name})
+        end
+    },
+    {
+        desc = 'Activate debug output restricted to LIST.',
+        long = 'debug',
+        short = 'd',
+        metavar = 'LIST',
+        type = 'string',
+        complete = 'debugs',
+        group = 'debug',
+        action = function(cl_config, opt_name, val)
+            if val == true then val = 'all' end
+            table.insert(cl_config, {'debug_list', val, opt_name})
+        end
+    },
+    -- config
+    {
+        desc = 'Set configuration item NAME to VALUE.',
+        short = 'c',
+        metavar = 'NAME=VALUE',
+        type = 'string',
+        complete = 'options',
+        group = 'debug',
+        action = function(cl_config, opt_name, val)
+            table.insert(cl_config, {val, nil, opt_name})
+        end
+    },
+}
 
 copyright_msg = [[
 Copyright 2008-2022 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
