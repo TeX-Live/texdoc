@@ -143,7 +143,119 @@ end
 
 -- print a usage message
 function M.print_usage()
-    print(C.usage_msg)
+    local groups = {
+        action = {},
+        mode = {},
+        interaction = {},
+        debug = {},
+    }
+    for _, opt in ipairs(C.options) do
+        local line = ''
+        local shortopt = ''
+        local longopt = ''
+        if opt['short'] then
+            if opt['short'] == 'D' then
+                opt['long'] = 'debug'
+            end
+            if opt['metavar'] then
+                shortopt = '-' .. opt['short'] .. ' ' .. opt['metavar']
+            else
+                shortopt = '-' .. opt['short']
+            end
+        end
+        if opt['long'] then
+            if opt['metavar'] then
+                local sep = '='
+                if opt['group'] == 'action' then
+                    sep = ' '
+                end
+                longopt = '--' .. opt['long'] .. sep .. opt['metavar']
+            else
+                longopt = '--' .. opt['long']
+            end
+        end
+        if #shortopt > 0 and #longopt > 0 then
+            line = '  ' .. shortopt .. ', ' .. longopt
+        elseif #shortopt > 0 then
+            line = '  ' .. shortopt
+        elseif #longopt > 0 then
+            line = '  ' .. longopt
+        end
+        if #line > 20 then
+            line = line .. "\n"
+        end
+        for _ = 1, 20 - #string.gsub(line, ".*\n", '') do
+            line = line .. ' '
+        end
+        line = line .. opt['desc']
+        table.insert(groups[opt['group']], line)
+    end
+    local usage_msg = C.usage_msg
+    for k, v in pairs(groups) do
+        usage_msg = string.gsub(usage_msg, '{{' .. k .. '}}', table.concat(v, "\n"))
+    end
+    print(usage_msg)
+end
+
+function M.print_zsh_completion()
+    local groups = {
+        action = {},
+        mode = {},
+        interaction = {},
+        debug = {},
+    }
+    local option = ''
+    local complete = ''
+    local choices = {}
+    local prefix = ''
+    for _, opt in ipairs(C.options) do
+        local stop_completions = {opt['group']}
+        if opt['group'] == 'action' then
+            stop_completions = {'-', ':', '*'}
+        end
+        prefix = '"(' .. table.concat(stop_completions, ' ') .. ')"'
+        if opt['short'] and opt['long'] then
+            if opt['long'] == 'debug' then
+                option = '{-' .. opt['short'] .. ',--' .. opt['long'] .. '=-}'
+            else
+                option = '{-' .. opt['short'] .. ',--' .. opt['long'] .. '}'
+            end
+        elseif opt['short'] then
+            option = '-' .. opt['short']
+        elseif opt['long'] then
+            option = '--' .. opt['long']
+        end
+        option = prefix .. option .. '"[' .. opt['desc'] .. ']'
+        if opt['type'] == 'string' then
+            if opt['complete'] == 'options' then
+                choices = {}
+                for _, v in pairs(C.known_options) do
+                    v = string.gsub(v, '%.%*', '')
+                    table.insert(choices, v)
+                end
+            elseif opt['complete'] == 'debugs' then
+                choices = {}
+                for i, _ in pairs(C.known_debugs) do
+                    table.insert(choices, i)
+                end
+            elseif type(opt['complete']) == 'table' then
+                choices = opt['complete']
+            end
+            complete = '(' .. table.concat(choices, ' ') .. ')'
+            if opt['complete'] == 'files' then
+                opt['metavar'] = ' '
+                complete = '_files'
+            end
+            option = option .. ':' .. string.lower(opt['metavar']) .. ':' .. complete
+        end
+        option = option .. '"'
+        table.insert(groups[opt['group']], option)
+    end
+    local completion = C.zsh_completion
+    for k, v in pairs(groups) do
+        completion = string.gsub(completion, '{{' .. k .. '}}', table.concat(v, "\n    "))
+    end
+    print(completion)
 end
 
 return M

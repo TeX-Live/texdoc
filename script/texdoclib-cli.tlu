@@ -81,14 +81,17 @@ end
 
 local function parse_options()
     local curr_arg
+    local option
     local cl_config = {}
 
-    local function insert_cl_config(key, val, opt_name)
-        table.insert(cl_config, {key, val, opt_name})
-    end
-
     -- actual parsing
-    opts = getopt(arg, 'cd')
+    local optstring = ''
+    for _, o in pairs(C.options) do
+        if o['type'] == 'string' and o['short'] then
+            optstring = optstring .. o['short']
+        end
+    end
+    local opts = getopt(arg, optstring)
 
     for _, tp in ipairs(opts) do
         local k, v = tp[1], tp[2]
@@ -98,52 +101,28 @@ local function parse_options()
             curr_arg = '--' .. k
         end
 
-        -- action
-        if (curr_arg == '-h') or (curr_arg == '--help') then
-            return true, 'help', cl_config
-        elseif (curr_arg == '-V') or (curr_arg == '--version') then
-            return true, 'version', cl_config
-        elseif (curr_arg == '-f') or (curr_arg == '--files') then
-            return true, 'files', cl_config
-        elseif curr_arg == '--just-view' then
-            return true, 'view', cl_config
+        for i, o in ipairs(C.options) do
+            if k == o["short"] or k == o["long"] then
+                k = i
+                break
+            end
+        end
 
-        -- mode
-        elseif (curr_arg == '-w') or (curr_arg == '--view') then
-            insert_cl_config('mode', 'view', curr_arg)
-        elseif (curr_arg == '-m') or (curr_arg == '--mixed') then
-            insert_cl_config('mode', 'mixed', curr_arg)
-        elseif (curr_arg == '-l') or (curr_arg == '--list') then
-            insert_cl_config('mode', 'list', curr_arg)
-        elseif (curr_arg == '-s') or (curr_arg == '--showall') then
-            insert_cl_config('mode', 'showall', curr_arg)
-
-        -- interaction
-        elseif (curr_arg == '-I') or (curr_arg == '--nointeract') then
-            insert_cl_config('interact_switch', 'false', curr_arg)
-        elseif (curr_arg == '-i') or (curr_arg == '--interact') then
-            insert_cl_config('interact_switch', 'true', curr_arg)
-
-        -- output format
-        elseif (curr_arg == '-M') or (curr_arg == '--machine') then
-            insert_cl_config('machine_switch', 'true', curr_arg)
-
-        -- config
-        elseif curr_arg == '-c' then
-            insert_cl_config(v, nil, curr_arg)
-
-        -- debug
-        elseif (curr_arg == '-d') or (curr_arg == '--debug') then
-            if v == true then v = 'all' end
-            insert_cl_config('debug_list', v, curr_arg)
-        elseif curr_arg == '-D' then
-            insert_cl_config('debug_list', 'all', curr_arg)
-
-        -- verbosity
-        elseif (curr_arg == '-q') or (curr_arg == '--quiet') then
-            insert_cl_config('verbosity_level', C.min_verbosity, curr_arg)
-        elseif (curr_arg == '-v') or (curr_arg == '--verbose') then
-            insert_cl_config('verbosity_level', C.max_verbosity, curr_arg)
+        option = C.options[k]
+        if option['group'] == 'action' then
+            if option['long'] == 'just-view' then
+                return true, 'view', cl_config
+            elseif option['long'] == 'print-completion' then
+                return true, 'complete', cl_config
+            else
+                return true, option['long'], cl_config
+            end
+        elseif option['group'] then
+            if option['type'] == 'boolean' then
+                option['action'](cl_config, curr_arg)
+            elseif option['type'] == 'string' then
+                option['action'](cl_config, curr_arg, v)
+            end
 
         -- having trouble
         else
@@ -180,6 +159,18 @@ local function do_action(action)
         end
         texdoc.view.view_file(arg[1])
         os.exit(C.exit_ok)
+    elseif action == 'complete' then
+        if not arg[1] then
+            err_print('error', 'Missing shell operand to --print-completion.')
+            err_print('error', C.error_msg)
+            os.exit(C.exit_usage)
+        elseif arg[1] == 'zsh' then
+            texdoc.util.print_zsh_completion()
+            os.exit(C.exit_ok)
+        else
+            err_print('error', arg[1] .. ' is not supported currently!')
+            os.exit(C.exit_error)
+        end
     end
 end
 

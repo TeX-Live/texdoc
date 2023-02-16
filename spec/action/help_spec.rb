@@ -33,6 +33,8 @@ RSpec.describe 'The "help" action', :type => :aruba do
         -V, --version     Print the version number.
         -f, --files       Print the list of configuration files used.
         --just-view FILE  Display FILE, given with full path (no searching).
+        --print-completion SHELL
+                          Print SHELL completion.
 
       Full manual available via `texdoc texdoc'.
 

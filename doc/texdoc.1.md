@@ -51,6 +51,8 @@ Alternatively, perform the given ACTION and exit.
   Print the list of configuration files used.
 * `--just-view` FILE:
   Display FILE, given with full path (no searching).
+* `--print-completion` SHELL:
+  Print SHELL completion.
 
 ## ENVIRONMENT
 
