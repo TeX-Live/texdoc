@@ -151,17 +151,17 @@ but rather intended to be used from another program, like a GUI front-end to
 Texdoc.
 \end{clopt}
 
-\begin{clopt}{\code{\lopt{print-completion}=\meta{SHELL}}}
+\begin{clopt}{\code{\lopt{print-completion} \meta{shell}}}
 Print |«SHELL»| completion. Now it only supports zsh. (A pull request is welcome!)
 
 Zsh users must \verb|autoload -Uz compinit && compinit| in \verb|~/.zshrc| to enable completion. Then users have two methods to install completion scripts:
 
 \begin{itemize}
-  \item Users can add \verb|eval "$(texdoc completion zsh)"| to \verb|~/.zshrc|.
+  \item Users can add \verb|eval "$(texdoc --print-completion zsh)"| to \verb|~/.zshrc|.
   \item Users can add the following file (also provided by \href{https://github.com/zsh-users/zsh-completions}{zsh-completions}) to \\\verb|/usr/share/zsh/site-functions/_texdoc|:
 \begin{verbatim}
 #compdef texdoc
-(( $+functions[__texdoc] )) || eval "$(texdoc complete zsh)" &&
+(( $+functions[__texdoc] )) || eval "$(texdoc --print-completion zsh)" &&
   __texdoc
 \end{verbatim}
     Then \verb|grep texdoc ~/.zcompdump| to confirm:
