@@ -29,6 +29,25 @@ RSpec.describe "Errors", :type => :aruba do
     end
   end
 
+  context 'execute action the "print completion" without an argument' do
+    before(:each) { run_texdoc "--print-completion" }
+
+    it 'result in the "missing shell operand" error' do
+      expect(last_command_started).to have_exit_status(2)
+      expect(stderr).to include(error_line "Missing shell operand to --print-completion.")
+      expect(stderr).to include(error_line msg_usage)
+    end
+  end
+
+  context 'execute action the "print completion" with unsupported shell' do
+    before(:each) { run_texdoc "--print-completion unrealistic-sh" }
+
+    it 'result in the "missing shell operand" error' do
+      expect(last_command_started).to have_exit_status(1)
+      expect(stderr).to include(error_line "unrealistic-sh is not supported currently!")
+    end
+  end
+
   context "missing arguments for Option -d" do
     before(:each) { run_texdoc "-d" }
 
