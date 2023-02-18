@@ -130,7 +130,6 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-
   if not OS.windows?
     context "PSVIEWER" do
       before(:each) { delete_environment_variable "PSVIEWER_texdoc" }
@@ -188,11 +187,13 @@ RSpec.describe "Environment variable", :type => :aruba do
 
   # check if texdoc works when an environment variable contains colon
   # https://github.com/TeX-Live/texdoc/issues/48
-  context "FIRST_OCCURRENCE_IN_COMMA_SEPARATED_VARIABLE" do
-    before(:each) { set_environment_variable "BROWSER_texdoc", "#{mock_viewer}:should-be-truncated" }
+  context "comma-separated list for BROWSER" do
+    before(:each) {
+      set_environment_variable "BROWSER_texdoc", "#{mock_viewer}:should-be-truncated"
+    }
     before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-    it "should be picked" do
+    it "should pick the first occurrence" do
       expect(stderr).to include(set_env_line "viewer_html=#{mock_viewer}", "BROWSER_texdoc")
     end
   end
