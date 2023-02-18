@@ -252,6 +252,9 @@ task :save_output => [PS_TEXDOC_LINK, PS_TEXDOC_CNF_LINK, OUTPUT_DIR] do
     sh "texlua #{TEXDOC_TLU} -qlM #{q} >> #{@output_file}"
     file_puts
   end
+
+  # replace year to XXXX
+  sh "sed -i '' -E 's/\\\/20[0-9][0-9]\\\//\\\/XXXX\\\//' #{@output_file}"
 end
 
 desc "Check aliases are alive"
