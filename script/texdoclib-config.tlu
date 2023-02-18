@@ -263,8 +263,8 @@ local function read_config_file(configfile)
 
         -- try to interpret the line
         local ok = string.match(line, '^%s*$')
-            or confline_to_alias(line, configfile, lineno)
-            or confline_to_score(line, configfile, lineno)
+            or confline_to_alias(line)
+            or confline_to_score(line)
             or confline_to_config(line, configfile, lineno)
 
         -- complain if it failed

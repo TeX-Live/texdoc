@@ -90,7 +90,7 @@ function M.get_patterns(name, no_alias)
 end
 
 -- interpret a confline as an alias setting or return false
-function M.confline_to_alias(line, file, pos)
+function M.confline_to_alias(line)
     -- alias directive without score
     local key, val = string.match(line, '^alias%s+([%w%p]+)%s*=%s*(.+)')
     if key and val then

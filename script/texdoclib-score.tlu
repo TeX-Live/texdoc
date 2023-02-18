@@ -30,7 +30,7 @@ local function set_score_table(tab, key, val)
 end
 
 -- interpret a confline as a score directive or return false
-function M.confline_to_score(line, file, pos)
+function M.confline_to_score(line)
     local keyw, pat, val
     -- try global adjscore
     pat, val = string.match(line, '^adjscore%s+([%w%p]+)%s*=%s*([%d+-.]+)')
