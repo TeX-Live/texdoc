@@ -15,15 +15,13 @@ RSpec.describe "Environment variable", :type => :aruba do
 
   let(:mock_viewer) { SpecHelplers::Texdoc::MOCK_VIEWER }
 
-  if not OS.windows?
-    context "BROWSER" do
-      before(:each) { delete_environment_variable "BROWSER_texdoc" }
-      before(:each) { set_environment_variable "BROWSER", mock_viewer }
-      before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "BROWSER" do
+    before(:each) { delete_environment_variable "BROWSER_texdoc" }
+    before(:each) { set_environment_variable "BROWSER", mock_viewer }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(set_env_line "viewer_html=#{mock_viewer}", "BROWSER")
-      end
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "viewer_html=#{mock_viewer}", "BROWSER")
     end
   end
 
@@ -38,15 +36,13 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if not OS.windows?
-    context "DVIVIEWER" do
-      before(:each) { delete_environment_variable "DVIVIEWER_texdoc" }
-      before(:each) { set_environment_variable "DVIVIEWER", mock_viewer }
-      before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "DVIVIEWER" do
+    before(:each) { delete_environment_variable "DVIVIEWER_texdoc" }
+    before(:each) { set_environment_variable "DVIVIEWER", mock_viewer }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(set_env_line "viewer_dvi=#{mock_viewer}", "DVIVIEWER")
-      end
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "viewer_dvi=#{mock_viewer}", "DVIVIEWER")
     end
   end
 
@@ -61,15 +57,13 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if not OS.windows?
-    context "MDVIEWER" do
-      before(:each) { delete_environment_variable "MDVIEWER_texdoc" }
-      before(:each) { set_environment_variable "MDVIEWER", mock_viewer }
-      before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "MDVIEWER" do
+    before(:each) { delete_environment_variable "MDVIEWER_texdoc" }
+    before(:each) { set_environment_variable "MDVIEWER", mock_viewer }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(set_env_line "viewer_md=#{mock_viewer}", "MDVIEWER")
-      end
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "viewer_md=#{mock_viewer}", "MDVIEWER")
     end
   end
 
@@ -84,15 +78,13 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if not OS.windows?
-    context "PAGER" do
-      before(:each) { delete_environment_variable "PAGER_texdoc" }
-      before(:each) { set_environment_variable "PAGER", mock_viewer }
-      before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "PAGER" do
+    before(:each) { delete_environment_variable "PAGER_texdoc" }
+    before(:each) { set_environment_variable "PAGER", mock_viewer }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(set_env_line "viewer_txt=#{mock_viewer}", "PAGER")
-      end
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "viewer_txt=#{mock_viewer}", "PAGER")
     end
   end
 
@@ -107,15 +99,13 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if not OS.windows?
-    context "PDFVIEWER" do
-      before(:each) { delete_environment_variable "PDFVIEWER_texdoc" }
-      before(:each) { set_environment_variable "PDFVIEWER", mock_viewer }
-      before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "PDFVIEWER" do
+    before(:each) { delete_environment_variable "PDFVIEWER_texdoc" }
+    before(:each) { set_environment_variable "PDFVIEWER", mock_viewer }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(set_env_line "viewer_pdf=#{mock_viewer}", "PDFVIEWER")
-      end
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "viewer_pdf=#{mock_viewer}", "PDFVIEWER")
     end
   end
 
@@ -130,15 +120,13 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if not OS.windows?
-    context "PSVIEWER" do
-      before(:each) { delete_environment_variable "PSVIEWER_texdoc" }
-      before(:each) { set_environment_variable "PSVIEWER", mock_viewer }
-      before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "PSVIEWER" do
+    before(:each) { delete_environment_variable "PSVIEWER_texdoc" }
+    before(:each) { set_environment_variable "PSVIEWER", mock_viewer }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(set_env_line "viewer_ps=#{mock_viewer}", "PSVIEWER")
-      end
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "viewer_ps=#{mock_viewer}", "PSVIEWER")
     end
   end
 
@@ -152,10 +140,6 @@ RSpec.describe "Environment variable", :type => :aruba do
       expect(stderr).to include(ignore_env_line "viewer_ps=#{mock_viewer}", "PSVIEWER")
     end
   end
-
-  # NOTE: We skip some examples on Windows because Aruba has a bug with
-  #       the "delete_environment_variable" method on the platform.
-  #       cf. https://github.com/cucumber/aruba/issues/349
 
   context "TEXDOCS" do
     before(:each) { set_environment_variable "TEXDOCS", "test1,!!test2//" }
