@@ -78,12 +78,12 @@ __texdoc() {
 
 options = {
     {
-        desc = 'description',
-        long = 'long name',
-        short = 'short name',
-        type = 'argument type'
-        group = 'same group will only complete once, that is `texdoc --interact <TAB>` will not complete `--nointeract`'
-        action = function to be called
+        desc = <string> description,
+        long = <string> long option name,
+        short = <string> short option name,
+        type = <string> argument type (boolean|string),
+        group = <string> group of the option, -- also used for shell completion
+        action = <function> to be called
     },
     ...
 }
