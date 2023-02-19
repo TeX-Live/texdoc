@@ -36,6 +36,19 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
+  # check if texdoc works when an environment variable contains colon
+  # https://github.com/TeX-Live/texdoc/issues/48
+  context "comma-separated list for BROWSER" do
+    before(:each) {
+      set_environment_variable "BROWSER_texdoc", "#{mock_viewer}:should-be-truncated"
+    }
+    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+
+    it "should pick the first occurrence" do
+      expect(stderr).to include(set_env_line "viewer_html=#{mock_viewer}", "BROWSER_texdoc")
+    end
+  end
+
   context "DVIVIEWER" do
     before(:each) { delete_environment_variable "DVIVIEWER_texdoc" }
     before(:each) { set_environment_variable "DVIVIEWER", mock_viewer }
@@ -155,30 +168,50 @@ RSpec.describe "Environment variable", :type => :aruba do
     end
   end
 
-  if OS.mac?
-    context "LC_ALL" do
-      before(:each) { set_environment_variable "LC_ALL", "ja_JP.UTF-8" }
-      before(:each) { run_texdoc "-dconfig", "texlive-en" }
+  context "LANGUAGE_texdoc" do
+    before(:each) { set_environment_variable "LANGUAGE_texdoc", "ja" }
+    before(:each) { set_environment_variable "LANGUAGE", "en" }
+    before(:each) { set_environment_variable "LC_ALL", "en" }
+    before(:each) { set_environment_variable "LANG", "en" }
+    before(:each) { run_texdoc "-dconfig", "texlive-en" }
 
-      it "should be effective" do
-        expect(stderr).to include(
-          debug_line "config", 'Setting "lang=ja" from operating system locale.')
-      end
+    it "should be effective and given priority to anything else" do
+      expect(stderr).to include(set_env_line "lang=ja", "LANGUAGE_texdoc")
+      expect(stderr).to include(ignore_env_line "lang=en", "LANGUAGE")
+      expect(stderr).to include(ignore_env_line "lang=en", "LC_ALL")
+      expect(stderr).to include(ignore_env_line "lang=en", "LANG")
     end
-  else
-    # TODO: test as well on Windows and Linux
   end
 
-  # check if texdoc works when an environment variable contains colon
-  # https://github.com/TeX-Live/texdoc/issues/48
-  context "comma-separated list for BROWSER" do
-    before(:each) {
-      set_environment_variable "BROWSER_texdoc", "#{mock_viewer}:should-be-truncated"
-    }
-    before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }
+  context "LANGUAGE" do
+    before(:each) { set_environment_variable "LANGUAGE", "fr" }
+    before(:each) { set_environment_variable "LC_ALL", "en" }
+    before(:each) { set_environment_variable "LANG", "en" }
+    before(:each) { run_texdoc "-dconfig", "texlive-en" }
 
-    it "should pick the first occurrence" do
-      expect(stderr).to include(set_env_line "viewer_html=#{mock_viewer}", "BROWSER_texdoc")
+    it "should be effective and given priority to anything but LANGUAGE_texdoc" do
+      expect(stderr).to include(set_env_line "lang=fr", "LANGUAGE")
+      expect(stderr).to include(ignore_env_line "lang=en", "LC_ALL")
+      expect(stderr).to include(ignore_env_line "lang=en", "LANG")
+    end
+  end
+
+  context "LC_ALL" do
+    before(:each) { set_environment_variable "LC_ALL", "ja_JP.UTF-8" }
+    before(:each) { run_texdoc "-dconfig", "texlive-en" }
+
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "lang=ja", "LC_ALL")
+    end
+  end
+
+  context "LANG" do
+    before(:each) { set_environment_variable "LC_ALL", "Japanese_Japan.932" }
+    before(:each) { set_environment_variable "LANG", "en_US.UTF-8" }
+    before(:each) { run_texdoc "-dconfig", "texlive-en" }
+
+    it "should be effective" do
+      expect(stderr).to include(set_env_line "lang=en", "LANG")
     end
   end
 end

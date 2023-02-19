@@ -169,6 +169,21 @@ local function set_config_list(conf, context)
     end
 end
 
+-- treat locale strings
+local function parse_locale(lc_str)
+    local lang
+
+    if lc_str == 'C' then -- the default C locale is en
+        lang = 'en'
+    elseif lc_str:match('^[a-z][a-z]$') then -- the simplest
+        lang = lc_str
+    elseif lc_str:match('^[a-z][a-z]_') then -- such as 'en_US'
+        lang = lc_str:sub(1, 2)
+    end
+
+    return lang
+end
+
 ------------------------   config from command-line   ------------------------
 
 -- set config from the command-line
@@ -196,26 +211,45 @@ end
 
 -- set config from environment if available
 local function setup_config_from_env()
-    local function set_config_elt_from_vars(key, vars)
+    -- lang
+    local lc_env_vars = {'LANGUAGE_texdoc', 'LANGUAGE', 'LC_ALL', 'LANG'}
+
+    for _, var in ipairs(lc_env_vars) do
+        local value = os.getenv(var)
+
+        if type(value) == 'string' then
+            local lang = parse_locale(value)
+            if lang then
+                set_config_element('lang', lang, {src='env', name=var})
+            end
+        end
+    end
+
+    -- viewers
+    local function set_config_viewer_from_vars(key, vars)
         for _, var in ipairs(vars) do
             local value = os.getenv(var)
+
+            -- support colon-separated list
             value = value and string.gmatch(value, '([^:]+)')()
+
             if value then
                 set_config_element(key, value, {src='env', name=var})
             end
         end
     end
-    set_config_elt_from_vars('viewer_pdf',
+
+    set_config_viewer_from_vars('viewer_pdf',
       {'PDFVIEWER_texdoc', 'PDFVIEWER', 'TEXDOCVIEW_pdf', 'TEXDOC_VIEWER_PDF'})
-    set_config_elt_from_vars('viewer_ps',
+    set_config_viewer_from_vars('viewer_ps',
       {'PSVIEWER_texdoc', 'PSVIEWER', 'TEXDOCVIEW_ps', 'TEXDOC_VIEWER_PS'})
-    set_config_elt_from_vars('viewer_dvi',
+    set_config_viewer_from_vars('viewer_dvi',
       {'DVIVIEWER_texdoc', 'DVIVIEWER', 'TEXDOCVIEW_dvi', 'TEXDOC_VIEWER_DVI'})
-    set_config_elt_from_vars('viewer_html',
+    set_config_viewer_from_vars('viewer_html',
       {'BROWSER_texdoc', 'BROWSER', 'TEXDOCVIEW_html', 'TEXDOC_VIEWER_HTML'})
-    set_config_elt_from_vars('viewer_md',
+    set_config_viewer_from_vars('viewer_md',
       {'MDVIEWER_texdoc', 'MDVIEWER', 'TEXDOCVIEW_md', 'TEXDOC_VIEWER_MD'})
-    set_config_elt_from_vars('viewer_txt',
+    set_config_viewer_from_vars('viewer_txt',
       {'PAGER_texdoc', 'PAGER', 'TEXDOCVIEW_txt', 'TEXDOC_VIEWER_TXT'})
 end
 
@@ -372,21 +406,21 @@ end -- end scope of config_files
 ----------------------   config from locale settings   -------------------------
 
 -- set up the locale from the system setting
--- Note that luatex set the locale to a neutral value for a reason, so we need
--- to set the locale (for the category 'all') to nil to ignore it.
+-- Note: luatex set the locale to a neutral value for a reason, so we need
+--       to set the locale (for the category 'all') to nil to ignore it.
 local function setup_config_from_locale()
     local current, native, lang
+
     current = os.setlocale(nil, 'all')  -- save the default value
     os.setlocale('', 'all')             -- set it to nil temporary
     native = os.setlocale(nil, 'all')   -- get the actual system locale
     os.setlocale(current, 'all')        -- put back the default value
-    if native == 'C' then -- the default C locale is en
-        lang = 'en'
-    else
-        lang = string.match(native, '^[a-z][a-z]')
-    end
-    if lang then
-        set_config_element('lang', lang, {src='loc'})
+
+    if type(native) == 'string' then
+        lang = parse_locale(native)
+        if lang then
+            set_config_element('lang', lang, {src='loc'})
+        end
     end
 end
 
@@ -574,7 +608,6 @@ end
 
 -- populate the config and alias arrays
 function M.setup_config_and_alias(cl_config)
-
     -- setup config from all sources
     setup_config_from_cl(cl_config)
     setup_config_from_env()

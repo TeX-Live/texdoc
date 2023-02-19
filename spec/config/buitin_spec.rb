@@ -1,13 +1,13 @@
 require 'os'
 require 'spec_helper'
 
-RSpec.describe "General configuration", :type => :aruba do
+RSpec.describe "The build-in config", :type => :aruba do
   include_context "messages"
 
-  context "the default behavior" do
+  context "if no other sources of config is set" do
     before(:each) { run_texdoc "-D", "texlive-en" }
 
-    it "most items should be set from built-in defaults" do
+    it "config items should be set to the default values" do
       defaults = [
         "badext_list=txt, dat, ",
         "mode=view",
@@ -31,10 +31,7 @@ RSpec.describe "General configuration", :type => :aruba do
     end
 
     if not OS.windows?
-      it 'item "lang" should be set from the OS locale (except Windows)' do
-        expect(stderr).to include(
-          debug_line "config", "Setting \"lang=en\" from operating system locale.")
-      end
+      # nothing: just to prevent a bug on windows
     end
   end
 end
