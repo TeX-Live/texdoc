@@ -317,21 +317,34 @@ task :bump_version do
   release_date = Date.today.strftime('%Y-%m-%d')
 
   # version
-  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./spec/support/shared_contexts/version_context.rb"
-  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./script/texdoclib-const.tlu"
-  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./doc/texdoc.tex"
-  sh "sed -i '' 's/#{old_version}/#{new_version}/' ./Rakefile"
+  [
+    "./spec/support/shared_contexts/version_context.rb",
+    "./script/texdoclib-const.tlu",
+    "./doc/texdoc.tex",
+    "./Rakefile"
+  ].each do |file|
+    sh "sed -i '' 's/#{old_version}/#{new_version}/' #{file}"
+  end
 
   # copyright year
-  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./spec/action/version_spec.rb"
-  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./script/texdoclib-const.tlu"
-  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./script/texdoclib.tlu"
-  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./doc/texdoc.1.md"
-  sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' ./doc/texdoc.tex"
+  [
+    "./spec/action/version_spec.rb",
+    "./script/texdoclib-const.tlu",
+    "./script/texdoclib.tlu",
+    "./doc/texdoc.1.md",
+    "./doc/texdoc.tex",
+    "./README.md"
+  ].each do |file|
+    sh "sed -i '' -E 's/-20[0-9][0-9]/-#{this_year}/' #{file}"
+  end
 
   # release date
-  sh "sed -i '' -E 's/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/#{release_date}/' ./spec/support/shared_contexts/version_context.rb"
-  sh "sed -i '' -E 's/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/#{release_date}/' ./script/texdoclib-const.tlu"
+  [
+    "./spec/support/shared_contexts/version_context.rb",
+    "./script/texdoclib-const.tlu"
+  ].each do |file|
+    sh "sed -i '' -E 's/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/#{release_date}/' #{file}"
+  end
 
   exit 0
 end
