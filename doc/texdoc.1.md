@@ -73,8 +73,8 @@ The following environment variables can be split by colon and used to set viewer
 
 The following environment variables are also used:
 
-* `LANG`, `LC_ALL` and so on:
-  Set the locale (which will influence on the search results).
+* `LANG`, `LC_ALL`, `LANGUAGE`, `LANGUAGE_texdoc`:
+  Set the locale, which will influence on the search results.
 * `TEXDOCS`:
   In addition to the documents included in the TeX Live database, Texdoc also
   searches documentation under TEXMF trees specified by the kpathsea variable
