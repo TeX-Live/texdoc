@@ -22,8 +22,8 @@ end
 -- progname and version
 fullname = kpse.find_file('texdoc/texdoclib', 'lua')
 progname = 'Texdoc'
-version = '3.4.1'
-release_date = '2022-03-19'
+version = '4.0'
+release_date = '2023-02-20'
 
 -- make sure to update setup_config_from_cl() accordingly
 -- and set a default value in setup_config_from_defaults() if relevant
@@ -260,7 +260,7 @@ options = {
 }
 
 copyright_msg = [[
-Copyright 2008-2022 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
+Copyright 2008-2023 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
 License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.]]
 

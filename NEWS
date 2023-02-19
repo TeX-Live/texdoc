@@ -2,6 +2,22 @@ NEWS for texdoc
 ===============
 (This file public domain.)
 
+Version 4.0 (TeX Live 2023)
+===========================
+Released on 2023-02-20
+
+Major changes
+- Online search feature is added:
+  users using TL without documentation will be sent to texdoc.org
+- Add new action --print-completion:
+  for the moment, only zsh is supported. Contributions welcome.
+
+Minor fixes and tweaks
+- Reflect environment variables (e.g., LANGUAGE, LC_ALL, and LANG) before checking system locale
+- Line continuation with tailing backslashes in config files
+- Scoring adjustments
+- Documentation tweaks
+
 Version 3.4.1
 -------------
 - Bug fix: give locale bonus only if "lang" is set
