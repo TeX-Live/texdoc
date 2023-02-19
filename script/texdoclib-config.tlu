@@ -173,9 +173,7 @@ end
 local function parse_locale(lc_str)
     local lang
 
-    if lc_str == 'C' then -- the default C locale is en
-        lang = 'en'
-    elseif lc_str:match('^[a-z][a-z]$') then -- the simplest
+    if lc_str:match('^[a-z][a-z]$') then -- the simplest
         lang = lc_str
     elseif lc_str:match('^[a-z][a-z]_') then -- such as 'en_US'
         lang = lc_str:sub(1, 2)
