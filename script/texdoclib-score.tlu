@@ -223,6 +223,9 @@ local function set_score(df, original_kw)
         if config_lang == file_lang then
             score = score + 1
             dbg_score('Locale match bonus: +1.0')
+        elseif file_lang ~= nil then
+            score = score - 0.1
+            dbg_score('Locale unmatch: -0.1')
         end
     end
 
