@@ -1,4 +1,3 @@
-require 'os'
 require 'spec_helper'
 
 RSpec.describe "Environment variable", :type => :aruba do

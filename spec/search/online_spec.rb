@@ -5,12 +5,14 @@ RSpec.describe "Online searches", :type => :aruba do
   include_context "messages"
 
   context "with no local docs" do
+    let(:no_docs_tlpdb) { Pathname.pwd / "spec/support/no_docs.tlpdb" }
+
     before(:each) { set_environment_variable "TEXDOC_NO_LOCAL_DOCS", "true" }
     before(:each) { set_environment_variable "TEXDOCS", "{}" }
     before(:each) {
       run_texdoc \
         "-dtlpdb",
-        "-c texlive_tlpdb=" + Pathname.pwd.to_s + "/spec/support/no-docs.tlpdb",
+        "-c texlive_tlpdb=#{no_docs_tlpdb}",
         "lua-widow-control"
     }
 

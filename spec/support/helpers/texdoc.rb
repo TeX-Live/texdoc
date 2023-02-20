@@ -6,8 +6,8 @@ module SpecHelplers
   module Texdoc
     # constants
     PWD = Pathname.pwd
-    TEXDOC_SCRIPT_DIR = PWD + "script"
-    TEXDOC_TLU = TEXDOC_SCRIPT_DIR + "texdoc.tlu"
+    TEXDOC_SCRIPT_DIR = PWD / "script"
+    TEXDOC_TLU = TEXDOC_SCRIPT_DIR / "texdoc.tlu"
 
     PATH = ENV["PATH"]
     TEXMFHOME = ENV["TEXMFHOME"]

@@ -170,6 +170,14 @@ task :test =>
     ""
   end
 
+  # use controlled environment
+  if not ENV["GITHUB_ACTIONS"]
+    env_path = ENV["PATH"]
+    ENV.clear
+    ENV["PATH"] = env_path
+  end
+  ENV["TEXMFHOME"] = PS_TEXMF.to_s
+
   # run rspec
   sh "bundle exec rspec" + opt_args + opt_files
 

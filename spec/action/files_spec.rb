@@ -27,13 +27,13 @@ RSpec.describe 'The "files" action', :type => :aruba do
 
   context "the output" do
     # known files
-    let(:texdoclib) { texmf_home + "scripts/texdoc/texdoclib.tlu" }
+    let(:texdoclib) { texmf_home / "scripts/texdoc/texdoclib.tlu" }
 
-    let(:dist_texdoc_dist_cnf) { texmf_dist + "texdoc/texdoc-dist.cnf" }
-    let(:dist_texdoc_cnf) { texmf_dist + "texdoc/texdoc.cnf" }
+    let(:dist_texdoc_dist_cnf) { texmf_dist / "texdoc/texdoc-dist.cnf" }
+    let(:dist_texdoc_cnf) { texmf_dist / "texdoc/texdoc.cnf" }
 
-    let(:home_texdoc_dist_cnf) { texmf_home + "texdoc/texdoc-dist.cnf" }
-    let(:home_texdoc_cnf) { texmf_home + "texdoc/texdoc.cnf" }
+    let(:home_texdoc_dist_cnf) { texmf_home / "texdoc/texdoc-dist.cnf" }
+    let(:home_texdoc_cnf) { texmf_home / "texdoc/texdoc.cnf" }
 
     # message
     let(:version_info) { "#{normalize_path(texdoclib)} #{version}" }
