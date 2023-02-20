@@ -95,9 +95,11 @@ DUMMY_TEXDOC_CNFS = []
 end
 
 # options for ronn
-OPT_MAN = "--manual=\"Texdoc manual\""
-OPT_ORG = "--organization=\"Texdoc #{TEXDOC_VERSION}\""
-OPT_DATE = "--date=\"#{Time.now.strftime('%F')}\""
+RONN_OPTS = [
+  "--manual=\"Texdoc manual\"",
+  "--organization=\"Texdoc #{TEXDOC_VERSION}\"",
+  "--date=\"#{Time.now.strftime('%F')}\""
+].join(" ")
 
 # cleaning
 CLEAN.include(["doc/*", "tmp"])
@@ -296,13 +298,13 @@ desc "Generate all documentation"
 task :doc do
   cd "doc"
   sh "llmk -qs texdoc.tex"
-  sh "bundle exec ronn -r #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md 2> #{File::NULL}"
+  sh "bundle exec ronn -r #{RONN_OPTS} texdoc.1.md 2> #{File::NULL}"
 end
 
 desc "Preview the manpage"
 task :man do
   cd "doc"
-  sh "bundle exec ronn -m #{OPT_DATE} #{OPT_MAN} #{OPT_ORG} texdoc.1.md"
+  sh "bundle exec ronn -m #{RONN_OPTS} texdoc.1.md"
 end
 
 desc "Bump version"
