@@ -61,6 +61,18 @@ module SpecHelplers
       # stop the command automatically if not interactive execution
       stop_all_commands if !interactive
     end
+
+    # path utility
+    def normalize_path path
+      pathname = path.to_s
+
+      if OS.windows?
+        pathname[0] = pathname[0].downcase
+        return pathname.gsub("/", "\\")
+      else
+        return pathname
+      end
+    end
   end
 end
 

@@ -23,4 +23,35 @@ shared_context "messages" do
       return "texdoc debug-#{cat}: #{msg}"
     end
   end
+
+  # shorthands
+  def set_from_cl_line config, opt
+    debug_line "config",
+      "Setting \"#{config}\" from command-line option \"#{opt}\""
+  end
+
+  def ignore_from_cl_line config, opt
+    debug_line "config",
+      "Ignoring \"#{config}\" from command-line option \"#{opt}\""
+  end
+
+  def set_from_env_line config, env
+    debug_line "config",
+      "Setting \"#{config}\" from environment variable \"#{env}\""
+  end
+
+  def ignore_from_env_line config, env
+    debug_line "config",
+      "Ignoring \"#{config}\" from environment variable \"#{env}\""
+  end
+
+  def set_from_file_line config, file
+    debug_line "config",
+      "Setting \"#{config}\" in file \"#{normalize_path(file)}\""
+  end
+
+  def ignore_from_file_line config, file
+    debug_line "config",
+      "Ignoring \"#{config}\" in file \"#{normalize_path(file)}\""
+  end
 end

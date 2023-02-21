@@ -16,16 +16,4 @@ shared_context "texmf" do
       texmf_home / "doc/sample/sample.#{ext}"
     }
   end
-
-  # path utility
-  def normalize_path path
-    pathname = path.to_s
-
-    if OS.windows?
-      pathname[0] = pathname[0].downcase
-      return pathname.gsub("/", "\\")
-    else
-      return pathname
-    end
-  end
 end

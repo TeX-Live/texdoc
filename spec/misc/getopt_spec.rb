@@ -3,15 +3,6 @@ require 'spec_helper'
 RSpec.describe "The command-line option parser", :type => :aruba do
   include_context "messages"
 
-  def set_cmo_line(config, opt)
-    debug_line "config",
-      "Setting \"#{config}\" from command-line option \"#{opt}\"."
-  end
-  def ignore_cmo_line(config, opt)
-    debug_line "config",
-      "Ignoring \"#{config}\" from command-line option \"#{opt}\"."
-  end
-
   context "with an argument" do
     before(:each) { run_texdoc "texlive-en" }
 
@@ -23,7 +14,7 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it "should activate all debug categories" do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "debug_list=all", "-D")
+      expect(stderr).to include(set_from_cl_line "debug_list=all", "-D")
     end
   end
 
@@ -32,7 +23,7 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it "should activate all debug categories" do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "debug_list=all", "--debug")
+      expect(stderr).to include(set_from_cl_line "debug_list=all", "--debug")
     end
   end
 
@@ -41,7 +32,7 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it 'should activate only debug category "config"' do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "debug_list=config", "-d")
+      expect(stderr).to include(set_from_cl_line "debug_list=config", "-d")
     end
   end
 
@@ -50,7 +41,7 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it 'should activate only debug category "config"' do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "debug_list=config", "--debug")
+      expect(stderr).to include(set_from_cl_line "debug_list=config", "--debug")
     end
   end
 
@@ -59,10 +50,10 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it "all specified options should be effective" do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "debug_list=config", "-d")
-      expect(stderr).to include(set_cmo_line "mode=list", "-l")
-      expect(stderr).to include(set_cmo_line "interact_switch=false", "-I")
-      expect(stderr).to include(set_cmo_line "verbosity_level=3", "-v")
+      expect(stderr).to include(set_from_cl_line "debug_list=config", "-d")
+      expect(stderr).to include(set_from_cl_line "mode=list", "-l")
+      expect(stderr).to include(set_from_cl_line "interact_switch=false", "-I")
+      expect(stderr).to include(set_from_cl_line "verbosity_level=3", "-v")
     end
   end
 
@@ -71,10 +62,10 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it "only -w should be effective and others should not be" do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "mode=view", "-w")
-      expect(stderr).to include(ignore_cmo_line "mode=mixed", "-m")
-      expect(stderr).to include(ignore_cmo_line "mode=list", "-l")
-      expect(stderr).to include(ignore_cmo_line "mode=showall", "-s")
+      expect(stderr).to include(set_from_cl_line "mode=view", "-w")
+      expect(stderr).to include(ignore_from_cl_line "mode=mixed", "-m")
+      expect(stderr).to include(ignore_from_cl_line "mode=list", "-l")
+      expect(stderr).to include(ignore_from_cl_line "mode=showall", "-s")
     end
   end
 
@@ -83,9 +74,9 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it "-w and -M should be effective, and -d should not be" do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "debug_list=all", "-D")
-      expect(stderr).to include(set_cmo_line "machine_switch=true", "-M")
-      expect(stderr).to include(ignore_cmo_line "debug_list=config", "-d")
+      expect(stderr).to include(set_from_cl_line "debug_list=all", "-D")
+      expect(stderr).to include(set_from_cl_line "machine_switch=true", "-M")
+      expect(stderr).to include(ignore_from_cl_line "debug_list=config", "-d")
     end
   end
 
@@ -94,9 +85,9 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
     it "-c and -q should be effective, and -v should not be" do
       expect(last_command_started).to be_successfully_executed
-      expect(stderr).to include(set_cmo_line "fuzzy_level=0", "-c")
-      expect(stderr).to include(set_cmo_line "verbosity_level=0", "-q")
-      expect(stderr).to include(ignore_cmo_line "verbosity_level=3", "-v")
+      expect(stderr).to include(set_from_cl_line "fuzzy_level=0", "-c")
+      expect(stderr).to include(set_from_cl_line "verbosity_level=0", "-q")
+      expect(stderr).to include(ignore_from_cl_line "verbosity_level=3", "-v")
     end
   end
 
