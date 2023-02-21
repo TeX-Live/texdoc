@@ -48,6 +48,7 @@ function M.get_value(key) return config[key] end
 
 -- interpreting 'context' in this section
 local function context_to_string(context)
+    local w32_path = import_function('util', 'w32_path')
     if not context then return '(no context)' end
     if context.src == 'cl' then
         return 'from command-line option "' .. context.name .. '"'
@@ -56,7 +57,7 @@ local function context_to_string(context)
     elseif context.src == 'loc' then
         return 'from operating system locale'
     elseif context.src == 'file' then
-        return 'in file "' .. context.file .. '" on line ' .. context.line
+        return 'in file "' .. w32_path(context.file) .. '" on line ' .. context.line
     elseif context.src == 'def' then
         return 'from built-in defaults'
     else
@@ -266,6 +267,7 @@ end
 -- set config and aliases from a particular config file assumed to exist
 local function read_config_file(configfile)
     local err_print = import_function('util', 'err_print')
+    local w32_path = import_function('util', 'w32_path')
     local confline_to_alias = import_function('alias', 'confline_to_alias')
     local confline_to_score = import_function('score', 'confline_to_score')
 
@@ -302,7 +304,7 @@ local function read_config_file(configfile)
         -- complain if it failed
         if not ok then
             err_print('warning',
-                'syntax error in %s at line %d.', configfile, lineno)
+                'syntax error in %s at line %d.', w32_path(configfile), lineno)
         end
 
         ::continue::
