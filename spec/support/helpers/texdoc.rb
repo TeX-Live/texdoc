@@ -46,6 +46,7 @@ module SpecHelplers
 
       set_environment_variable "TEXMFHOME", PS_TEXMF.to_s
       set_environment_variable "TEXMFVAR", PS_TEXMF_VAR.to_s
+      # WARNING: leave TEXMFDIST as is for searching local TeX Live docs
     end
 
     # running the target texdoc
