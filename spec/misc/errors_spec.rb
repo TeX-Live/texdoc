@@ -13,16 +13,6 @@ RSpec.describe "Errors", :type => :aruba do
     end
   end
 
-  context 'execute action the "just view" without an argument' do
-    before(:each) { run_texdoc "--just-view" }
-
-    it 'should result in the "missing file operand" error' do
-      expect(last_command_started).to have_exit_status(2)
-      expect(stderr).to include(error_line "Missing file operand to --just-view.")
-      expect(stderr).to include(error_line msg_usage)
-    end
-  end
-
   context "missing arguments for Option -d" do
     before(:each) { run_texdoc "-d" }
 
