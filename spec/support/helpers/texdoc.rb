@@ -28,15 +28,12 @@ module SpecHelplers
 
     # prevent to pop-up documents during testing
     def setup_mock_viewers
-      viewer_list = [
-        "PAGER",
-        "BROWSER",
-        "DVIVIEWER",
-        "PSVIEWER",
-        "PDFVIEWER",
-        "MDVIEWER"
-      ]
-      viewer_list.each { |v| ENV[v + "_texdoc"] = MOCK_VIEWER }
+      set_environment_variable "PAGER_texdoc", MOCK_VIEWER
+      set_environment_variable "BROWSER_texdoc", MOCK_VIEWER
+      set_environment_variable "DVIVIEWER_texdoc", MOCK_VIEWER
+      set_environment_variable "PSVIEWER_texdoc", MOCK_VIEWER
+      set_environment_variable "PDFVIEWER_texdoc", MOCK_VIEWER
+      set_environment_variable "MDVIEWER_texdoc", MOCK_VIEWER
     end
 
     # setup TEXMF trees

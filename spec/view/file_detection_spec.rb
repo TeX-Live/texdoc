@@ -93,7 +93,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
       run_texdoc "-dview --just-view", sample_tex
     end
 
-    it "should be opened with the viewer_txt (fallback)" do
+    it "should be opened with the viewer_txt as fallback" do
       expect(stderr).to include(
         warning_line 'No viewer defined for ".tex" files, using "viewer_txt" instead.')
       expect(last_command_started).to be_successfully_executed
