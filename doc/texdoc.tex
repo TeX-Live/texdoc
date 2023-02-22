@@ -776,12 +776,10 @@ in your zsh configuration file (such as \code{\~/.zshrc}). You can install our
 completion function with either of the following two ways:
 %
 \begin{itemize}
-\item adding \code{eval \$(texdoc \lopt{print-completion} zsh)} to your
+\item adding \code{eval "\$(texdoc \lopt{print-completion} zsh)"} to your
   zsh configuration file.
 
-\item adding the following file (also provided by
-  \href{https://github.com/zsh-users/zsh-completions}{zsh-completions}) to \\
-  \code{/usr/share/zsh/site-functions/\_texdoc}:
+\item adding a file somewhere in \code{\$fpath} with the following contents:
 %
 \begin{htcode}
 #compdef texdoc
@@ -796,16 +794,6 @@ contains the following:
 \begin{htcode}
 'texdoc' '_texdoc'
 \end{htcode}
-
-Note: The path \code{/usr/share} is for GNU/Linux. For other platforms, the
-path can be:
-%
-\begin{description}
-\item[macOS (homebrew, x86)] \verb|/usr/local/share|
-\item[macOS (homebrew, arm)] \verb|/opt/homebrew/share|
-\item[Android (Termux)] \verb|/data/data/com.termux/files/usr/share|
-\item[Windows (Msys2 Mingw64)] \verb|/mingw64/share|
-\end{description}
 
 \section{Licence}
 \label{sec:licence}
