@@ -3,6 +3,11 @@ shared_context "messages" do
   let(:stdout) { last_command_started.stdout.gsub("\r", "") }
   let(:stderr) { last_command_started.stderr.gsub("\r", "") }
 
+  # common text
+  let(:msg_usage) {
+    "Try `texdoc --help' for short help, `texdoc texdoc' for full manual."
+  }
+
   # functions for output line genaration
   def error_line msg
     return "texdoc error: #{msg}"
