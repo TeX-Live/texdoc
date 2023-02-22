@@ -37,25 +37,26 @@ RSpec.describe "View commands", :type => :aruba do
     end
   end
 
-  context "when they are not set" do
-    before(:each) do
-      delete_environment_variable "PAGER_texdoc"
-      delete_environment_variable "BROWSER_texdoc"
-      delete_environment_variable "DVIVIEWER_texdoc"
-      delete_environment_variable "PSVIEWER_texdoc"
-      delete_environment_variable "PDFVIEWER_texdoc"
-      delete_environment_variable "MDVIEWER_texdoc"
+  if not OS.windows?
+    context "when they are not set" do
+      before(:each) do
+        delete_environment_variable "PAGER_texdoc"
+        delete_environment_variable "BROWSER_texdoc"
+        delete_environment_variable "DVIVIEWER_texdoc"
+        delete_environment_variable "PSVIEWER_texdoc"
+        delete_environment_variable "PDFVIEWER_texdoc"
+        delete_environment_variable "MDVIEWER_texdoc"
 
-      run_texdoc "-dconfig --just-view", sample_txt
-    end
+        run_texdoc "-dconfig --just-view", sample_txt
+      end
 
-    it "should be guessed appropriately" do
-      expect(which(viewer_dvi)).not_to be_nil
-      expect(which(viewer_html)).not_to be_nil
-      expect(which(viewer_pdf)).not_to be_nil
-      expect(which(viewer_ps)).not_to be_nil
-      expect(which(viewer_txt)).not_to be_nil
+      it "should be guessed appropriately" do
+        expect(which(viewer_dvi)).not_to be_nil
+        expect(which(viewer_html)).not_to be_nil
+        expect(which(viewer_pdf)).not_to be_nil
+        expect(which(viewer_ps)).not_to be_nil
+        expect(which(viewer_txt)).not_to be_nil
+      end
     end
   end
-
 end
