@@ -764,6 +764,14 @@ Sets the \meta{url} to use for online documentation. Texdoc will replace
 \section{Shell Completion}
 \label{sec:completion}
 
+Shell completion can be used to receive assistance in entering command-line
+options and arguments (typically package names) for the |texdoc| command.
+Texdoc can provide shell completion functions via the \lopt{print-completion}
+action. Configuring the appropriate per-shell setting described below can
+enable this shell completion function.
+
+%\subsection{Bash}
+
 \subsection{Zsh}
 
 To enable completion for zsh, you need to put
@@ -772,8 +780,8 @@ To enable completion for zsh, you need to put
 autoload -Uz compinit && compinit
 \end{htcode}
 %
-in your zsh configuration file (such as \code{\~/.zshrc}). You can install our
-completion function with either of the following two ways:
+in your zsh configuration file (such as \code{\$HOME/.zshrc}). You can install
+our completion function with either of the following two ways:
 %
 \begin{itemize}
 \item adding \code{eval "\$(texdoc \lopt{print-completion} zsh)"} to your
@@ -787,13 +795,6 @@ completion function with either of the following two ways:
   --print-completion zsh)" && __texdoc
 \end{htcode}
 \end{itemize}
-
-You can confirm your installation by checking whether \code{\~/.zcompdump}
-contains the following:
-%
-\begin{htcode}
-'texdoc' '_texdoc'
-\end{htcode}
 
 \section{Licence}
 \label{sec:licence}

@@ -7,9 +7,9 @@ Version 4.0 (TeX Live 2023)
 Released on 2023-02-20
 
 Major changes
-- Online search feature is added:
+- Online search feature is added (Wu Zhenyu):
   users using TL without documentation will be sent to texdoc.org
-- Add new action --print-completion:
+- Add new action --print-completion (Max Chernoff):
   for the moment, only zsh is supported. Contributions welcome.
 
 Minor fixes and tweaks
