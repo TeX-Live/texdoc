@@ -1,15 +1,15 @@
-NEWS for texdoc
+NEWS for Texdoc
 ===============
 (This file public domain.)
 
-Version 4.0 (TeX Live 2023)
-===========================
-Released on 2023-02-20
+Version 4.0 (2023-02-20)
+========================
+Release for TeX Live 2023.
 
 Major changes
-- Online search feature is added (Wu Zhenyu):
+- Online search feature is added (by Wu Zhenyu):
   users using TL without documentation will be sent to texdoc.org
-- Add new action --print-completion (Max Chernoff):
+- Add new action --print-completion (by Max Chernoff):
   for the moment, only zsh is supported. Contributions welcome.
 
 Minor fixes and tweaks
@@ -18,56 +18,62 @@ Minor fixes and tweaks
 - Scoring adjustments
 - Documentation tweaks
 
-Version 3.4.1
--------------
+Version 3.4.1 (2022-03-19)
+--------------------------
 - Bug fix: give locale bonus only if "lang" is set
 
-Version 3.4 (TeX Live 2022)
-===========================
-- Make Data.tlpdb.lua reproducible
+Version 3.4 (2022-03-03)
+========================
+Release for TeX Live 2022.
+- Make Data.tlpdb.lua reproducible (by Vincenzo Mantova)
 - Better locale handling in scoring
 - Alias adjustments
 
-Version 3.3.1
--------------
-- Support non-ascii username on Windows (patch by A. Kakuto)
+Version 3.3.1 (2021-05-20)
+--------------------------
+- Support non-ascii username on Windows (by Akira Kakuto)
 - Better support for multiple doc trees
 - Alias adjustments
 - Documentation tweaks
 
-Version 3.3 (TeX Live 2021)
-===========================
+Version 3.3 (2021-05-17)
+========================
+Release for TeX Live 2021.
 - Show all possible config files for -vf
 - Show diagnostic message of DISPLAY only if viewer failed
 - Alias adjustments
 - Documentation tweaks
 
-Version 3.2.2
--------------
+Version 3.2.2 (2020-09-16)
+--------------------------
 - Several aliases are added
 - Small documentation fixes
 
-Version 3.2.1
--------------
+Version 3.2.1 (2020-02-20)
+--------------------------
 - Bug fix: suspend a realpath not found error
 
-Version 3.2 (TeX Live 2020)
-===========================
+Version 3.2 (2020-02-02)
+========================
+Release for TeX Live 2020.
 - Improved the scoring scheme to prioritize the latex tree than the latex-dev
 - Support invoking the program with absolute paths
 - The document was entirely rewritten
 - Other small improvements and bug fixes
 
-Version 3.1 (TeX Live 2019)
-===========================
+Version 3.1 (2019-03-28)
+========================
+Release for TeX Live 2019.
 - New option -c: changing configure temporally
 - New config item `texlive_tlpdb` to specify a path for texlive.tlpdb
 - Fixed an issue that texdoc fails to open gzipped file in GNOME/XFCE
 - Added prefixes to script files not to contaminate kpse search space
 - Many other small improvements and bug fixes
 
-Version 3.0 (TeX Live 2018)
-===========================
+Version 3.0 (2018-06-06)
+========================
+Release for TeX Live 2018.
+
 This version has two big features:
 - Fuzzy search
 - New option parser
@@ -85,7 +91,7 @@ Version 2.0171
 - --help and --version override other specified command-line actions.
 
 Version 2.017 (TeX Live 2017)
-============================
+=============================
 - Restore user's LC_CTYPE value if possible (with this year's luatex).
 - Generic system environment variables, such as BROWSER, accept
   a colon-separated list of programs.
