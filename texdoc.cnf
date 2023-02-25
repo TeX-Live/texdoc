@@ -278,6 +278,7 @@ alias tex-live-zh-cn = texlive-zh-cn
 
 # a few useful general documents
 alias latex = latex-doc-ptr
+alias plain = gentle
 
 # various lshort translations
 adjscore(lshort) /lshort-english/ = +0.5                   # original
