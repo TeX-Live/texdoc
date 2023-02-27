@@ -6,7 +6,7 @@ require 'optparse'
 require 'date'
 
 # basics
-TEXDOC_VERSION = "4.0"
+TEXDOC_VERSION = "4.0.1"
 PKG_NAME = "texdoc-#{TEXDOC_VERSION}"
 CTAN_MIRROR = "http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
 

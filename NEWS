@@ -2,6 +2,12 @@ NEWS for Texdoc
 ===============
 (This file public domain.)
 
+Version 4.0.1 (2023-02-27)
+--------------------------
+- Minor bug fixes for Windows
+- Scoring adjustments
+- Documentation tweaks
+
 Version 4.0 (2023-02-20)
 ========================
 Release for TeX Live 2023.
