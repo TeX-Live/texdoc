@@ -5,19 +5,19 @@ require 'fileutils'
 module SpecHelplers
   module Texdoc
     # from repository
-    REPO_ROOT = Pathname.pwd
+    BASE_DIR = Pathname.pwd
 
-    TEXDOC_SCRIPT_DIR = REPO_ROOT / "script"
+    TEXDOC_SCRIPT_DIR = BASE_DIR / "script"
     TEXDOC_TLU = TEXDOC_SCRIPT_DIR / "texdoc.tlu"
 
-    REPO_TMP_DIR = REPO_ROOT / "tmp"
+    TMP_DIR = BASE_DIR / "tmp"
 
-    REPO_TEXMF = REPO_TMP_DIR / "texmf"
-    REPO_TEXMF_DIST = REPO_TMP_DIR / "texmf-dist"
-    REPO_TEXLIVE_TLPDB = REPO_TMP_DIR / "texlive.tlpdb"
+    REPO_TEXMF = TMP_DIR / "texmf"
+    REPO_TEXMF_DIST = TMP_DIR / "texmf-dist"
+    REPO_TEXLIVE_TLPDB = TMP_DIR / "texlive.tlpdb"
 
     # for testing
-    HOME_DIR = REPO_TMP_DIR / "aruba"
+    HOME_DIR = TMP_DIR / "aruba"
 
     PS_TEXMF = HOME_DIR / "texmf"
     PS_TEXMF_DIST = HOME_DIR / "texmf-dist"
