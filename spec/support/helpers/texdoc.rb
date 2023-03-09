@@ -47,7 +47,7 @@ module SpecHelplers
     end
 
     # running the target texdoc
-    def run_texdoc(*args, interactive: false)
+    def run_texdoc *args, interactive: false
       # constract the arguments
       arg_str = ""
       arg_str = " " + args.join(" ") if args.size > 0
