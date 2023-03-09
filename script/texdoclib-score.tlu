@@ -308,19 +308,18 @@ end
 
 -- returns the index of the most specific extension of file in ext_list,
 -- or config.ext_list_max + 1
-function M.ext_pos(file)
+function M.ext_pos(filename)
     -- remove zipext if applicable
-    file = texdoc.util.parse_zip(file)
+    filename = texdoc.util.parse_zip(filename)
     -- now find the extension
     local p, e, pos, ext
     for p, e in ipairs(texdoc.config.get_value('ext_list')) do
         if (e == '*') and (ext == nil) then
             pos, ext = p, e
-        elseif (e == '') and not string.find(file, '.', 1, true) then
+        elseif (e == '') and not filename:find('.', 1, true) then
             pos, ext = p, e
-        elseif string.sub(file, -string.len(e)-1) == '.' .. e then
-            if (ext == nil) or (ext == '*')
-                or (string.len(e) > string.len(ext)) then
+        elseif filename:sub(-e:len() - 1) == '.' .. e then
+            if (ext == nil) or (ext == '*') or (e:len() > ext:len()) then
                 pos, ext = p, e
             end
         end
