@@ -21,32 +21,32 @@ local err_print = texdoc.util.err_print
 -- modified Alternative GetOpt
 -- cf. http://lua-users.org/wiki/AlternativeGetOpt
 local function getopt(arg, options)
-    local tmp = nil
+    local tmp
     local tab = {}
     local saved_arg = {table.unpack(arg)}
 
     for k, v in ipairs(saved_arg) do
-        if string.sub(v, 1, 2) == '--' then
+        if v:sub(1, 2) == '--' then
             table.remove(arg, 1)
-            local x = string.find(v, '=', 1, true)
+            local x = v:find('=', 1, true)
             if x then
-                table.insert(tab, {string.sub(v, 3, x - 1), string.sub(v, x+1)})
+                table.insert(tab, {v:sub(3, x - 1), v:sub(x+1)})
             else
-                table.insert(tab, {string.sub(v, 3), true})
+                table.insert(tab, {v:sub(3), true})
             end
 
-        elseif string.sub(v, 1, 1) == '-' then
+        elseif v:sub(1, 1) == '-' then
             table.remove(arg, 1)
             local y = 2
-            local l = string.len(v)
+            local l = v:len()
             local jopt
 
             while (y <= l) do
-                jopt = string.sub(v, y, y)
+                jopt = v:sub(y, y)
 
-                if string.find(options, jopt, 1, true) then
+                if options:find(jopt, 1, true) then
                     if y < l then
-                        tmp = string.sub(v, y + 1)
+                        tmp = v:sub(y + 1)
                         y = l
                     else
                         table.remove(arg, 1)
@@ -60,7 +60,7 @@ local function getopt(arg, options)
                         os.exit(C.exit_error)
                     end
 
-                    if string.match(tmp, '^%-') then
+                    if tmp:match('^%-') then
                         table.insert(tab, {jopt, false})
                     else
                         table.insert(tab, {jopt, tmp})
