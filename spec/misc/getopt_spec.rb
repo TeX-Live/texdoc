@@ -94,11 +94,20 @@ RSpec.describe "The command-line option parser", :type => :aruba do
   context "with -D texlive-en -l" do
     before (:each) { run_texdoc "-D", "texlive-en", "-l" }
 
-    it "the last argument -l should be treated as non-option" do
+    it "the last argument -l should be treated as non-option argument" do
       expect(stderr).to include(
         debug_line "search", "Searching documents for pattern \"texlive-en\"")
       expect(stderr).to include(
         debug_line "search", "Searching documents for pattern \"-l\"")
+    end
+  end
+
+  context "with -D -- -texlive-en" do
+    before (:each) { run_texdoc "-D", "--", "-texlive-en" }
+
+    it "arguments after -- should be treated as non-option argument" do
+      expect(stderr).to include(
+        debug_line "search", "Searching documents for pattern \"-texlive-en\"")
     end
   end
 end

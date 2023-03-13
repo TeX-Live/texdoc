@@ -28,6 +28,10 @@ local function getopt(arg, options)
     for k, v in ipairs(saved_arg) do
         if v:sub(1, 2) == '--' then
             table.remove(arg, 1)
+            if v == '--' then -- terminate parsing
+                break
+            end
+
             local x = v:find('=', 1, true)
             if x then
                 table.insert(tab, {v:sub(3, x - 1), v:sub(x+1)})
