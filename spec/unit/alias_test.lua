@@ -4,7 +4,7 @@
 --
 -- This file public domain.
 
-kpse.set_program_name('luatex')
+kpse.set_program_name(arg[-1], 'texdoc')
 local texdoc = require('texdoclib')
 local M = texdoc.alias
 
