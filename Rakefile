@@ -445,7 +445,7 @@ task :setup_windows do
     TEXMFSYSCONFIG D:/texlive/texmf-config
     TEXMFSYSVAR D:/texlive/texmf-var
     TEXMFVAR ~/.texlive/texmf-var
-    binary_win32 1
+    binary_windows 1
     tlpdbopt_install_srcfiles 0
   EOF
 
