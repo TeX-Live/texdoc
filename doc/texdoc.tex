@@ -787,13 +787,7 @@ our completion function with either of the following two ways:
 \item adding \code{eval "\$(texdoc \lopt{print-completion} zsh)"} to your
   zsh configuration file.
 
-\item adding a file somewhere in \code{\$fpath} with the following contents:
-%
-\begin{htcode}
-#compdef texdoc
-(( $+functions[__texdoc] )) || eval "$(texdoc \textbackslash
-  --print-completion zsh)" && __texdoc
-\end{htcode}
+\item creating a file named \code{\_texdoc} in \code{\$fpath} whose content is the output of \code{texdoc \lopt{print-completion} zsh}.
 \end{itemize}
 
 \section{Licence}
