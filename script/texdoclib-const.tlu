@@ -50,8 +50,8 @@ Website: <https://tug.org/texdoc/>
 Repository: <https://github.com/TeX-Live/texdoc>
 Please email bugs to <texdoc@tug.org>.]]
 
-zsh_completion = [[
-compdef __texdoc texdoc
+zsh_completion = [=[
+#compdef texdoc
 
 __texdoc() {
   local options=(
@@ -72,7 +72,15 @@ __texdoc() {
     ;;
   esac
 }
-]]
+
+if [[ $zsh_eval_context[-1] == loadautofunc ]]; then
+  # autoload from fpath, call function directly
+  __texdoc "$@"
+else
+  # eval/source/. command, register function for later
+  compdef __texdoc texdoc
+fi
+]=]
 
 --[[ structure of the options table
 
