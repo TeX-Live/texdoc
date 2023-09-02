@@ -200,10 +200,9 @@ adjscore(context) /gnuplot/ = -3
 adjscore(context) context.man1 = +2
 adjscore(symbols) /staves/ = -5
 
-# catalogue info missing in the tlcontrib version of the package :-(
+# catalogue info missing cases
+adjscore(inputenc) inputenc.pdf = +5
 adjscore(pgf) pgfmanual.pdf = +5
-
-# another catalogue info missing case
 adjscore(hyph-utf8) hyphenation.pdf = +5
 
 # let's not have context version found first
