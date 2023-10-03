@@ -500,6 +500,9 @@ alias jurabib-de = jbgerdoc
 alias ofs-cz = ofsdoc
 alias ofs = ofsdoc-e
 
+# a rare case: '-p.pdf' (for printing, a4), '-s.pdf' (for screen)
+alias metafun = metafun-p
+
 ## aliases basically borrowed from texdoctk.dat with some adaptations
 alias akletter = akletter/lettereng
 alias arydshln = arydshln-man
