@@ -329,6 +329,7 @@ alias flafter = source2e
 alias fontenc = source2e
 alias textcomp = source2e
 alias tracefnt = source2e
+alias structuredlog = ltfilehook-doc
 # TODO: try to avoid the huge amount of false positives for `doc' itself.
 
 # latex-dev instruction
