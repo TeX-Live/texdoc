@@ -2,6 +2,12 @@ NEWS for Texdoc
 ===============
 (This file public domain.)
 
+Version 4.0.2 (2024-02-02)
+--------------------------
+- Improve the option parser
+- Better locale handling
+- Scoring adjustments
+
 Version 4.0.1 (2023-02-27)
 --------------------------
 - Minor bug fixes for Windows
@@ -13,9 +19,9 @@ Version 4.0 (2023-02-20)
 Release for TeX Live 2023.
 
 Major changes
-- Online search feature is added (by Wu Zhenyu):
+- Online search feature is added (by Max Chernoff):
   users using TL without documentation will be sent to texdoc.org
-- Add new action --print-completion (by Max Chernoff):
+- Add new action --print-completion (by Wu Zhenyu):
   for the moment, only zsh is supported. Contributions welcome.
 
 Minor fixes and tweaks

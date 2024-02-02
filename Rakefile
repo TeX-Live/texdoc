@@ -7,7 +7,7 @@ require 'date'
 
 # basics
 PKG_NAME = "texdoc"
-PKG_VERSION = "4.0.1"
+PKG_VERSION = "4.0.2"
 CTAN_MIRROR = "http://ctan.mirror.rafal.ca/systems/texlive/tlnet"
 
 # woking/temporaly dirs
