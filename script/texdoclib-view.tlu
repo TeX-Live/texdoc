@@ -161,75 +161,98 @@ end
 
 -----------------------------   display results   -----------------------------
 
--- print a list of docfile objects (see texdoclib-search.tlu) as a menu
--- if showall is false, stop as soon as a bad result is encountered
-local function print_menu(name, doclist, showall)
-    local max_lines = tonumber(texdoc.config.get_value('max_lines'))
-    if texdoc.config.get_value('interact_switch') and doclist[max_lines + 1] then
-        -- there may be too many lines, count them
-        local n = 0
-        for _, doc in pairs(doclist) do
-            if doc:get_quality() == 'good' or
-                    (showall and doc:get_quality() ~= 'killed') then
-                n = n + 1
-            end
-        end
-
-        if n > max_lines then
-            io.write(n, ' results. Display them all? (y/N) ')
-            local ans = io.read('*line')
-            if not ((ans == 'y') or (ans == 'Y')
-                -- io.read had a bug wrt windows eol on some versions of texlua
-                or (ans == '\ry') or (ans == '\rY')) then
-                return
-            end
+-- length of the list to be shown
+local function count_list_length(doclist, showall)
+    local res = 0
+    for _, doc in pairs(doclist) do
+        if doc:get_quality() == 'good' or
+                (showall and doc:get_quality() ~= 'killed') then
+            res = res + 1
         end
     end
-    local last_i
-    while true do
-        for i, doc in ipairs(doclist) do
-            if doc:get_quality() == 'killed' then break end
-            if doc:get_quality() ~= 'good' and not showall then break end
+    return res
+end
 
-            last_i = i -- save for test below
-            if texdoc.config.get_value('machine_switch') == true then
-                print(name, doc.score, texdoc.util.w32_path(doc.realpath),
-                doc.lang or '', doc.details or '')
-            else
-                print(string.format('%2d %s', i, texdoc.util.w32_path(doc.realpath)))
-                if doc.details or doc.lang then
-                    local line = '   = '
-                    if doc.lang then line = line .. '[' .. doc.lang .. '] ' end
-                    if doc.details then line = line .. doc.details end
-                    print(line)
+-- parse user response and view the file
+local function view_selected_doc(doclist, num_str, last_i)
+    -- That returns the empty string on an empty line, nil on EOF.
+    -- We only want to default to viewing 1 on an empty line.
+    -- Use Lua's faked ternary operator for fun and brevity:
+    num = (num_str == '' and 1 or tonumber(num_str))
+    if num and doclist[num] and num <= last_i then
+        view_doc(doclist[num])
+    end
+end
+
+-- print a list of docfile objects (see texdoclib-search.tlu) as a menu
+-- if showall is false, stop as soon as a bad result is encountered
+local function print_doclist(name, doclist, showall)
+    local max_lines = tonumber(texdoc.config.get_value('max_lines'))
+    local interact = texdoc.config.get_value('interact_switch')
+
+    local last_i = 0
+    local prompt_more = false
+
+    local len = count_list_length(doclist, showall)
+    if interact and len > max_lines then
+        local msg = '%d results. Only the top %d are shown below.'
+        print(msg:format(len, max_lines))
+        prompt_more = true
+    end
+
+    for i, doc in ipairs(doclist) do
+        if doc:get_quality() == 'killed' then break end
+        if doc:get_quality() ~= 'good' and not showall then break end
+
+        last_i = i -- save for testing
+        if texdoc.config.get_value('machine_switch') == true then
+            -- for machine-readable output, list all results in a certain format
+            print(name, doc.score, texdoc.util.w32_path(doc.realpath),
+                  doc.lang or '', doc.details or '')
+        else
+            print(string.format('%2d %s', i, texdoc.util.w32_path(doc.realpath)))
+            if doc.details or doc.lang then
+                local line = '   = '
+                if doc.lang then line = line .. '[' .. doc.lang .. '] ' end
+                if doc.details then line = line .. doc.details end
+                print(line)
+            end
+
+            if i >= max_lines and prompt_more then
+                io.write('Enter number of file to view, RET to view 1, S to show all results, ' ..
+                         'or any other key to exit: ')
+                local ans = io.read('*line')
+                if ans == 'S' then
+                    prompt_more = false  -- and continue this loop
+                else
+                    view_selected_doc(doclist, ans, last_i)
+                    return last_i  -- which should be always positive
                 end
             end
         end
-
-        if last_i or showall then
-            break
-        else
-            err_print('warning', 'No good result found, showing all results.')
-            showall = true
-        end
     end
 
-    if not last_i then
+    if interact then
+        io.write('Enter number of file to view, RET to view 1, anything else to skip: ')
+        view_selected_doc(doclist, io.read('*line'), last_i)
+    end
+
+    return last_i
+end
+
+-- wrapper function for print_doclist(): we could call it twice
+local function print_list_menu(name, doclist, showall)
+    local last_i = print_doclist(name, doclist, showall)
+
+    if not showall and last_i == 0 then
+        err_print('warning', 'No good result found, showing all results.')
+        last_i = print_doclist(name, doclist, true)
+    end
+
+    if last_i == 0 then
         local msg = string.gsub(C.notfound_msg, C.notfound_msg_ph, name)
         io.stderr:write(msg .. '\n') -- get rid of gsub's 2nd value
         os.exit(C.exit_notfound)
-    end
-
-    if texdoc.config.get_value('interact_switch') then
-        io.write('Enter number of file to view, RET to view 1, anything else to skip: ')
-        local num_str = io.read('*line')
-        -- That returns the empty string on an empty line, nil on EOF.
-        -- We only want to default to viewing 1 on an empty line.
-        -- Use Lua's faked ternary operator for fun and brevity:
-        num = (num_str == '' and 1 or tonumber(num_str))
-        if num and doclist[num] and num <= last_i then
-            view_doc(doclist[num])
-        end
     end
 end
 
@@ -296,6 +319,7 @@ function M.deliver_results(name, doclist, many)
         io.stderr:write(msg .. '\n') -- get rid of gsub's 2nd value
         os.exit(C.exit_notfound)
     end
+
     -- shall we show all of them or only the "good" ones?
     local mode = texdoc.config.get_value('mode')
 
@@ -310,7 +334,7 @@ function M.deliver_results(name, doclist, many)
         if many and not texdoc.config.get_value('machine_switch') then
             print('*** Results for: ' .. name .. ' ***')
         end
-        print_menu(name, doclist, mode == 'showall')
+        print_list_menu(name, doclist, mode == 'showall')
     else
         search_online(name, doclist)
     end
