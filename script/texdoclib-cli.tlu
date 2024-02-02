@@ -106,14 +106,14 @@ local function parse_options()
         end
 
         for i, o in ipairs(C.options) do
-            if k == o["short"] or k == o["long"] then
+            if k == o['short'] or k == o['long'] then
                 k = i
                 break
             end
         end
 
         option = C.options[k]
-        if option['group'] == 'action' then
+        if option ~= nil and option['group'] == 'action' then
             if option['long'] == 'just-view' then
                 return true, 'view', cl_config
             elseif option['long'] == 'print-completion' then
@@ -121,7 +121,7 @@ local function parse_options()
             else
                 return true, option['long'], cl_config
             end
-        elseif option['group'] then
+        elseif option~=nil and option['group'] then
             if option['type'] == 'boolean' then
                 option['action'](cl_config, curr_arg)
             elseif option['type'] == 'string' then
