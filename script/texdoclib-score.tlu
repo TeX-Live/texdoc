@@ -212,7 +212,7 @@ local function set_score(df, original_kw)
 
     -- bonus for locale
     local config_lang = texdoc.config.get_value('lang')
-    if not is_alias and config_lang ~= nil then
+    if not is_alias then
         local file_lang = df.lang
 
         if not file_lang then
@@ -220,10 +220,12 @@ local function set_score(df, original_kw)
             file_lang = texdoc.const.lang_codes[file_lang]
         end
 
-        if config_lang == file_lang then
+        if config_lang ~= nil and config_lang == file_lang then
             score = score + 1
             dbg_score('Locale match bonus: +1.0')
-        elseif file_lang ~= nil then
+        elseif file_lang ~= nil and file_lang ~= 'en' then
+            -- normally, english documents do not have file_lang,
+            -- but sometimes the catalog includes en info (e.g., geometry)
             score = score - 0.1
             dbg_score('Locale unmatch: -0.1')
         end
