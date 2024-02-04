@@ -592,7 +592,7 @@ local function setup_config_from_defaults()
         suffix_list = '',
         verbosity_level = C.def_verbosity,
         debug_list = '',
-        max_lines = '20',
+        max_lines = '10',
         fuzzy_level = '3',
         online_url = 'https://texdoc.org/serve/PKGNAME/0',
     }
