@@ -8,11 +8,11 @@ Files under this directory are public domain.
 
 The Texdoc test mechanism is a bit complicated because it needs to run in concert with the TEXMF trees of TeX Live. Here is an overview of how it works.
 
-First, a local installation of TeX Live is required to run the Texdoc test: we assume that the `PATH` is also properly set. During the test run, `TEXMFDIST` will use the locally installed TeX Live's `TEXMFDIST` tree, except in a few exceptional cases.
+A local installation of TeX Live is required to run the Texdoc test: we assume that the PATH is also properly set. The locally installed TeX Live's `texmf-dist` tree is used for TEXMFDIST during the test run, except in a few exceptional cases.
 
-`TEXMFHOME`, on the other hand, is dynamically generated. When executing tests, as a rule, do not run `rspec` directly, but always use the `rake test` command. In this rake task, the contents of the TEXMF trees used in the test are automatically generated in a temporary directory.
+TEXMFHOME, on the other hand, is dynamically generated. As a rule, you should not run `rspec` directly when executing tests, but always use the `rake test` command. In this rake task, the contents of the TEXMF trees used in the test are automatically generated in a temporary directory.
 
-For testing by Aruba, the working and HOME directories are in principle `tmp/aruba`. In Texdoc tests, the entire contents of `TEXMFHOME` generated above are copied under `tmp/aruba` before each example is executed (see [`support/helpers/texdoc.rb`](./support/helpers/texdoc.rb)). Then, by setting the environment variable `TEXMFHOME` to this path location, the Texdoc to be tested will refer to this tree.
+For testing by Aruba, the working and HOME directories are, in principle, `tmp/aruba`. In Texdoc tests, all the contents of TEXMFHOME generated above are copied under `tmp/aruba` before each example is executed (see [`support/helpers/texdoc.rb`](./support/helpers/texdoc.rb)). Then, by setting the environment variable TEXMFHOME to this path location, the Texdoc to be tested will refer to this tree.
 
 ## Tips for spec writers
 
