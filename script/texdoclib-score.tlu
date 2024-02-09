@@ -213,8 +213,15 @@ local function set_score(df, original_kw)
     -- bonus for locale
     local config_lang = texdoc.config.get_value('lang')
     if not is_alias then
-        local file_lang = df.lang
+        local file_lang
 
+        -- from its catalogue
+        if df.lang then
+            -- take first two letters; it may have country codes
+            file_lang = df.lang:sub(1, 2)
+        end
+
+        -- from its filename
         if not file_lang then
             _, file_lang, _ = parse(name)
             file_lang = texdoc.const.lang_codes[file_lang]
@@ -225,7 +232,8 @@ local function set_score(df, original_kw)
             dbg_score('Locale match bonus: +1.0')
         elseif file_lang ~= nil and file_lang ~= 'en' then
             -- normally, english documents do not have file_lang,
-            -- but sometimes the catalog includes en info (e.g., geometry)
+            -- but sometimes catalogue includes en info (e.g., geometry)
+            -- we want to treat both cases similar
             score = score - 0.1
             dbg_score('Locale unmatch: -0.1')
         end
