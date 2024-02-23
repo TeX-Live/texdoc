@@ -330,6 +330,7 @@ alias fontenc = source2e
 alias textcomp = source2e
 alias tracefnt = source2e
 alias structuredlog = ltfilehook-doc
+alias xparse = usrguide
 # TODO: try to avoid the huge amount of false positives for `doc' itself.
 
 # latex-dev instruction
@@ -408,8 +409,10 @@ alias(5) mp = mpintro
 
 # latex3 and friends
 alias latex3 = ltx3info
-alias(3) expl3 = interface3
+alias expl3 = interface3
 alias(3) expl3 = source3
+alias l3 = interface3
+alias(9) l3 = source3
 alias l3bootstrap = interface3
 alias l3names = interface3
 alias l3basics = interface3
