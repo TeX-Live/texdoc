@@ -104,7 +104,7 @@ More specific information, such as the TODO list of this project and some inform
 
 ## Copyright and License
 
-Copyright 2008-2023 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
+Copyright 2008-2024 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
 
 This package is distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either [version 3](./COPYING) of the License, or (at your option) any later version.
 

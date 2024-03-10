@@ -2,6 +2,13 @@ NEWS for Texdoc
 ===============
 (This file public domain.)
 
+Version 4.1 (2024-03-10)
+========================
+Release for TeX Live 2024.
+- CLI update: 10 results (configurable via "max_lines") are displayed even if there are many results
+- Some bug fixes and improvements
+- Scoring adjustments
+
 Version 4.0.2 (2024-02-02)
 --------------------------
 - Improve the option parser
