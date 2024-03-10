@@ -198,6 +198,8 @@ local function print_doclist(name, doclist, showall)
         local msg = '%d results. Only the top %d are shown below.'
         print(msg:format(len, max_lines))
         prompt_more = true
+    elseif len == 0 then -- nothing to show
+        return last_i
     end
 
     for i, doc in ipairs(doclist) do
