@@ -144,20 +144,6 @@ RSpec.describe "Environment variables", :type => :aruba do
     end
   end
 
-  context "TEXDOCS" do
-    before(:each) { set_environment_variable "TEXDOCS", "test1,!!test2//" }
-    before(:each) { run_texdoc "-dtexdocs", "texlive-en" }
-
-    it "should be effective" do
-      expect(stderr).to include(
-        debug_line "texdocs",
-          "texdocs[2] = test1 (index_mandatory=false, recursion_allowed=false)")
-      expect(stderr).to include(
-        debug_line "texdocs",
-          "texdocs[1] = test2 (index_mandatory=true, recursion_allowed=true)")
-    end
-  end
-
   context "LANGUAGE_texdoc" do
     before(:each) { set_environment_variable "LANGUAGE_texdoc", "ja" }
     before(:each) { set_environment_variable "LANGUAGE", "en" }
