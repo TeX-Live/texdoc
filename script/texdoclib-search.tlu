@@ -359,6 +359,7 @@ init_texdocs_database = function()
 
     doc_roots = {}
     local kpse_texdocs = kpse.expand_var('$TEXDOCS')
+    local w32_path = texdoc.util.w32_path
 
     -- expand the path and turn it into a lua list
     local raw_doc_roots = kpse.expand_braces(kpse_texdocs):explode(C.kpse_sep)
@@ -376,13 +377,13 @@ init_texdocs_database = function()
         local index_mandatory = (n == 1)
         dbg_print('texdocs',
             'texdocs[%d] = %s (index_mandatory=%s, recursion_allowed=%s)',
-            i, path, tostring(index_mandatory), tostring(recursion_allowed))
+            i, w32_path(path), tostring(index_mandatory), tostring(recursion_allowed))
 
         -- decide if we should use a ls-R index, the filesystem, or do nothing
         local root, shift = lsr_root(path)
         if root and shift and recursion_allowed then
             dbg_print('texdocs',
-                'texdocs[%d] using index: %s (shift=%s)', i, root, shift)
+                'texdocs[%d] using index: %s (shift=%s)', i, w32_path(root), w32_path(shift))
             db = init_lsr_db(root, shift)
         elseif not index_mandatory and lfs.isdir(path) then
             dbg_print('texdocs',

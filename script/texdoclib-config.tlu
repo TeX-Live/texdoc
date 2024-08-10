@@ -152,7 +152,8 @@ function M.set_config_element(key, value, context)
 
     -- special case: if we just set debug_list, print version info now
     if key == 'debug_list' then
-        dbg_print('version', '%s v%s', C.fullname, C.version)
+        local w32_path = import_function('util', 'w32_path')
+        dbg_print('version', '%s v%s', w32_path(C.fullname), C.version)
     end
 
     -- now tell what we have just done, for debugging
