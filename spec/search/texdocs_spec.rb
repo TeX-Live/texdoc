@@ -30,9 +30,7 @@ RSpec.describe "TEXDOCS handling", :type => :aruba do
   context "with standard testing setup" do
     before(:each) { run_texdoc "-dtexdocs", "listings" }
 
-    let(:texmf_dist_regex) {
-      Regexp.escape(normalize_path("/usr/local/texlive/YEAR/texmf-dist")).sub("YEAR", '\d\d\d\d')
-    }
+    let(:texmf_dist_regex) { Regexp.escape(normalize_path(`kpsewhich -var-value TEXMFDIST`.chomp)) }
     let(:texmf_home_regex) { Regexp.escape(normalize_path(texmf_home)) }
 
     let(:texdocs_n_dist) {
