@@ -7,7 +7,7 @@ RSpec.describe "The build-in config", :type => :aruba do
   context "if no other sources of config is set" do
     before(:each) { run_texdoc "-D", "texlive-en" }
 
-    it "config items should be set to the default values" do
+    it "should be set to the default values" do
       defaults = [
         "badext_list=txt, dat, ",
         "mode=view",
@@ -28,10 +28,6 @@ RSpec.describe "The build-in config", :type => :aruba do
         expect(stderr).to include(
           debug_line "config", "Setting \"#{config}\" from built-in defaults.")
       end
-    end
-
-    if not OS.windows?
-      # nothing: just to prevent a bug on windows
     end
   end
 end

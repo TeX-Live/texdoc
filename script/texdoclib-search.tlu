@@ -126,11 +126,12 @@ function Doclist:add(df)
     -- if no realpath information, unable to add
     -- (useful if vanilla == false)
     if not df.realpath then return end
+    local w32_path = texdoc.util.w32_path
     local df_hash = md5.sumhexa(df.normname:lower()):sub(1, 7)  -- same as debug-score
 
     -- check the existence of the file
     if not lfs.isfile(df.realpath) then
-        dbg_print('search', '(%d) File %s not found.  Skipping.', df_hash, df.realpath)
+        dbg_print('search', '(%d) File %s not found.  Skipping.', df_hash, w32_path(df.realpath))
         return
     end
 
@@ -139,7 +140,7 @@ function Doclist:add(df)
     if index then
         self[index]:mergein(df)
     else
-        dbg_print('search', '(%s) File %s found.', df_hash, df.realpath)
+        dbg_print('search', '(%s) File %s found.', df_hash, w32_path(df.realpath))
         dbg_print_docfile(df, df_hash)
 
         local newindex = #self + 1

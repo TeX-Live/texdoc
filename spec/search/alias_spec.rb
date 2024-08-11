@@ -13,13 +13,14 @@ RSpec.describe "Alias", :type => :aruba do
       EOF
     }
     before(:each) { File.write(texdoc_cnf, config_content) }
+    let(:realpath) { Regexp.escape(normalize_path("texlive/texlive-en/texlive-en.pdf")) }
 
     context "and query the exact alias" do
       before(:each) { run_texdoc "-ddocfile", "testalias" }
 
       it "should find aliased documents" do
         expect(stderr).to include(debug_line "search", 'Searching documents for pattern "testalias"')
-        expect(stderr).to match(/texdoc debug-search: \(0da8ec4\) File \S*texlive\/texlive-en\/texlive-en.pdf found/)
+        expect(stderr).to match(/texdoc debug-search: \(0da8ec4\) File \S*#{realpath} found/)
         expect(stderr).to include(debug_line "docfile", "(0da8ec4) name: texlive/texlive-en/texlive-en.pdf")
         expect(stderr).to include(debug_line "docfile", "(0da8ec4) matches: texlive (alias)")
         expect(last_command_started).to be_successfully_executed
@@ -31,7 +32,7 @@ RSpec.describe "Alias", :type => :aruba do
 
       it "should not find aliased documents" do
         expect(stderr).to include(debug_line "search", 'Searching documents for pattern "testaliases"')
-        expect(stderr).not_to match(/texdoc debug-search: \(0da8ec4\) File \S*texlive\/texlive-en\/texlive-en.pdf found/)
+        expect(stderr).not_to match(/texdoc debug-search: \(0da8ec4\) File \S*#{realpath} found/)
         expect(stderr).not_to include(debug_line "docfile", "(0da8ec4) name: texlive/texlive-en/texlive-en.pdf")
         expect(stderr).not_to include(debug_line "docfile", "(0da8ec4) matches: texlive (alias)")
       end
