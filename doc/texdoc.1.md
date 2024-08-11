@@ -36,7 +36,7 @@ Alternatively, perform the given ACTION and exit.
   Activate all debug output (equal to "--debug=all").
 * `-d` LIST, `--debug`=LIST:
   Activate debug output restricted to the categories specified in LIST.  
-  Available categories: `config`, `files`, `search`, `score`, `texdocs`,
+  Available categories: `config`, `files`, `search`, `docfile`, `score`, `texdocs`,
   `tlpdb`, `version`, `view`, and `all` to activate all of these.
 * `-c` NAME=VALUE:
   Set configuration item NAME to VALUE.
