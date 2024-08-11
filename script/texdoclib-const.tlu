@@ -355,10 +355,13 @@ min_verbosity = '0'  -- (nothing at all)
 max_verbosity = '3'
 def_verbosity = '2'
 
+-- debug categories
+-- the listed categories in the values are automatically activated
 known_debugs = {
     config = {'files'},
     files = {},
     search = {},
+    docfile = {'search'},
     score = {},
     texdocs = {},
     tlpdb = {},

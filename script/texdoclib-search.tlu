@@ -7,6 +7,7 @@
 -- dependencies
 local kpse = require 'kpse'
 local lfs = require 'lfs'
+local md5 = require 'md5'
 local texdoc = {
     const = require 'texdoclib-const',
     util = require 'texdoclib-util',
@@ -75,15 +76,61 @@ function Doclist:new()
     return dl
 end
 
+-- show debug information of docfile
+local function dbg_print_docfile(df, df_hash)
+    local function dbg_df_item(item)
+        if not df[item] then return end
+
+        local cur_pattern, value
+        if item == 'matches' then
+            if #df[item] == 0 then return end
+            for i, v in ipairs(df[item]) do
+                -- judge alias or not
+                if v.original then
+                    cur_pattern = v.name
+                else
+                    cur_pattern = v.name .. ' (alias)'
+                end
+
+                if i == 1 then
+                    value = cur_pattern
+                else
+                    value = value .. ', ' .. cur_pattern
+                end
+            end
+        else
+            value = df[item]
+        end
+
+        local msg = string.format('(%s) %s: %s', df_hash, item, value)
+        dbg_print('docfile', msg)
+    end
+
+    -- mandatory info
+    dbg_df_item('name')
+    dbg_df_item('tree')
+    dbg_df_item('source')
+
+    -- support info
+    dbg_df_item('matches')
+    dbg_df_item('runtodoc')
+    dbg_df_item('tlptodoc')
+
+    -- other details
+    dbg_df_item('details')
+    dbg_df_item('lang')
+end
+
 -- add a docfile to a list
 function Doclist:add(df)
     -- if no realpath information, unable to add
     -- (useful if vanilla == false)
     if not df.realpath then return end
+    local df_hash = md5.sumhexa(df.normname:lower()):sub(1, 7)  -- same as debug-score
 
     -- check the existence of the file
     if not lfs.isfile(df.realpath) then
-        dbg_print('search', 'File %s not found.  Skipping.', df.realpath)
+        dbg_print('search', '(%d) File %s not found.  Skipping.', df_hash, df.realpath)
         return
     end
 
@@ -92,7 +139,8 @@ function Doclist:add(df)
     if index then
         self[index]:mergein(df)
     else
-        dbg_print('search', 'File %s found.', df.realpath)
+        dbg_print('search', '(%s) File %s found.', df_hash, df.realpath)
+        dbg_print_docfile(df, df_hash)
 
         local newindex = #self + 1
         self[newindex] = df
@@ -110,10 +158,13 @@ docfile = {
     -- name and tree are mandatory
     name      = filename (used for scoring only)
     tree      = code of the tree, see below
+    source    = where the docfile found (sty, tlpdb, or texdocs)
+
     -- at least one of the following fields should exist
-    matches   = {pattern1, pattern2, ...} or {}
-    runtodoc  = true if there is a runfile -> docfile association
-    tlptodoc  = true if there is a tlp name -> docfile association
+    matches   = {pattern1, pattern2, ...} or {} (for sty and texdocs)
+    runtodoc  = true if there is a runfile -> docfile association (for tlpdb)
+    tlptodoc  = true if there is a tlp name -> docfile association (for tlpdb)
+
     -- those are virtual members, see below
     realpath  = full path
     normname  = nomrmalised (path removed up to the 'doc' component)
@@ -122,12 +173,14 @@ docfile = {
     details   = details tag from the catalogue metadata
     quality   = 'good', 'bad', or 'killed' depending on score
     ext_pos   = position of the extension in ext_list
+
     -- set for elements of a list as a side effect of sort_doclist()
     score     = score
 }
-if tree > 1, this is the index of the tree in TEXDOCS
+
+if tree > 0, this is the index of the tree in TEXDOCS
 if tree = 0, then name is relative to TLROOT
-tree = - 1 if and only if file is a sty file. Here name is absolute.
+tree = -1 if and only if file is a sty file. Here name is absolute.
 --]]
 
 -- Docfile objects inherit members from Docfile
@@ -233,7 +286,7 @@ end
 local function matches(pattern, file)
     if pattern.original then
         return file:lower():find(pattern.name:lower(), 1, true)
-    else
+    else  -- alias
         return texdoc.score.is_exact(file, pattern.name)
     end
 end
@@ -263,7 +316,10 @@ end
 local function scan_db(patlist, code, lsr_db)
     for file, basename in pairs(lsr_db) do
         local df = process_file(patlist, basename, file, code)
-        if df then s_doclist:add(df) end
+        if df then
+            df.source = 'texdocs'
+            s_doclist:add(df)
+        end
     end
 end
 
@@ -420,6 +476,7 @@ local function get_doclist_sty(patlist)
             local df = Docfile:new({
                 name = file,
                 tree = -1,
+                source = 'sty',
                 pattern = pat,
             })
             s_doclist:add(df)
@@ -625,6 +682,7 @@ get_doclist_tlpdb = function(pattern)
                 s_doclist:add(Docfile:new{
                     name = file,
                     tree = 0,
+                    source = 'tlpdb',
                     runtodoc = true,
                 })
             end
@@ -636,6 +694,7 @@ get_doclist_tlpdb = function(pattern)
             s_doclist:add(Docfile:new{
                 name = file,
                 tree = 0,
+                source = 'tlpdb',
                 tlptodoc = true,
             })
         end
@@ -761,7 +820,6 @@ function M.get_doclist(pattern, no_alias)
 
         -- get results; _texdocs search comes after _tlpdb search so that
         -- files found by both will have the priority of the _texdocs tree.
-        -- (https://puszcza.gnu.org.ua/bugs/?369)
         get_doclist_sty(sty)
         get_doclist_tlpdb(pattern)
         get_doclist_texdocs(normal)

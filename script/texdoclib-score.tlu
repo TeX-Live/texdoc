@@ -150,13 +150,13 @@ end
 -- set the score of a docfile
 local function set_score(df, original_kw)
     -- scoring is case-insensitive (patterns are already lowercased)
-    local name = string.lower(df.normname)
-    local df_id = string.sub(md5.sumhexa(name), 1, 7)
+    local name = df.normname:lower()
+    local df_hash = md5.sumhexa(name):sub(1, 7)  -- we use normname hash for cross-platform consistency
 
     -- special debugging function
     local function dbg_score(msg, ...)
         -- add the hash id prefix to make the outputs grep-friendly
-        local msg = string.format('(%s) ', df_id) .. msg
+        local msg = string.format('(%s) ', df_hash) .. msg
         texdoc.util.dbg_print('score', msg, ...)
     end
 

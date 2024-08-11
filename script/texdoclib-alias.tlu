@@ -46,7 +46,7 @@ end
 
 -- add an alias value for a key
 local function add_alias(key, value, score)
-    local k = string.lower(key)
+    local k = key:lower()
     alias[k] = alias[k] or {make_alias(key, false)}
     if alias[k].stop then return end
     table.insert(alias[k], make_alias(value, score))
@@ -54,14 +54,14 @@ end
 
 -- prevent a key from being further aliased
 local function stop_alias(key)
-    local k = string.lower(key)
+    local k = key:lower()
     alias[k] = alias[k] or {}
     alias[k].stop = true
 end
 
 -- get patterns for a name
 function M.get_patterns(name, no_alias)
-    local n = string.lower(name)
+    local n = name:lower()
 
     -- get normal aliases
     local res
@@ -92,21 +92,20 @@ end
 -- interpret a confline as an alias setting or return false
 function M.confline_to_alias(line)
     -- alias directive without score
-    local key, val = string.match(line, '^alias%s+([%w%p]+)%s*=%s*(.+)')
+    local key, val = line:match('^alias%s+([%w%p]+)%s*=%s*(.+)')
     if key and val then
         add_alias(key, val)
         return true
     end
     -- alias directive with score
-    local score, key, val = string.match(line,
-        '^alias%(([%d+-.]+)%)%s+([%w%p]+)%s*=%s*(.+)')
+    local score, key, val = line:match('^alias%(([%d+-.]+)%)%s+([%w%p]+)%s*=%s*(.+)')
     if score then score = tonumber(score) end
     if key and val and score then
         add_alias(key, val, score)
         return true
     end
     -- stopalias directive
-    local key = string.match(line, '^stopalias%s+(.+)')
+    local key = line:match('^stopalias%s+(.+)')
     if key then
         stop_alias(key)
         return true
