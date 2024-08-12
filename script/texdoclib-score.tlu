@@ -160,7 +160,7 @@ local function set_score(df, original_kw)
         texdoc.util.dbg_print('score', msg, ...)
     end
 
-    dbg_score('Start scoring ' .. df.realpath)
+    dbg_score('Start scoring ' .. texdoc.util.w32_path(df.realpath))
     dbg_score('Name used: ' .. name)
 
     -- get score from patterns
