@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe "Scoring", :type => :aruba do
   include_context "messages"
 
-  context 'Example query "babel"' do
+  context 'query "babel"' do
     let(:test_query) { "babel" }
 
     context "babel/babel.pdf" do
@@ -72,7 +72,7 @@ RSpec.describe "Scoring", :type => :aruba do
     end
   end
 
-  context 'Example query "texlive"' do
+  context 'query "texlive"' do
     let(:test_query) { "texlive" }
 
     context "texlive-en/texlive-en.pdf" do
@@ -85,7 +85,7 @@ RSpec.describe "Scoring", :type => :aruba do
         EXPECTED
       end
 
-      before(:each) { run_texdoc "-dscore", test_query }
+      before(:each) { run_texdoc "-dscore", "-clang=de", test_query }
 
       it "should get alias match score" do
         expect(stderr).to include(res_score_log)
