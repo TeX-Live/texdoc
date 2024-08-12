@@ -87,7 +87,24 @@ RSpec.describe "Scoring", :type => :aruba do
 
       before(:each) { run_texdoc "-dscore", test_query }
 
-      it "should get exact match + directory bonus + catalogue details bonus" do
+      it "should get alias match score" do
+        expect(stderr).to include(res_score_log)
+      end
+    end
+
+    context "texlive-en/texlive-en.pdf with lang=en" do
+      let(:res_score_log) do
+        <<~EXPECTED
+          texdoc debug-score: (0da8ec4) Name used: texlive/texlive-en/texlive-en.pdf
+          texdoc debug-score: (0da8ec4) Matching alias "texlive-en", score: 15.0, (language-based)
+          texdoc debug-score: (0da8ec4) Max pattern score: 15.0
+          texdoc debug-score: (0da8ec4) Final score: 15.0
+        EXPECTED
+      end
+
+      before(:each) { run_texdoc "-dscore", "-clang=en", test_query }
+
+      it "should get language-based alias match score" do
         expect(stderr).to include(res_score_log)
       end
     end
@@ -110,23 +127,6 @@ RSpec.describe "Scoring", :type => :aruba do
       before(:each) { run_texdoc "-dscore", test_query }
 
       it "should get a very low score" do
-        expect(stderr).to include(res_score_log)
-      end
-    end
-
-    context "texlive-fr/texlive-fr.pdf with lang=fr" do
-      let(:res_score_log) do
-        <<~EXPECTED
-          texdoc debug-score: (02add68) Name used: texlive/texlive-fr/texlive-fr.pdf
-          texdoc debug-score: (02add68) Matching alias "texlive-fr", score: 15.0, (language-based)
-          texdoc debug-score: (02add68) Max pattern score: 15.0
-          texdoc debug-score: (02add68) Final score: 15.0
-        EXPECTED
-      end
-
-      before(:each) { run_texdoc "-dscore", "-clang=fr", test_query }
-
-      it "should get exact match + directory bonus + catalogue details bonus" do
         expect(stderr).to include(res_score_log)
       end
     end
