@@ -78,13 +78,23 @@ end
 
 -- show debug information of docfile
 local function dbg_print_docfile(df, df_hash)
+    local function make_comma_list(res, cur)
+        if res == nil then
+            return cur
+        else
+            return res .. ', ' .. cur
+        end
+    end
+
     local function dbg_df_item(item)
         if not df[item] then return end
 
-        local cur_pattern, value
+        local value
         if item == 'matches' then
             if #df[item] == 0 then return end
-            for i, v in ipairs(df[item]) do
+
+            local cur_pattern
+            for _, v in ipairs(df[item]) do
                 -- judge alias or not
                 if v.original then
                     cur_pattern = v.name
@@ -92,11 +102,11 @@ local function dbg_print_docfile(df, df_hash)
                     cur_pattern = v.name .. ' (alias)'
                 end
 
-                if i == 1 then
-                    value = cur_pattern
-                else
-                    value = value .. ', ' .. cur_pattern
-                end
+                value = make_comma_list(value, cur_pattern)
+            end
+        elseif item == 'sources' then
+            for _, v in ipairs(df[item]) do
+                value = make_comma_list(value, v)
             end
         else
             value = df[item]
@@ -109,7 +119,7 @@ local function dbg_print_docfile(df, df_hash)
     -- mandatory info
     dbg_df_item('name')
     dbg_df_item('tree')
-    dbg_df_item('source')
+    dbg_df_item('sources')
 
     -- support info
     dbg_df_item('matches')
@@ -139,6 +149,8 @@ function Doclist:add(df)
     local index = self.inv[df.realpath:lower()]
     if index then
         self[index]:mergein(df)
+        dbg_print('search', '(%s) Update info for %s.', df_hash, w32_path(df.realpath))
+        dbg_print_docfile(self[index], df_hash)
     else
         dbg_print('search', '(%s) File %s found.', df_hash, w32_path(df.realpath))
         dbg_print_docfile(df, df_hash)
@@ -156,13 +168,14 @@ end
 
 --[[
 docfile = {
-    -- name and tree are mandatory
+    -- mandatory fields (never be nil)
     name      = filename (used for scoring only)
     tree      = code of the tree, see below
-    source    = where the docfile found (sty, tlpdb, or texdocs)
+    matches   = matched patterns: {pattern1, pattern2, ...} or {} (for sty and texdocs)
+    sources   = sources of the found docfile: {source1, source2, ...} or {}
+                (where <sourceN> is either 'sty', 'tlpdb', or 'texdocs')
 
     -- at least one of the following fields should exist
-    matches   = {pattern1, pattern2, ...} or {} (for sty and texdocs)
     runtodoc  = true if there is a runfile -> docfile association (for tlpdb)
     tlptodoc  = true if there is a tlp name -> docfile association (for tlpdb)
 
@@ -214,10 +227,25 @@ end
 
 -- merge a second docfile object in, assuming it represents the same file
 function Docfile:mergein(df)
+    local function in_value(tab, val)
+        for _, v in pairs(tab) do
+            if v == val then
+                return true
+            end
+        end
+        return false
+    end
+
     for k, v in pairs(df) do
         if k == 'matches' then
-            for _, m in ipairs(df.matches or {}) do
-                table.insert(self.matches, m)
+            for _, m in ipairs(df[k] or {}) do
+                table.insert(self[k], m)
+            end
+        elseif k == 'sources' then
+            for _, s in ipairs(df[k] or {}) do
+                if not in_value(self[k], s) then
+                    table.insert(self[k], s)
+                end
             end
         else
             self[k] = v
@@ -268,8 +296,12 @@ function Docfile:get_basename()
     return self.name:gsub('.*/', '')
 end
 
--- for interface consistency, matches should always be a table, never nil
+-- for interface consistency, matches and sources should always be a table, never nil
 function Docfile:get_matches()
+    return {}
+end
+
+function Docfile:get_sources()
     return {}
 end
 
@@ -303,11 +335,7 @@ local function process_file(patlist, file, pathfile, code)
                 tree = code,
                 pattern = pattern,
             }
-            if docfile then
-                docfile:mergein(Docfile:new(info))
-            else
-                docfile = Docfile:new(info)
-            end
+            docfile = Docfile:new(info)
         end
     end
     return docfile
@@ -318,7 +346,7 @@ local function scan_db(patlist, code, lsr_db)
     for file, basename in pairs(lsr_db) do
         local df = process_file(patlist, basename, file, code)
         if df then
-            df.source = 'texdocs'
+            table.insert(df.sources, 'texdocs')
             s_doclist:add(df)
         end
     end
@@ -477,7 +505,7 @@ local function get_doclist_sty(patlist)
             local df = Docfile:new({
                 name = file,
                 tree = -1,
-                source = 'sty',
+                sources = {'sty'},
                 pattern = pat,
             })
             s_doclist:add(df)
@@ -683,7 +711,7 @@ get_doclist_tlpdb = function(pattern)
                 s_doclist:add(Docfile:new{
                     name = file,
                     tree = 0,
-                    source = 'tlpdb',
+                    sources = {'tlpdb'},
                     runtodoc = true,
                 })
             end
@@ -695,7 +723,7 @@ get_doclist_tlpdb = function(pattern)
             s_doclist:add(Docfile:new{
                 name = file,
                 tree = 0,
-                source = 'tlpdb',
+                sources = {'tlpdb'},
                 tlptodoc = true,
             })
         end
