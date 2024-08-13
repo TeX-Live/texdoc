@@ -4,8 +4,6 @@ RSpec.describe "The shipped texdoc.cnf", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 
-  let(:texdoc_cnf) { texmf_home / "texdoc/texdoc.cnf" }
-  let(:texdoc_dist_cnf) { texmf_home / "texdoc/texdoc-dist.cnf" }
 
   context "when it loaded" do
     before(:each) { run_texdoc "-dconfig", "-lI", "texlive-en" }

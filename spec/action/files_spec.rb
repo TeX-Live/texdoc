@@ -27,13 +27,13 @@ RSpec.describe 'The "files" action', :type => :aruba do
 
   context "the output" do
     # known files
-    let(:texdoclib) { texmf_home / "scripts/texdoc/texdoclib.tlu" }
+    let(:texdoclib) { ps_texmf_home / "scripts/texdoc/texdoclib.tlu" }
 
-    let(:dist_texdoc_dist_cnf) { texmf_dist / "texdoc/texdoc-dist.cnf" }
-    let(:dist_texdoc_cnf) { texmf_dist / "texdoc/texdoc.cnf" }
+    let(:dist_texdoc_dist_cnf) { ps_texmf_dist / "texdoc/texdoc-dist.cnf" }
+    let(:dist_texdoc_cnf) { ps_texmf_dist / "texdoc/texdoc.cnf" }
 
-    let(:home_texdoc_dist_cnf) { texmf_home / "texdoc/texdoc-dist.cnf" }
-    let(:home_texdoc_cnf) { texmf_home / "texdoc/texdoc.cnf" }
+    let(:home_texdoc_dist_cnf) { ps_texmf_home / "texdoc/texdoc-dist.cnf" }
+    let(:home_texdoc_cnf) { ps_texmf_home / "texdoc/texdoc.cnf" }
 
     # message
     let(:version_info) { "#{normalize_path(texdoclib)} #{version}" }
@@ -51,7 +51,7 @@ RSpec.describe 'The "files" action', :type => :aruba do
     end
 
     context "with normal setting" do
-      before(:each) { set_environment_variable "TEXMFDIST", texmf_dist.to_s }
+      before(:each) { set_environment_variable "TEXMFDIST", ps_texmf_dist.to_s }
       before(:each) { run_texdoc "-f" }
 
       it "should contain version information" do
@@ -78,7 +78,7 @@ RSpec.describe 'The "files" action', :type => :aruba do
     end
 
     context "with verbose setting" do
-      before(:each) { set_environment_variable "TEXMFDIST", texmf_dist.to_s }
+      before(:each) { set_environment_variable "TEXMFDIST", ps_texmf_dist.to_s }
       before(:each) { run_texdoc "-vf" }
 
       it "should contain version information" do

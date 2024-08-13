@@ -5,15 +5,13 @@ RSpec.describe "Alias", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 
-  let(:test_texdoc_cnf) { texmf_home / "texdoc/texdoc.cnf" }
-
   context "is set in texdoc.cnf" do
     let(:config_content) {
       <<~EOF
         alias testalias = texlive
       EOF
     }
-    before(:each) { File.write(test_texdoc_cnf, config_content) }
+    before(:each) { File.write(texdoc_cnf, config_content) }
 
     let(:test_res_name) { "texlive/texlive-en/texlive-en.pdf" }
     let(:test_res_hash) { Digest::MD5.hexdigest(test_res_name)[0, 7] }

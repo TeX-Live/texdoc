@@ -4,8 +4,6 @@ RSpec.describe "Config files for Texdoc", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 
-  let(:texdoc_cnf) { texmf_home / "texdoc/texdoc.cnf" }
-
   context "config lines in texdoc.cnf" do
     let(:config_content) {
       <<~EOF

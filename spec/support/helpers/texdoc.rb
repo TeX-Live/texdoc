@@ -12,15 +12,15 @@ module SpecHelplers
 
     TMP_DIR = BASE_DIR / "tmp"
 
-    REPO_TEXMF = TMP_DIR / "texmf"
+    REPO_TEXMF_HOME = TMP_DIR / "texmf"
     REPO_TEXMF_DIST = TMP_DIR / "texmf-dist"
-    REPO_TEXLIVE_TLPDB = TMP_DIR / "texlive.tlpdb"
+    REPO_TEXLIVE_TLPDB = TMP_DIR / "texlive.tlpdb"  # used in shared_context/texmf_context.rb
 
     # for testing
     HOME_DIR = TMP_DIR / "aruba"
 
-    PS_TEXMF = HOME_DIR / "texmf"
-    PS_TEXMF_DIST = HOME_DIR / "texmf-dist"
+    PS_TEXMF_HOME = HOME_DIR / "texmf"
+    PS_TEXMF_DIST = HOME_DIR / "texmf-dist"  # used in shared_context/texmf_context.rb
     PS_TEXMF_VAR = HOME_DIR / "texmf-var"
 
     # mock
@@ -38,10 +38,10 @@ module SpecHelplers
 
     # setup TEXMF trees
     def setup_texmf_trees
-      FileUtils.cp_r(REPO_TEXMF, HOME_DIR)
+      FileUtils.cp_r(REPO_TEXMF_HOME, HOME_DIR)
       FileUtils.cp_r(REPO_TEXMF_DIST, HOME_DIR)
 
-      set_environment_variable "TEXMFHOME", PS_TEXMF.to_s
+      set_environment_variable "TEXMFHOME", PS_TEXMF_HOME.to_s
       set_environment_variable "TEXMFVAR", PS_TEXMF_VAR.to_s
       # WARNING: leave TEXMFDIST as is for searching local TeX Live docs
     end

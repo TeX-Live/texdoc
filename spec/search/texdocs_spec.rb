@@ -32,8 +32,8 @@ RSpec.describe "Handling texdocs", :type => :aruba do
   context "with standard testing setup" do
     before(:each) { run_texdoc "-dtexdocs", "listings" }
 
-    let(:texmf_dist_regex) { Regexp.escape(normalize_path(`kpsewhich -var-value TEXMFDIST`.chomp)) }
-    let(:texmf_home_regex) { Regexp.escape(normalize_path(texmf_home)) }
+    let(:texmf_dist_regex) { Regexp.escape(normalize_path(texmf_dist)) }
+    let(:texmf_home_regex) { Regexp.escape(normalize_path(ps_texmf_home)) }
 
     let(:path_doc_suffix_regex) { Regexp.escape(normalize_path("/doc")) }
     let(:shift_doc_suffix_regex) { Regexp.escape(normalize_path("doc/")) }

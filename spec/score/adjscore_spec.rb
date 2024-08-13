@@ -4,8 +4,6 @@ RSpec.describe "Directive adjscore", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 
-  let(:texdoc_cnf) { texmf_home / "texdoc/texdoc.cnf" }
-
   context "global pattern score adjustment" do
     let(:config_content) {
       <<~EOF

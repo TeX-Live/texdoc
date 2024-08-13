@@ -8,16 +8,13 @@ RSpec.describe "Configuration item", :type => :aruba do
 
   context "texlive_tlpdb" do
     context "to set custom path" do
-      before(:each) { set_environment_variable "TEXMFVAR", texmf_var.to_s }
       before(:each) {
-        run_texdoc "-dtlpdb", "-c texlive_tlpdb=#{tlpdb.to_s}", "texlive-en"
+        run_texdoc "-dtlpdb", "-c texlive_tlpdb=#{ps_tlpdb.to_s}", "texlive-en"
       }
-
-      after(:each) { FileUtils.remove_dir(texmf_var) }
 
       it "should be effective" do
         expect(stderr).to include(
-          debug_line "tlpdb", "Getting data from tlpdb file #{tlpdb.to_s}")
+          debug_line "tlpdb", "Getting data from tlpdb file #{ps_tlpdb.to_s}")
       end
     end
 
