@@ -7,7 +7,7 @@ shared_context "texmf" do
   let(:ps_texmf_dist) { SpecHelplers::Texdoc::PS_TEXMF_DIST }
 
   # the only real TEXMF tree
-  let(:texmf_dist) { `kpsewhich --var-value TEXMFDIST`.chomp }
+  let(:texmf_dist) { Pathname(`kpsewhich --var-value TEXMFDIST`.chomp) }
 
   # link to texlive.tlpdb
   let(:ps_tlpdb) { SpecHelplers::Texdoc::REPO_TEXLIVE_TLPDB }
