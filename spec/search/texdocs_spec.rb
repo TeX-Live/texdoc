@@ -58,18 +58,19 @@ end
 
 RSpec.describe "Document search in texdocs", :type => :aruba do
   include_context "messages"
+  include_context "texmf"
 
   context "for a docfile name query" do
     let(:test_res_name) { "latex/babel/babel-code.pdf" }
     let(:test_res_hash) { "4abb904" }
-    let(:test_res_realpath) { Regexp.escape(normalize_path(test_res_name)) }
+    let(:test_res_realpath) { normalize_path(texmf_dist / "doc" / test_res_name) }
 
     let(:test_query) { "babel-code" }
     before(:each) { run_texdoc "-ddocfile", test_query }
 
     it "should find the document" do
       expect(stderr).to include(debug_line "search", "Searching documents for pattern \"#{test_query}\"")
-      expect(stderr).to match(/#{debug_line "search"} \(#{test_res_hash}\) File \S*#{test_res_realpath} found/)
+      expect(stderr).to include(debug_line "search", "(#{test_res_hash}) File #{test_res_realpath} found")
       expect(stderr).to include(debug_line "docfile", "(#{test_res_hash}) name: #{test_res_name}")
       expect(stderr).to include(debug_line "docfile", "(#{test_res_hash}) matches: #{test_query}")
       expect(stderr).to include(debug_line "docfile", "(#{test_res_hash}) sources: texdocs")
