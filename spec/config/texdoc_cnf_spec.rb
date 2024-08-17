@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "Config files for Texdoc", :type => :aruba do
+RSpec.describe "In config files for Texdoc", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 

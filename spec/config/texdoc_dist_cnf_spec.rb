@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "The shipped texdoc.cnf", :type => :aruba do
+RSpec.describe "In the shipped texdoc.cnf", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 

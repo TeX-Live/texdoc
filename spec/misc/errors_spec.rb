@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "Errors", :type => :aruba do
+RSpec.describe "Errors:", :type => :aruba do
   include_context "messages"
 
   context "when any document for input cannot be found" do

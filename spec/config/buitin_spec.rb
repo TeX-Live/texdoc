@@ -1,7 +1,7 @@
 require 'os'
 require 'spec_helper'
 
-RSpec.describe "The build-in config", :type => :aruba do
+RSpec.describe "The built-in configs", :type => :aruba do
   include_context "messages"
 
   context "if no other sources of config is set" do

@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe "File detection for viewing", :type => :aruba do
+RSpec.describe "File type", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 
-  context "File *.html" do
+  context "*.html" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_html
     end
@@ -16,7 +16,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.htm" do
+  context "*.htm" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_htm
     end
@@ -28,7 +28,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.dvi" do
+  context "*.dvi" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_dvi
     end
@@ -40,7 +40,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.md" do
+  context "*.md" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_md
     end
@@ -52,7 +52,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.txt" do
+  context "*.txt" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_txt
     end
@@ -64,7 +64,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.pdf" do
+  context "*.pdf" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_pdf
     end
@@ -76,7 +76,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.ps" do
+  context "*.ps" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_ps
     end
@@ -88,7 +88,7 @@ RSpec.describe "File detection for viewing", :type => :aruba do
     end
   end
 
-  context "File *.tex" do
+  context "*.tex" do
     before(:each) do
       run_texdoc "-dview --just-view", sample_tex
     end

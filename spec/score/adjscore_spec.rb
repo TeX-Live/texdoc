@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe "Directive adjscore", :type => :aruba do
+RSpec.describe "Score adjustment", :type => :aruba do
   include_context "messages"
   include_context "texmf"
 
-  context "global pattern score adjustment" do
+  context "for global pattern" do
     let(:config_content) {
       <<~EOF
         stopalias texlive-en
@@ -26,7 +26,7 @@ RSpec.describe "Directive adjscore", :type => :aruba do
     end
   end
 
-  context "global pattern score adjustment for aliased name" do
+  context "for global pattern of an aliased name" do
     let(:config_content) {
       <<~EOF
         adjscore texlive-en = 7.3
@@ -47,7 +47,7 @@ RSpec.describe "Directive adjscore", :type => :aruba do
     end
   end
 
-  context "specific pattern score adjustment" do
+  context "for specific pattern" do
     let(:config_content) {
       <<~EOF
         adjscore(live) texlive-en = -2
@@ -68,7 +68,7 @@ RSpec.describe "Directive adjscore", :type => :aruba do
     end
   end
 
-  context "specific pattern score adjustment for unmatch name" do
+  context "for specific pattern of an unmatch name" do
     let(:config_content) {
       <<~EOF
         adjscore(live) texlive-en = -2
