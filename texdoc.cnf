@@ -465,6 +465,7 @@ alias(0.1) fontinst = fontinstallationguide
 alias hyperref-dev = hyperref.pdf
 alias iso = isoman
 alias knuth-pdf = knuth-pdf/index.pdf
+alias kpsewhich = kpathsea
 alias kvoptions-patch = kvoptions  # XXX?
 alias layouts = layman
 alias lettrine = lettrine          # to hide context/third/lettrine-doc.pdf
