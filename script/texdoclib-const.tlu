@@ -63,14 +63,26 @@ __texdoc() {
     + debug
     {{debug}}
   )
-  _arguments -C -A $options \
-    '*: :->arguments' && return
-  case $state in
-    arguments)
-      local tlpdb="$(kpsewhich -var-value TEXMFROOT)/tlpkg/texlive.tlpdb"
-      _values package $(awk '/^name[^.]*$/ {print $2}' $tlpdb)
-    ;;
-  esac
+  _arguments -C -A $options '*:document:__texdoc_argument'
+}
+
+__texdoc_argument() {
+  _alternative \
+    "files:local documents:$(__texdoc_massage __texdoc_localfiles)" \
+    "aliases:aliases:$(__texdoc_massage __texdoc_aliases)" \
+    "packages:packages:$(__texdoc_massage __texdoc_packages)" \
+    "pdf:documents:$(__texdoc_massage __texdoc_lsr pdf)" \
+}
+
+# stdout of $@ is split at linebreaks, ordered, element-wise quoted, space joined, and ripped of empty words
+__texdoc_massage() { echo \(${(j: :)${(@q)${(ou)${(f)"$($@ 2>/dev/null)"}}}:#"''"}\) }
+
+__texdoc_localfiles() { find -L "$(kpsewhich -var-value TEXMFHOME)/doc" -type f -printf '%f\n' }
+__texdoc_aliases() { sed -n 's/^alias[^ ]* \(.*\) = .*$/\1/p' "${(f@)"$(texdoc --files|sed -n 's/^\s\+active\s\+//p')"}" }
+__texdoc_lsr() { grep -h "\\.$1$" "${(f@)"$(kpsewhich -all ls-R)"}" }
+__texdoc_packages() { # Use texlive.tlpdb if it exists, otherwise fallback to texdoc's own data
+  sed -n '/\./!s/^name //p' "${(f@)"$(kpsewhich -all -cnf-line='TEXINPUTS={$TEXMFROOT,$TEXMFHOME}/tlpkg' -format=tex texlive.tlpdb)"}" \
+  || sed -n 's/^  \["\([^"]*\)"\] = {$/\1/p' "$(kpsewhich Data.tlpdb.lua)"
 }
 
 if [[ $zsh_eval_context[-1] == loadautofunc ]]; then
