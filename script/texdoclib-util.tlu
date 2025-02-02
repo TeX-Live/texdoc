@@ -241,6 +241,7 @@ function M.print_zsh_completion()
             elseif type(opt['complete']) == 'table' then
                 choices = opt['complete']
             end
+            table.sort(choices)
             complete = '(' .. table.concat(choices, ' ') .. ')'
             if opt['complete'] == 'files' then
                 opt['metavar'] = ' '
