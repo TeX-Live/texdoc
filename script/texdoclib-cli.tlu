@@ -58,14 +58,10 @@ local function getopt(arg, options)
                     end
 
                     -- check the existence of an argument
-                    if not tmp then
+                    if not tmp or tmp:match('^%-') then
                         err_print('error',
                             'Option -%s requires an argument.', jopt)
                         os.exit(C.exit_error)
-                    end
-
-                    if tmp:match('^%-') then
-                        table.insert(tab, {jopt, false})
                     else
                         table.insert(tab, {jopt, tmp})
                     end
