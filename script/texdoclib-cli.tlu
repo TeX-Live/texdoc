@@ -117,7 +117,7 @@ local function parse_options()
             else
                 return true, option['long'], cl_config
             end
-        elseif option~=nil and option['group'] then
+        elseif option ~= nil and option['group'] then
             if option['type'] == 'boolean' then
                 option['action'](cl_config, curr_arg)
             elseif option['type'] == 'string' then
