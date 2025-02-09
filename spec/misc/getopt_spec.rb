@@ -112,7 +112,7 @@ RSpec.describe "The command-line option parser", :type => :aruba do
   end
 
   # error cases
-  context "running without any option nor argument" do
+  context "without any option nor argument" do
     before(:each) { run_texdoc }
 
     it 'should result in the "no action" error' do
@@ -133,6 +133,15 @@ RSpec.describe "The command-line option parser", :type => :aruba do
 
   context "missing arguments for Option -c" do
     before(:each) { run_texdoc "-c" }
+
+    it "should result in a getopt parser error" do
+      expect(last_command_started).to have_exit_status(1)
+      expect(stderr).to include(error_line "Option -c requires an argument.")
+    end
+  end
+
+  context "missing arguments for Option -c, followed by other options" do
+    before(:each) { run_texdoc "-c", "--help" }
 
     it "should result in a getopt parser error" do
       expect(last_command_started).to have_exit_status(1)
