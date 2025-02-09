@@ -27,7 +27,7 @@ RSpec.describe 'The "print completion" action', :type => :aruba do
 
     it 'should result in the "missing shell operand" error' do
       expect(last_command_started).to have_exit_status(1)
-      expect(stderr).to include(error_line "unrealistic-sh is not supported currently!")
+      expect(stderr).to include(error_line "unrealistic-sh is currently not supported.")
     end
   end
 

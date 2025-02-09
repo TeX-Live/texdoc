@@ -168,7 +168,7 @@ local function do_action(action)
             texdoc.util.print_zsh_completion()
             os.exit(C.exit_ok)
         else
-            err_print('error', arg[1] .. ' is not supported currently!')
+            err_print('error', arg[1] .. ' is currently not supported.')
             os.exit(C.exit_error)
         end
     end
