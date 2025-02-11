@@ -105,7 +105,7 @@ Source: <https://github.com/TeX-Live/texdoc>
 
 ## COPYRIGHT
 
-Copyright 2008-2024 Manuel Pe'gourie'-Gonnard, Takuto Asakura, the TeX Live Team.  
+Copyright 2008-2025 Manuel Pe'gourie'-Gonnard, Takuto Asakura, the TeX Live Team.  
 License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.  
 This is free software: you are free to change and redistribute it.
 

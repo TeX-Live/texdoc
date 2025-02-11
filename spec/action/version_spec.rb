@@ -8,7 +8,7 @@ RSpec.describe 'The "version" action', :type => :aruba do
     <<~EXPECTED
       Texdoc #{version} (#{release_date})
 
-      Copyright 2008-2024 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
+      Copyright 2008-2025 Manuel Pégourié-Gonnard, Takuto Asakura, the TeX Live Team.
       License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
       This is free software: you are free to change and redistribute it.
     EXPECTED
