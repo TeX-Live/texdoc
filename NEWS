@@ -2,7 +2,7 @@ NEWS for Texdoc
 ===============
 (This file public domain.)
 
-Version 4.1.1 (2025-02-09)
+Version 4.1.1 (2025-02-11)
 --------------------------
 - New debug category "docfile"
 - Improve zsh completion function (by Markus Kurtz)
