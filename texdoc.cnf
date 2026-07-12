@@ -333,6 +333,10 @@ alias structuredlog = ltfilehook-doc
 alias xparse = usrguide
 # TODO: try to avoid the huge amount of false positives for `doc' itself.
 
+# latex-firstaid special cases (see #135)
+alias latex-firstaid = latex2e-first-aid-for-external-files
+alias latex-first-aid = latex2e-first-aid-for-external-files
+
 # latex-dev instruction
 alias latex-dev = latex/base/ltnews30
 alias(9) latex-dev = latex-dev.man1
