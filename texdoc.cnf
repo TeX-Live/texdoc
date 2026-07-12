@@ -471,6 +471,7 @@ alias layouts = layman
 alias lettrine = lettrine          # to hide context/third/lettrine-doc.pdf
 alias llmk = light-latex-make/llmk
 alias(2) llmk = light-latex-make/README
+alias lmodern = lm-info
 alias mathfont = mathfont_user_guide
 alias mktexfmt = kpathsea
 alias mktexlsr = kpathsea
