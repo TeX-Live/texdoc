@@ -231,7 +231,11 @@ local function setup_config_from_env()
             local value = os.getenv(var)
 
             -- support colon-separated list
-            value = value and string.gmatch(value, '([^:]+)')()
+            if os.type == 'windows' then
+                value = value and string.gmatch(value, '([^;]+)')()
+            else
+                value = value and string.gmatch(value, '([^:]+)')()
+            end
 
             if value then
                 set_config_element(key, value, {src='env', name=var})
