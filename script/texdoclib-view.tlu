@@ -330,12 +330,12 @@ function M.deliver_results(name, doclist, many)
 
     -- view result or show menu based on mode and number of results
     if (mode == 'view' and doclist[1] and doclist[1]:get_quality() == 'good') or
-        (mode == 'mixed' and
+        (mode == 'mixed' and doclist[1] and
             (not doclist[2] or doclist[2]:get_quality() ~= 'good')
         )
     then
         view_doc(doclist[1])
-    elseif mode ~= 'view' then
+    elseif mode ~= 'view' and doclist[1] then
         if many and not texdoc.config.get_value('machine_switch') then
             print('*** Results for: ' .. name .. ' ***')
         end
