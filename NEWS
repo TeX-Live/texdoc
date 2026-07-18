@@ -2,6 +2,11 @@ NEWS for Texdoc
 ===============
 (This file public domain.)
 
+Version 4.1.2 (2026-07-19)
+--------------------------
+- Some bug fixes
+- Scoring adjustments
+
 Version 4.1.1 (2025-02-11)
 --------------------------
 - New debug category "docfile"
