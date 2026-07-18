@@ -270,10 +270,10 @@ local function search_online(name, doclist)
         io.stderr:write(msg .. '') -- cast to string
     end
     -- Fuzzy heuristic to see if the user has _any_ local documentation
-    local kpathsea_docs = texdoc.search.get_doclist("kpathsea")
+    local kpathsea_docs = texdoc.search.get_doclist('kpathsea')
     local docs_installed = kpathsea_docs[1] and
-                           kpathsea_docs[1].basename == "kpathsea.pdf" and
-                           not os.getenv("TEXDOC_NO_LOCAL_DOCS")
+                           kpathsea_docs[1].basename == 'kpathsea.pdf' and
+                           not os.getenv('TEXDOC_NO_LOCAL_DOCS')
 
     if docs_installed and doclist[1] then
         write(C.badmatch_msg:gsub(C.badmatch_msg_ph, name))
@@ -295,18 +295,21 @@ local function search_online(name, doclist)
     write(C.online_msg:gsub(C.online_msg_url, url)
                       :gsub(C.online_msg_ph, name))
 
+    local ans
     if docs_installed and doclist[1] then
         write(C.badmatch_prompt)
+        ans = io.read('*line')
+        if ans:match('^\r?[yY]') then
+            M.view_file(url)
+        elseif tonumber(ans) then
+            view_doc(doclist[tonumber(ans)])
+        end
     else
         write(C.nolocaldocs_prompt)
-    end
-
-    local ans = io.read('*line')
-
-    if ans:match('^\r?[yY]') then
-        M.view_file(url)
-    elseif tonumber(ans) then
-        view_doc(doclist[tonumber(ans)])
+        ans = io.read('*line')
+        if ans:match('^\r?[yY]') then
+            M.view_file(url)
+        end
     end
 end
 
