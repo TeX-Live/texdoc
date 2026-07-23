@@ -158,6 +158,9 @@ adjscore /latex-dev/ = -2
 # but they're still slightly better than other results with negative scores
 adjscore readme = +0.1
 
+# auto-generated README file shopuld not be preferred
+adjscore readme.texlive = -10
+
 ## Specific adjustments
 
 # 'texdoc' may look like "tex's documentation" but it isn't; 'tex-*' as well
