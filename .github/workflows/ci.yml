@@ -16,27 +16,27 @@ jobs:
     timeout-minutes: 30
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
 
     - if: matrix.os == 'ubuntu-latest'
       name: Set up PATH on Linux
-      run: echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
+      run: echo "/tmp/texlive/bin/x86_64-linux" >> "$GITHUB_PATH"
 
     - if: matrix.os == 'macos-latest'
       name: Set up PATH on macOS
-      run: echo "/tmp/texlive/bin/universal-darwin" >> $GITHUB_PATH
+      run: echo "/tmp/texlive/bin/universal-darwin" >> "$GITHUB_PATH"
 
     - if: matrix.os == 'windows-latest'
       name: Set up PATH on Windows
-      run: echo "D:\texlive\bin\windows" >> $GITHUB_PATH
+      run: echo "D:\texlive\bin\windows" >> "$GITHUB_PATH"
       shell: bash
 
     - if: matrix.os != 'windows-latest'
       name: Cache TeX Live on Unix
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       id: cache-texlive-unix
       with:
         path: /tmp/texlive
@@ -46,7 +46,7 @@ jobs:
 
     - if: matrix.os == 'windows-latest'
       name: Cache TeX Live on Windows
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       id: cache-texlive-windows
       with:
         path: D:\texlive
@@ -55,7 +55,7 @@ jobs:
           ${{ runner.os }}-texlive-
 
     - name: Cache RubyGems
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       id: cache-gems
       with:
         path: vendor/bundle
