@@ -61,7 +61,7 @@ local function context_to_string(context)
     elseif context.src == 'def' then
         return 'from built-in defaults'
     else
-        return 'from unkown source (should not happen, please report)'
+        return 'from unknown source (should not happen, please report)'
     end
 end
 
@@ -380,7 +380,7 @@ function M.show_config_files(is_action)
     local w32_path = import_function('util', 'w32_path')
     local dbg_print = import_function('util', 'dbg_print')
 
-    -- controled print_func
+    -- controlled print_func
     local indent = is_action and '    ' or ''
     local print_func = is_action and print
         or function(s) dbg_print('files', s) end

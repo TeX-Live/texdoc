@@ -8,7 +8,7 @@ shared_context "messages" do
     "Try `texdoc --help' for short help, `texdoc texdoc' for full manual."
   }
 
-  # functions for output line genaration
+  # functions for output line generation
   def error_line msg
     return "texdoc error: #{msg}"
   end

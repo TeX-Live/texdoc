@@ -104,7 +104,7 @@ function M.view_file(filename)
             os.exit(C.exit_error)
         end
 
-        -- it is necessary to sleep a few secounds. Otherwise, the temporary
+        -- it is necessary to sleep a few seconds. Otherwise, the temporary
         -- file could be removed before opening it.
         viewer_replacement = tmpfile .. '; sleep 2; ' ..
             texdoc.config.get_value('rm_file') .. ' ' ..tmpfile .. '; ' ..

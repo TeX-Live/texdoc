@@ -35,7 +35,7 @@ end
 -- load texdoclib for tests bellow
 local texdoc = require('texdoclib')
 
--- Are all submodules sucessfully loaded?
+-- Are all submodules successfully loaded?
 do
     local names = {
         'const',

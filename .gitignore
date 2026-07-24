@@ -24,7 +24,7 @@
 .bundle
 vendor/*
 
-# Temporaly
+# Temporary
 tmp/*
 texdoc-*.zip
 

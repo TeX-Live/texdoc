@@ -31,7 +31,7 @@ local vanilla -- is this a vanilla TL or a re-package one without tlpdb?
 
 -- find the TeX Live root
 local function get_tlroot()
-    local tlroot = kpse.expand_path('$TEXMFROOT') -- it should be exisitng one
+    local tlroot = kpse.expand_path('$TEXMFROOT') -- it should be existing one
     get_tlroot = function() return tlroot end
     return tlroot
 end
@@ -40,7 +40,7 @@ end
 -- (or known basename according to basename_list)
 local function check_ext(file)
     file = file:lower()
-    -- has a known extention?
+    -- has a known extension?
     if texdoc.util.get_ext(file) ~= nil then
         return true
     end
@@ -517,7 +517,7 @@ end
 
 -- tlpdb means TeX Live Package DataBase and tlp means TeX Live Package
 
--- return an iterator that ouputs the keys in order
+-- return an iterator that outputs the keys in order
 local function opairs(t)
     local tkeys = {}
 
