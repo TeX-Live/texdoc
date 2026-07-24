@@ -23,15 +23,15 @@ jobs:
 
     - if: matrix.os == 'ubuntu-latest'
       name: Set up PATH on Linux
-      run: echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
+      run: echo "/tmp/texlive/bin/x86_64-linux" >> "$GITHUB_PATH"
 
     - if: matrix.os == 'macos-latest'
       name: Set up PATH on macOS
-      run: echo "/tmp/texlive/bin/universal-darwin" >> $GITHUB_PATH
+      run: echo "/tmp/texlive/bin/universal-darwin" >> "$GITHUB_PATH"
 
     - if: matrix.os == 'windows-latest'
       name: Set up PATH on Windows
-      run: echo "D:\texlive\bin\windows" >> $GITHUB_PATH
+      run: echo "D:\texlive\bin\windows" >> "$GITHUB_PATH"
       shell: bash
 
     - if: matrix.os != 'windows-latest'
