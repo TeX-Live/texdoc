@@ -47,7 +47,7 @@ RSpec.describe "In config files for Texdoc", :type => :aruba do
     end
   end
 
-  context "containes invalid line" do
+  context "contains invalid line" do
     let(:config_content) {
       <<~EOF
         XXX

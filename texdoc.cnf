@@ -158,7 +158,7 @@ adjscore /latex-dev/ = -2
 # but they're still slightly better than other results with negative scores
 adjscore readme = +0.1
 
-# auto-generated README file shopuld not be preferred
+# auto-generated README file should not be preferred
 adjscore readme.texlive = -10
 
 ## Specific adjustments

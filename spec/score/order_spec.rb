@@ -19,7 +19,7 @@ RSpec.describe "Document order in the result", :type => :aruba do
     end
   end
 
-  context "for documents with the same scores and different extentions" do
+  context "for documents with the same scores and different extensions" do
     before(:each) { run_texdoc "-lM", "texlive-en" }
 
     let(:res_list_head) do
@@ -29,7 +29,7 @@ RSpec.describe "Document order in the result", :type => :aruba do
       EXPECTED
     end
 
-    it "should be ordered by the extention position" do
+    it "should be ordered by the extension position" do
       expect(stdout).to start_with(res_list_head)
     end
   end
